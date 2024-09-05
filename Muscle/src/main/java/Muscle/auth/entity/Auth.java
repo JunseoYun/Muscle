@@ -1,0 +1,60 @@
+package Muscle.auth.entity;
+
+
+import lombok.Builder;
+import lombok.Data;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+
+import jakarta.persistence.*;
+@Table(name="auth")
+@Entity
+@Getter
+@NoArgsConstructor
+@Data
+public class Auth {
+    @Id
+    @GeneratedValue(strategy = GenerationType.AUTO)
+    private Long id;
+
+    @Column(name="email")
+    private String email;
+
+    @Column(name="password")
+    private String password;
+
+    @Column(name="name")
+    private String name;
+
+    @Column(name="nickName")
+    private String nickName;
+
+
+    @Column(name="salt")
+    private String salt;
+
+    @Column(name = "userImg")
+    private String userImg;
+
+    @Builder
+    public Auth(String email, String password, String name, String nickName, String salt, String userImg){
+        this.email = email;
+        this.password = password;
+        this.name = name;
+        this.nickName = nickName;
+        this.salt = salt;
+        this.userImg = userImg;
+    }
+
+    public void update(String password, String name, String nickName, String salt) {
+        this.password = password;
+        this.name = name;
+        this.nickName = nickName;
+        this.salt = salt;
+    }
+
+    public void changePassword(String password, String salt){
+        this.password = password;
+        this.salt = salt;
+    }
+}
