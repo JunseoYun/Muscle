@@ -49,7 +49,7 @@ public class EmailService {
     //mail을 어디서 보내는지, 어디로 보내는지 , 인증 번호를 html 형식으로 어떻게 보내는지 작성합니다.
     public String writeEmail(String email) {
         makeRandomNumber();
-        String setFrom = "musclepj24@gmail.com"; // email-config에 설정한 자신의 이메일 주소를 입력
+        String setFrom = "musclepj24@naver.com"; // email-config에 설정한 자신의 이메일 주소를 입력
         String toMail = email;
         String title = "Muscle 가입 인증 이메일입니다."; // 이메일 제목
         String content =
