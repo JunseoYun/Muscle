@@ -51,6 +51,13 @@ public class RequestAuth {
 
     @Builder
     @Data
+    public static class SetUserLevelDto {
+        @NotNull
+        private String level;
+    }
+
+    @Builder
+    @Data
     public static class ChangePasswordDto{
         @NotNull
         private String password;

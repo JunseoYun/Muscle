@@ -21,6 +21,7 @@ import java.io.IOException;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.util.Date;
+import java.util.Objects;
 import java.util.Optional;
 
 @Service
@@ -111,6 +112,41 @@ public class AuthService implements AuthServiceInterface {
 
     @Override
     @Transactional
+    public void setUserLevel(Optional<String> token, String level) {
+        String email = null;
+        if (token.isPresent()) {
+            JwtAuthToken jwtAuthToken = jwtAuthTokenProvider.convertAuthToken(token.get());
+            email = jwtAuthToken.getClaims().getSubject();
+        }
+        Auth user = authRepository.findByEmail(email);
+        if(user == null)
+            throw new NotFoundUserException();
+        if(Objects.equals(user.getLevel(), level)) {
+            throw new RegisterFailedException();
+        }
+        user.setUserLevel(level);
+    }
+
+    @Override
+    @Transactional
+    public void updateLevel(Optional<String> token, String level) {
+        String email = null;
+        if (token.isPresent()) {
+            JwtAuthToken jwtAuthToken = jwtAuthTokenProvider.convertAuthToken(token.get());
+            email = jwtAuthToken.getClaims().getSubject();
+        }
+        Auth user = authRepository.findByEmail(email);
+        if(user == null)
+            throw new NotFoundUserException();
+        if(Objects.equals(user.getLevel(), level)) {
+            throw new RegisterFailedException();
+        }
+        user.setUserLevel(level);
+
+    }
+
+    @Override
+    @Transactional
     public void updateUser(Optional<String> token, RequestAuth.UpdateUserDto updateUserDto) {
 
         String email = null;
@@ -150,6 +186,8 @@ public class AuthService implements AuthServiceInterface {
         user.changePassword(encryptedPassword, salt);
         authRepository.save(user);
     }
+
+
 
     @Override
     @Transactional
