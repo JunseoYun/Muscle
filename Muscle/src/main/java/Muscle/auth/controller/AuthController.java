@@ -48,11 +48,27 @@ public class AuthController {
         return ResponseEntity.status(HttpStatus.OK).body(responseMessage);
     }
 
+    @PutMapping("/setUserLevel")
+    public ResponseEntity<ResponseMessage> setUserLevel(HttpServletRequest request, @Valid @RequestBody RequestAuth.SetUserLevelDto setUserLevelDto) {
+        Optional<String> token = null;
+        if (request != null) {
+            token = jwtAuthTokenProvider.getAuthToken(request);
+        }
+        authService.setUserLevel(token, setUserLevelDto);
+
+        ResponseMessage responseMessage = ResponseMessage.builder()
+                .message("User level set successfully.")
+                .build();
+        return ResponseEntity.status(HttpStatus.OK).body(responseMessage);
+    }
+
     @PostMapping ("/sendEmail")
     public String sendEmail(@RequestBody @Valid RequestAuth.SendEmailDto sendEmailDto){
         System.out.println("이메일 인증 이메일 :"+sendEmailDto.getEmail());
         return emailService.writeEmail(sendEmailDto.getEmail());
     }
+
+
 
     @PostMapping("/verifyEmail")
     public ResponseEntity<ResponseMessage> verifyEmail(@RequestBody @Valid RequestAuth.VerifyEmailDto verifyEmailDto){
@@ -88,33 +104,6 @@ public class AuthController {
 //                .build();
 //        return ResponseEntity.status(HttpStatus.OK).body(responseDto);
 //    }
-
-    @PostMapping("/setUserLevel")
-    public ResponseEntity<ResponseMessage> setUserLevel(HttpServletRequest request, String level) {
-        Optional<String> token = null;
-        if (request != null) {
-            token = jwtAuthTokenProvider.getAuthToken(request);
-        }
-        authService.setUserLevel(token, level);
-
-        ResponseMessage responseMessage = ResponseMessage.builder()
-                .message("User level set successfully.")
-                .build();
-        return ResponseEntity.status(HttpStatus.OK).body(responseMessage);
-    }
-
-    @PutMapping("/updateLevel")
-    public ResponseEntity<ResponseMessage> updateLevel(HttpServletRequest request, String level) {
-        Optional<String> token = null;
-        if (request != null) {
-            token = jwtAuthTokenProvider.getAuthToken(request);
-        }
-        authService.updateLevel(token, level);
-        ResponseMessage responseMessage = ResponseMessage.builder()
-                .message("User level updated successfully.")
-                .build();
-        return ResponseEntity.status(HttpStatus.OK).body(responseMessage);
-    }
 
 
 

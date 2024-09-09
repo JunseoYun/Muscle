@@ -10,6 +10,7 @@ import jakarta.persistence.*;
 
 import java.time.DayOfWeek;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -47,14 +48,14 @@ public class Post {
     private Long postReportCount = 0L;
 
     @Column(name = "postDate")
-    private LocalDate postDate;
+    private LocalDateTime postDate;
 
     @OneToMany(mappedBy = "post", cascade = CascadeType.REMOVE, orphanRemoval = true)
     private List<Comment> commentList = new ArrayList<>();
 
 
     @Builder
-    public Post(Long writerId, String title, String content, String board, LocalDate postDate) {
+    public Post(Long writerId, String title, String content, String board, LocalDateTime postDate) {
         this.writerId = writerId;
         this.title = title;
         this.content = content;
@@ -62,7 +63,7 @@ public class Post {
         this.postDate = postDate;
     }
 
-    public  void update(String title, String content, LocalDate postDate) {
+    public  void update(String title, String content, LocalDateTime postDate) {
         this.title = title;
         this.content = content;
         this.postDate = postDate;

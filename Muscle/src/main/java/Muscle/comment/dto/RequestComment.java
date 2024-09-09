@@ -7,6 +7,7 @@ import lombok.Data;
 import org.springframework.format.annotation.DateTimeFormat;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 
 public class RequestComment {
@@ -15,7 +16,7 @@ public class RequestComment {
     @Builder
     public static class CreateCommentDto {
         private String commentContent;
-        private LocalDate commentDate;
+        private LocalDateTime commentDate;
         private Long postId;
 
         public static Comment toEntity(CreateCommentDto createCommentDto, Long commentWriterId, Post post) {
@@ -33,7 +34,7 @@ public class RequestComment {
     public static class UpdateCommentDto {
         private Long commentId;
         private String commentContent;
-        private LocalDate commentDate;
+        private LocalDateTime commentDate;
 
         public static Comment toEntity(Comment comment, UpdateCommentDto updateCommentDto) {
             comment.update(updateCommentDto.getCommentContent(), updateCommentDto.getCommentDate());

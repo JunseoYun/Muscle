@@ -68,6 +68,9 @@ public class AuthService implements AuthServiceInterface {
         return Optional.ofNullable(ResponseAuth.LoginUserRsDto.toDto(accessToken));
     }
 
+
+
+
 //    @Override
 //    @Transactional
 //    public String uploadImg(MultipartFile file, Optional<String> token) {
@@ -110,40 +113,6 @@ public class AuthService implements AuthServiceInterface {
         return tempToken.getToken();
     }
 
-    @Override
-    @Transactional
-    public void setUserLevel(Optional<String> token, String level) {
-        String email = null;
-        if (token.isPresent()) {
-            JwtAuthToken jwtAuthToken = jwtAuthTokenProvider.convertAuthToken(token.get());
-            email = jwtAuthToken.getClaims().getSubject();
-        }
-        Auth user = authRepository.findByEmail(email);
-        if(user == null)
-            throw new NotFoundUserException();
-        if(Objects.equals(user.getLevel(), level)) {
-            throw new RegisterFailedException();
-        }
-        user.setUserLevel(level);
-    }
-
-    @Override
-    @Transactional
-    public void updateLevel(Optional<String> token, String level) {
-        String email = null;
-        if (token.isPresent()) {
-            JwtAuthToken jwtAuthToken = jwtAuthTokenProvider.convertAuthToken(token.get());
-            email = jwtAuthToken.getClaims().getSubject();
-        }
-        Auth user = authRepository.findByEmail(email);
-        if(user == null)
-            throw new NotFoundUserException();
-        if(Objects.equals(user.getLevel(), level)) {
-            throw new RegisterFailedException();
-        }
-        user.setUserLevel(level);
-
-    }
 
     @Override
     @Transactional
@@ -166,6 +135,25 @@ public class AuthService implements AuthServiceInterface {
         String encryptedPassword = SHA256Util.getEncrypt(updateUserDto.getPassword(), salt);
         Auth updatedUser = RequestAuth.UpdateUserDto.toEntity(originalUser, updateUserDto, salt, encryptedPassword);
         authRepository.save(updatedUser);
+    }
+
+    @Override
+    @Transactional
+    public void setUserLevel(Optional<String> token, RequestAuth.SetUserLevelDto setUserLevelDto) {
+        String email = null;
+        if (token.isPresent()) {
+            JwtAuthToken jwtAuthToken = jwtAuthTokenProvider.convertAuthToken(token.get());
+            email = jwtAuthToken.getClaims().getSubject();
+        }
+        Auth user = authRepository.findByEmail(email);
+        if(user == null)
+            throw new NotFoundUserException();
+        if(Objects.equals(user.getLevel(), setUserLevelDto.getLevel())) {
+            throw new RegisterFailedException();
+        }
+        Auth levelSetUser = RequestAuth.SetUserLevelDto.toEntity(user, setUserLevelDto);
+
+        authRepository.save(levelSetUser);
     }
 
     @Override

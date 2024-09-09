@@ -7,6 +7,7 @@ import lombok.Getter;
 
 import java.time.DayOfWeek;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -22,7 +23,7 @@ public class ResponsePost {
         private String title;
         private String content;
         private String board;
-        private LocalDate postDate;
+        private LocalDateTime postDate;
         private Long postLikeCount;
         private Long postCommentCount;
         private Boolean isPostLiked;
@@ -59,7 +60,7 @@ public class ResponsePost {
         private Long commentId;
         private Long commentWriterId;
         private String commentContent;
-        private LocalDate commentDate;
+        private LocalDateTime commentDate;
 
         public static CommentListDto toDto(Comment comment) {
             return CommentListDto.builder()
@@ -80,7 +81,7 @@ public class ResponsePost {
         private String title;
         private String content;
         private String board;
-        private LocalDate postDate;
+        private LocalDateTime postDate;
         private Long postLikeCount;
         private Long postCommentCount;
         private Boolean isPostLiked;
@@ -112,7 +113,7 @@ public class ResponsePost {
         private String title;
         private String content;
         private String board;
-        private LocalDate postDate;
+        private LocalDateTime postDate;
         private Long postLikeCount;
         private Long postCommentCount;
         private Boolean isPostLiked;
@@ -144,7 +145,7 @@ public class ResponsePost {
         private String title;
         private String content;
         private String board;
-        private LocalDate postDate;
+        private LocalDateTime postDate;
         private Long postLikeCount;
         private Long postCommentCount;
         private Boolean isPostLiked;

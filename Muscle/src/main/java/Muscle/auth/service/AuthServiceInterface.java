@@ -19,9 +19,8 @@ public interface AuthServiceInterface {
 
     void changePassword(Optional<String> token, String password);
 
-    void setUserLevel(Optional<String> token, String level);
+    void setUserLevel(Optional<String> token, RequestAuth.SetUserLevelDto setUserLevelDto);
 
-    void updateLevel(Optional<String> token, String level);
 
     void updateUser(Optional<String> token, RequestAuth.UpdateUserDto updateUserDto);
 
