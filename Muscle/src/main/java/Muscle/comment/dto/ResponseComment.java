@@ -6,6 +6,7 @@ import lombok.Builder;
 import lombok.Getter;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 public class ResponseComment {
 
@@ -15,7 +16,7 @@ public class ResponseComment {
         private Long commentWriterId;
         private Long commentId;
         private String commentContent;
-        private LocalDate commentDate;
+        private LocalDateTime commentDate;
         private Long postId;
 
         public static GetCommentDto toDto(Comment comment) {
@@ -35,7 +36,7 @@ public class ResponseComment {
         private Long commentWriterId;
         private Long commentId;
         private String commentContent;
-        private LocalDate commentDate;
+        private LocalDateTime commentDate;
         private Long postId;
 
         public static GetAllCommentDto toDto(Comment comment) {

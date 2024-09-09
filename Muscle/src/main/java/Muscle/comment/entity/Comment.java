@@ -10,6 +10,7 @@ import lombok.NoArgsConstructor;
 import jakarta.persistence.*;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 @Table(name = "comment")
 @Entity
@@ -29,21 +30,21 @@ public class Comment {
     private String commentContent;
 
     @Column(name = "commentDate")
-    private LocalDate commentDate;
+    private LocalDateTime commentDate;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "post_id", nullable = false)
     private Post post;
 
     @Builder
-    public Comment(Long commentWriterId, String commentContent, LocalDate commentDate, Post post) {
+    public Comment(Long commentWriterId, String commentContent, LocalDateTime commentDate, Post post) {
         this.commentWriterId = commentWriterId;
         this.commentContent = commentContent;
         this.commentDate = commentDate;
         this.post = post;
     }
 
-    public void update(String commentContent, LocalDate commentDate) {
+    public void update(String commentContent, LocalDateTime commentDate) {
         this.commentContent = commentContent;
         this.commentDate = commentDate;
     }

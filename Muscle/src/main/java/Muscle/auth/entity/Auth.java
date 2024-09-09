@@ -7,6 +7,9 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 import jakarta.persistence.*;
+
+import java.time.LocalDateTime;
+
 @Table(name="auth")
 @Entity
 @Getter
@@ -39,6 +42,17 @@ public class Auth {
     @Column(name = "userImg")
     private String userImg;
 
+    @OneToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "muscleFriend_id")
+    private Auth muscleFriend;
+
+    // 친구 요청 상태 (수락/대기/거절 등)
+    @Enumerated(EnumType.STRING)
+    private FriendshipStatus friendshipStatus;
+
+    // 친구가 된 날짜
+    private LocalDateTime friendshipDate;
+
     @Builder
     public Auth(String email, String password, String name, String nickName, String salt, String userImg){
         this.email = email;
@@ -60,12 +74,11 @@ public class Auth {
         this.level = level;
     }
 
-    public void updateLevel(String level) {
-        this.level = level;
-    }
 
     public void changePassword(String password, String salt){
         this.password = password;
         this.salt = salt;
     }
+
+
 }
