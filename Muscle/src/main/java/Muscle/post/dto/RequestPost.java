@@ -5,6 +5,7 @@ import Muscle.post.entity.Post;
 import lombok.Builder;
 import lombok.Data;
 
+import java.time.LocalDate;
 import java.time.LocalTime;
 
 public class RequestPost {
@@ -15,7 +16,7 @@ public class RequestPost {
         private String title;
         private String content;
         private String board;
-        private LocalTime postDate;
+        private LocalDate postDate;
 
         public static Post toEntity(CreatePostDto createPostDto, Long writerId) {
             return Post.builder()
@@ -33,9 +34,10 @@ public class RequestPost {
         private Long postId;
         private String title;
         private String content;
+        private LocalDate postDate;
 
         public static Post toEntity(Post post, UpdatePostDto updatePostDto) {
-            post.update(updatePostDto.getTitle(), updatePostDto.getContent());
+            post.update(updatePostDto.getTitle(), updatePostDto.getContent(), updatePostDto.getPostDate());
             return post;
         }
     }
