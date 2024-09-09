@@ -29,7 +29,10 @@ public class PostController {
 
     @PostMapping("/create")
     public ResponseEntity<ResponseDto> createPost(@RequestBody RequestPost.CreatePostDto createPostDto, HttpServletRequest request){
-        Optional<String> token = jwtAuthTokenProvider.getAuthToken(request);
+        Optional<String> token = null;
+        if (request != null) {
+            token = jwtAuthTokenProvider.getAuthToken(request);
+        }
         Long PostId = PostService.createPost(createPostDto, token);
         ResponseDto responseDto = ResponseDto.builder()
                 .message("Post created successfully.")
@@ -41,7 +44,10 @@ public class PostController {
 
     @PostMapping("/like/{postId}")
     public ResponseEntity<ResponseDto> likePost(@PathVariable("postId") Long postId, HttpServletRequest request){
-        Optional<String> token = jwtAuthTokenProvider.getAuthToken(request);
+        Optional<String> token = null;
+        if (request != null) {
+            token = jwtAuthTokenProvider.getAuthToken(request);
+        }
         PostService.likePost(postId, token);
         ResponseDto responseDto = ResponseDto.builder()
                 .message("Post liked successfully.")
@@ -51,7 +57,10 @@ public class PostController {
 
     @PostMapping("/unlike/{postId}")
     public ResponseEntity<ResponseDto> unlikePost(@PathVariable("postId") Long postId, HttpServletRequest request){
-        Optional<String> token = jwtAuthTokenProvider.getAuthToken(request);
+        Optional<String> token = null;
+        if (request != null) {
+            token = jwtAuthTokenProvider.getAuthToken(request);
+        }
         PostService.unlikePost(postId, token);
         ResponseDto responseDto = ResponseDto.builder()
                 .message("Post unliked successfully.")
@@ -61,7 +70,10 @@ public class PostController {
 
     @PostMapping("/save/{postId}")
     public ResponseEntity<ResponseDto> savePost(@PathVariable("postId") Long postId, HttpServletRequest request){
-        Optional<String> token = jwtAuthTokenProvider.getAuthToken(request);
+        Optional<String> token = null;
+        if (request != null) {
+            token = jwtAuthTokenProvider.getAuthToken(request);
+        }
         PostService.savePost(postId, token);
         ResponseDto responseDto = ResponseDto.builder()
                 .message("Post saved successfully.")
@@ -71,7 +83,10 @@ public class PostController {
 
     @PostMapping("/unSave/{postId}")
     public ResponseEntity<ResponseDto> unSavePost(@PathVariable("postId") Long postId, HttpServletRequest request){
-        Optional<String> token = jwtAuthTokenProvider.getAuthToken(request);
+        Optional<String> token = null;
+        if (request != null) {
+            token = jwtAuthTokenProvider.getAuthToken(request);
+        }
         PostService.unSavePost(postId, token);
         ResponseDto responseDto = ResponseDto.builder()
                 .message("Post unSaved successfully.")
@@ -155,17 +170,26 @@ public class PostController {
 
 
     @PutMapping("/update")
-    public ResponseEntity<ResponseDto> updatePost(@RequestBody RequestPost.UpdatePostDto updatePostDto){
-        PostService.updatePost(updatePostDto);
+    public ResponseEntity<ResponseDto> updatePost(@RequestBody RequestPost.UpdatePostDto updatePostDto, HttpServletRequest request){
+        Optional<String> token = null;
+        if (request != null) {
+            token = jwtAuthTokenProvider.getAuthToken(request);
+        }
+        PostService.updatePost(updatePostDto, token);
         ResponseDto responseDto = ResponseDto.builder()
                 .message("Post updated successfully.")
                 .build();
         return ResponseEntity.status(HttpStatus.OK).body(responseDto);
     }
 
+
     @DeleteMapping("/delete/{postId}")
-    public ResponseEntity<ResponseDto> deletePost(@PathVariable("postId") Long postId){
-        PostService.deletePost(postId);
+    public ResponseEntity<ResponseDto> deletePost(@PathVariable("postId") Long postId, HttpServletRequest request){
+        Optional<String> token = null;
+        if (request != null) {
+            token = jwtAuthTokenProvider.getAuthToken(request);
+        }
+        PostService.deletePost(postId, token);
         ResponseDto responseDto = ResponseDto.builder()
                 .message("Post deleted successfully.")
                 .build();

@@ -20,10 +20,7 @@ import java.io.IOException;
 import java.time.DayOfWeek;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
-import java.util.AbstractMap;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
@@ -259,16 +256,32 @@ public class PostService {
 
 
 
-    public void updatePost(RequestPost.UpdatePostDto updatePostDto) {
+    public void updatePost(RequestPost.UpdatePostDto updatePostDto, Optional<String> token) {
+        String email = null;
+        if(token.isPresent()) {
+            JwtAuthToken jwtAuthToken = jwtAuthTokenProvider.convertAuthToken(token.get());
+            email = jwtAuthToken.getClaims().getSubject();
+        }
+        Long writerId = authRepository.findByEmail(email).getId();
         Post originalPost = postRepository.findById(updatePostDto.getPostId()).get();
-        Post updatedPost = RequestPost.UpdatePostDto.toEntity(originalPost, updatePostDto);
-        postRepository.save(updatedPost);
+        if(Objects.equals(writerId, originalPost.getWriterId())) {
+            Post updatedPost = RequestPost.UpdatePostDto.toEntity(originalPost, updatePostDto);
+            postRepository.save(updatedPost);
+        }
     }
 
     //Delete permission exception handling required.
-    public void deletePost(Long postId) {
+    public void deletePost(Long postId, Optional<String> token) {
+        String email = null;
+        if(token.isPresent()) {
+            JwtAuthToken jwtAuthToken = jwtAuthTokenProvider.convertAuthToken(token.get());
+            email = jwtAuthToken.getClaims().getSubject();
+        }
+        Long writerId = authRepository.findByEmail(email).getId();
         Post post = postRepository.findById(postId).get();
-        postRepository.delete(post);
+        if(Objects.equals(writerId, post.getWriterId())) {
+            postRepository.delete(post);
+        }
     }
 
     //    public String uploadImg(MultipartFile file, long storeId){

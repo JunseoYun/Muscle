@@ -1,10 +1,12 @@
 package Muscle.post.dto;
 
+import Muscle.comment.entity.Comment;
 import Muscle.post.entity.Post;
 import lombok.Builder;
 import lombok.Getter;
 
 import java.time.DayOfWeek;
+import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -20,19 +22,19 @@ public class ResponsePost {
         private String title;
         private String content;
         private String board;
-        private LocalTime postDate;
+        private LocalDate postDate;
         private Long postLikeCount;
         private Long postCommentCount;
         private Boolean isPostLiked;
         private Boolean isPostSaved;
-//        private List<CommentListDto> commentList;
+        private List<CommentListDto> commentList;
 
 
         public static GetPostDto toDto(Post post, Boolean isPostLiked, Boolean isPostSaved) {
 
-//            List<CommentListDto> menuList = new ArrayList<>();
-//            if(!post.getCommentList().isEmpty())
-//                post.getCommentList().stream().forEach(comment -> commentList.add(CommentListDto.toDto(comment)));
+            List<CommentListDto> commentList = new ArrayList<>();
+            if(!post.getCommentList().isEmpty())
+                post.getCommentList().stream().forEach(comment -> commentList.add(CommentListDto.toDto(comment)));
 
 
             return GetPostDto.builder()
@@ -46,8 +48,28 @@ public class ResponsePost {
                     .postCommentCount(post.getPostCommentCount())
                     .isPostLiked(isPostLiked)
                     .isPostSaved(isPostSaved)
+                    .commentList(commentList)
                     .build();
         }
+    }
+
+    @Getter
+    @Builder
+    public static class CommentListDto {
+        private Long commentId;
+        private Long commentWriterId;
+        private String commentContent;
+        private LocalDate commentDate;
+
+        public static CommentListDto toDto(Comment comment) {
+            return CommentListDto.builder()
+                    .commentId(comment.getCommentId())
+                    .commentWriterId(comment.getCommentWriterId())
+                    .commentContent(comment.getCommentContent())
+                    .commentDate(comment.getCommentDate())
+                    .build();
+        }
+
     }
 
     @Getter
@@ -58,7 +80,7 @@ public class ResponsePost {
         private String title;
         private String content;
         private String board;
-        private LocalTime postDate;
+        private LocalDate postDate;
         private Long postLikeCount;
         private Long postCommentCount;
         private Boolean isPostLiked;
@@ -90,7 +112,7 @@ public class ResponsePost {
         private String title;
         private String content;
         private String board;
-        private LocalTime postDate;
+        private LocalDate postDate;
         private Long postLikeCount;
         private Long postCommentCount;
         private Boolean isPostLiked;
@@ -122,7 +144,7 @@ public class ResponsePost {
         private String title;
         private String content;
         private String board;
-        private LocalTime postDate;
+        private LocalDate postDate;
         private Long postLikeCount;
         private Long postCommentCount;
         private Boolean isPostLiked;
