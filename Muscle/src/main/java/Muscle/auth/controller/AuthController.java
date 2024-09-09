@@ -89,9 +89,43 @@ public class AuthController {
 //        return ResponseEntity.status(HttpStatus.OK).body(responseDto);
 //    }
 
+    @PostMapping("/setUserLevel")
+    public ResponseEntity<ResponseMessage> setUserLevel(HttpServletRequest request, String level) {
+        Optional<String> token = null;
+        if (request != null) {
+            token = jwtAuthTokenProvider.getAuthToken(request);
+        }
+        authService.setUserLevel(token, level);
+
+        ResponseMessage responseMessage = ResponseMessage.builder()
+                .message("User level set successfully.")
+                .build();
+        return ResponseEntity.status(HttpStatus.OK).body(responseMessage);
+    }
+
+    @PutMapping("/updateLevel")
+    public ResponseEntity<ResponseMessage> updateLevel(HttpServletRequest request, String level) {
+        Optional<String> token = null;
+        if (request != null) {
+            token = jwtAuthTokenProvider.getAuthToken(request);
+        }
+        authService.updateLevel(token, level);
+        ResponseMessage responseMessage = ResponseMessage.builder()
+                .message("User level updated successfully.")
+                .build();
+        return ResponseEntity.status(HttpStatus.OK).body(responseMessage);
+    }
+
+
+
+
+
     @PutMapping("/update")
     public ResponseEntity<ResponseMessage> updateUser(HttpServletRequest request, @Valid @RequestBody RequestAuth.UpdateUserDto updateUserDto) {
-        Optional<String> token = jwtAuthTokenProvider.getAuthToken(request);
+        Optional<String> token = null;
+        if (request != null) {
+            token = jwtAuthTokenProvider.getAuthToken(request);
+        }
         authService.updateUser(token, updateUserDto);
         ResponseMessage responseMessage = ResponseMessage.builder()
                 .message("User information updated successfully.")
@@ -99,9 +133,14 @@ public class AuthController {
         return ResponseEntity.status(HttpStatus.OK).body(responseMessage);
     }
 
+
+
     @PutMapping("/changePassword")
     public ResponseEntity<ResponseMessage> changePassword(HttpServletRequest request, @Valid @RequestBody RequestAuth.ChangePasswordDto changePasswordDto){
-        Optional<String> token = jwtAuthTokenProvider.getAuthToken(request);
+        Optional<String> token = null;
+        if (request != null) {
+            token = jwtAuthTokenProvider.getAuthToken(request);
+        }
         authService.changePassword(token, changePasswordDto.getPassword());
         ResponseMessage responseMessage = ResponseMessage.builder()
                 .message("Password changed successfully.")
@@ -109,9 +148,13 @@ public class AuthController {
         return ResponseEntity.status(HttpStatus.OK).body(responseMessage);
     }
 
+
     @GetMapping("/get")
     public ResponseEntity<ResponseMessage> getUser(HttpServletRequest request) {
-        Optional<String> token = jwtAuthTokenProvider.getAuthToken(request);
+        Optional<String> token = null;
+        if (request != null) {
+            token = jwtAuthTokenProvider.getAuthToken(request);
+        }
         ResponseAuth.GetUserDto response = authService.getUser(token);
         ResponseMessage responseMessage = ResponseMessage.builder()
                 .message("User information retrieved successfully.")

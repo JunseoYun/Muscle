@@ -29,6 +29,9 @@ public class Auth {
     @Column(name="nickName")
     private String nickName;
 
+    @Column(name="level")
+    private String level;
+
 
     @Column(name="salt")
     private String salt;
@@ -51,6 +54,14 @@ public class Auth {
         this.name = name;
         this.nickName = nickName;
         this.salt = salt;
+    }
+
+    public void setUserLevel(String level) {
+        this.level = level;
+    }
+
+    public void updateLevel(String level) {
+        this.level = level;
     }
 
     public void changePassword(String password, String salt){

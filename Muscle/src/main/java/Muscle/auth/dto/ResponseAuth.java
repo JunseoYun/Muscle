@@ -24,6 +24,7 @@ public class ResponseAuth {
         private String email;
         private String name;
         private String nickName;
+        private String level;
         private String userImg;
 
         public static GetUserDto toDto(Auth user){
@@ -31,6 +32,7 @@ public class ResponseAuth {
                     .email(user.getEmail())
                     .name(user.getName())
                     .nickName(user.getNickName())
+                    .level(user.getLevel())
                     .userImg(user.getUserImg())
                     .build();
         }
