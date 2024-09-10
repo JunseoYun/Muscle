@@ -9,6 +9,8 @@ import lombok.NoArgsConstructor;
 import jakarta.persistence.*;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 
 @Table(name="auth")
 @Entity
@@ -46,12 +48,15 @@ public class Auth {
     @JoinColumn(name = "muscleFriend_id")
     private Auth muscleFriend;
 
-    // 친구 요청 상태 (수락/대기/거절 등)
-    @Enumerated(EnumType.STRING)
-    private FriendshipStatus friendshipStatus;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "sendFriendRequest_id")
+    private Auth sendFriendRequest;
 
-    // 친구가 된 날짜
-    private LocalDateTime friendshipDate;
+
+    // 내가 받은 친구 요청 리스트 (1:N 관계)
+    @OneToMany(mappedBy = "sendFriendRequest", cascade = CascadeType.REMOVE, orphanRemoval = true)
+    private List<Auth> friendRequestList = new ArrayList<>();
+
 
     @Builder
     public Auth(String email, String password, String name, String nickName, String salt, String userImg){
@@ -73,6 +78,20 @@ public class Auth {
     public void setUserLevel(String level) {
         this.level = level;
     }
+
+    public void setFriend(Auth auth) {
+        this.muscleFriend = auth;
+    }
+
+    public void addFriendRequestList(Auth auth) {
+        this.friendRequestList.add(auth);
+    }
+
+    public void sendFriendRequest(Auth auth) {
+        this.sendFriendRequest = auth;
+    }
+
+
 
 
     public void changePassword(String password, String salt){
