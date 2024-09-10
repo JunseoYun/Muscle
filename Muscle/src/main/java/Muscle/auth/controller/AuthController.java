@@ -48,6 +48,8 @@ public class AuthController {
         return ResponseEntity.status(HttpStatus.OK).body(responseMessage);
     }
 
+
+
     @PutMapping("/setUserLevel")
     public ResponseEntity<ResponseMessage> setUserLevel(HttpServletRequest request, @Valid @RequestBody RequestAuth.SetUserLevelDto setUserLevelDto) {
         Optional<String> token = null;

@@ -2,14 +2,18 @@ package Muscle.auth.dto;
 
 
 import Muscle.auth.entity.Auth;
+import Muscle.auth.repository.AuthRepository;
 import lombok.Builder;
 import lombok.Data;
+import lombok.RequiredArgsConstructor;
+import org.checkerframework.checker.units.qual.A;
 
 import javax.validation.constraints.Email;
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
 
 public class RequestAuth {
+
     @Builder
     @Data
     public static class RegisterUserDto{
@@ -60,6 +64,28 @@ public class RequestAuth {
             return user;
         }
     }
+
+
+    @Data
+    public static class FriendRequestDto {
+        private Long userId;    // 친구 요청을 받을 사람의 ID
+        private String temp;
+    }
+
+//    @Builder
+//    @Data
+//    public static class ReceiveFriendRequestDto {
+//        private Long sendUserId;
+//        private String temp;
+//
+//        public static Auth toEntity(Auth receiveUser, ReceiveFriendRequestDto receiveFriendRequestDto) {
+//            receiveUser.addFriendRequestList(receiveFriendRequestDto.getSendUserId());
+//
+//            return receiveUser;
+//        }
+//    }
+
+
 
     @Builder
     @Data

@@ -37,4 +37,44 @@ public class ResponseAuth {
                     .build();
         }
     }
+
+    @Data
+    @Builder
+    public static class FriendResponseDto {
+        private Long friendId;
+        private String friendName;
+        private String friendNickName;
+        private String friendImg;
+        private String friendLevel;
+
+        public static FriendResponseDto toDto(Auth user) {
+            return FriendResponseDto.builder()
+                    .friendId(user.getId())
+                    .friendName(user.getName())
+                    .friendNickName(user.getNickName())
+                    .friendImg(user.getUserImg())
+                    .friendLevel(user.getLevel())
+                    .build();
+        }
+    }
+
+    @Data
+    @Builder
+    public static class FriendRequestResponseDto  {
+        private Long requesterId;
+        private String requesterName;
+        private String requesterNickName;
+        private String requesterImg;
+        private String requesterLevel;
+
+        public static FriendRequestResponseDto  toDto(Auth user) {
+            return FriendRequestResponseDto .builder()
+                    .requesterId(user.getId())
+                    .requesterName(user.getName())
+                    .requesterNickName(user.getNickName())
+                    .requesterImg(user.getUserImg())
+                    .requesterLevel(user.getLevel())
+                    .build();
+        }
+    }
 }
