@@ -267,6 +267,8 @@ public class PostService {
         if(Objects.equals(writerId, originalPost.getWriterId())) {
             Post updatedPost = RequestPost.UpdatePostDto.toEntity(originalPost, updatePostDto);
             postRepository.save(updatedPost);
+        } else {
+            throw new IllegalArgumentException("Isn't your post.");
         }
     }
 
@@ -281,6 +283,8 @@ public class PostService {
         Post post = postRepository.findById(postId).get();
         if(Objects.equals(writerId, post.getWriterId())) {
             postRepository.delete(post);
+        } else {
+            throw new IllegalArgumentException("Isn't your post.");
         }
     }
 
