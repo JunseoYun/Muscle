@@ -72,6 +72,8 @@ public class CommentService {
         if(Objects.equals(commentWriterId, originalComment.getCommentWriterId())) {
             Comment updatedComment = RequestComment.UpdateCommentDto.toEntity(originalComment, updateCommentDto);
             commentRepository.save(updatedComment);
+        } else {
+            throw new IllegalArgumentException("Isn't your comment.");
         }
 
     }
@@ -88,6 +90,8 @@ public class CommentService {
 
         if(Objects.equals(userId, comment.getCommentWriterId()) || Objects.equals(userId, postWriterId)) {
             commentRepository.delete(comment);
+        } else {
+            throw new IllegalArgumentException("Isn't your comment or post.");
         }
     }
 

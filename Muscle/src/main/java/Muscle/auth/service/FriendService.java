@@ -25,6 +25,7 @@ public class FriendService {
 
 
 
+    // 친구 요청
     @Transactional
     public void sendFriendRequest(Optional<String> token, RequestAuth.FriendRequestDto friendRequestDto) {
         String email = null;
@@ -32,9 +33,20 @@ public class FriendService {
             JwtAuthToken jwtAuthToken = jwtAuthTokenProvider.convertAuthToken(token.get());
             email = jwtAuthToken.getClaims().getSubject();
         }
-        Auth requester = authRepository.findByEmail(email);
-        Auth target = authRepository.findById(friendRequestDto.getUserId()).get();
 
+        Auth requester = authRepository.findByEmail(email);
+        if(requester.getMuscleFriend() != null){
+            throw new IllegalArgumentException("You have already Muscle Friend.");
+        }
+
+        Auth target = authRepository.findById(friendRequestDto.getUserId()).get();
+        if(target.getMuscleFriend() != null) {
+            throw new IllegalArgumentException("Target already have Muscle Friend.");
+        }
+
+        if (target.getFriendRequestList().stream().anyMatch(r -> r.getId().equals(requester.getId()))) {
+            throw new IllegalArgumentException("Friend request already sent to this user.");
+        }
         requester.sendFriendRequest(target);
         target.addFriendRequestList(requester);
 
@@ -54,6 +66,9 @@ public class FriendService {
         Auth target = authRepository.findByEmail(email);
         Auth requester = authRepository.findById(friendRequestDto.getUserId()).get();
 
+        if(target.getMuscleFriend() != null) {
+            throw new IllegalArgumentException("You have already Muscle Friend.");
+        }
         target.setFriend(requester); // 친구 관계 설정
         requester.setFriend(target);
 
