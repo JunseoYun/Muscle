@@ -34,6 +34,7 @@ public class FriendService {
             email = jwtAuthToken.getClaims().getSubject();
         }
 
+
         Auth requester = authRepository.findByEmail(email);
         if(requester.getMuscleFriend() != null){
             throw new IllegalArgumentException("You have already Muscle Friend.");
@@ -42,10 +43,11 @@ public class FriendService {
         Auth target = authRepository.findById(friendRequestDto.getUserId()).get();
         if(target.getMuscleFriend() != null) {
             throw new IllegalArgumentException("Target already have Muscle Friend.");
-        }
-
-        if (target.getFriendRequestList().stream().anyMatch(r -> r.getId().equals(requester.getId()))) {
+        } else if (target.getFriendRequestList().stream().anyMatch(r -> r.getId().equals(requester.getId()))) {
             throw new IllegalArgumentException("Friend request already sent to this user.");
+        } else if (requester == target) {
+
+            throw new IllegalArgumentException("Don't request myself");
         }
         requester.sendFriendRequest(target);
         target.addFriendRequestList(requester);
@@ -72,8 +74,8 @@ public class FriendService {
         target.setFriend(requester); // 친구 관계 설정
         requester.setFriend(target);
 
-        // 친구 요청 리스트에서 제거 (수락했으므로)
-        target.getFriendRequestList().remove(requester);
+        // 친구 요청 리스트 제거 (수락했으므로)
+        target.clearFriendRequestList();
 
         authRepository.save(target);
         authRepository.save(requester);

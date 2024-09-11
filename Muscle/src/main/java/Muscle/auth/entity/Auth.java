@@ -54,7 +54,7 @@ public class Auth {
 
 
     // 내가 받은 친구 요청 리스트 (1:N 관계)
-    @OneToMany(mappedBy = "sendFriendRequest", cascade = CascadeType.REMOVE, orphanRemoval = true)
+    @OneToMany(mappedBy = "sendFriendRequest", orphanRemoval = true)
     private List<Auth> friendRequestList = new ArrayList<>();
 
 
@@ -73,6 +73,10 @@ public class Auth {
         this.name = name;
         this.nickName = nickName;
         this.salt = salt;
+    }
+
+    public void clearFriendRequestList() {
+        this.friendRequestList.clear();
     }
 
     public void setUserLevel(String level) {
