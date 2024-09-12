@@ -44,18 +44,12 @@ public class Auth {
     @Column(name = "userImg")
     private String userImg;
 
+    // 친구 관계
     @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "muscleFriend_id")
     private Auth muscleFriend;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "sendFriendRequest_id")
-    private Auth sendFriendRequest;
 
-
-    // 내가 받은 친구 요청 리스트 (1:N 관계)
-    @OneToMany(mappedBy = "sendFriendRequest", orphanRemoval = true)
-    private List<Auth> friendRequestList = new ArrayList<>();
 
 
     @Builder
@@ -75,26 +69,14 @@ public class Auth {
         this.salt = salt;
     }
 
-    public void clearFriendRequestList() {
-        this.friendRequestList.clear();
-    }
+
+
+
+
 
     public void setUserLevel(String level) {
         this.level = level;
     }
-
-    public void setFriend(Auth auth) {
-        this.muscleFriend = auth;
-    }
-
-    public void addFriendRequestList(Auth auth) {
-        this.friendRequestList.add(auth);
-    }
-
-    public void sendFriendRequest(Auth auth) {
-        this.sendFriendRequest = auth;
-    }
-
 
 
 

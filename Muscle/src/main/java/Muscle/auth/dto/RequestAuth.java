@@ -66,10 +66,16 @@ public class RequestAuth {
     }
 
 
+    @Builder
     @Data
     public static class FriendRequestDto {
         private Long userId;    // 친구 요청을 받을 사람의 ID
         private String temp;
+
+//        public FriendRequestDto(FriendRequestDto friendRequestDto) {
+//            this.userId = friendRequestDto.getUserId();
+//            this.temp = friendRequestDto.getTemp();
+//        }
     }
 
 //    @Builder
