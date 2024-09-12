@@ -2,6 +2,7 @@ package Muscle.auth.dto;
 
 
 import Muscle.auth.entity.Auth;
+import Muscle.auth.entity.FriendRequest;
 import lombok.Builder;
 import lombok.Data;
 
@@ -67,13 +68,33 @@ public class ResponseAuth {
         private String requesterImg;
         private String requesterLevel;
 
-        public static FriendRequestResponseDto  toDto(Auth user) {
-            return FriendRequestResponseDto .builder()
-                    .requesterId(user.getId())
-                    .requesterName(user.getName())
-                    .requesterNickName(user.getNickName())
-                    .requesterImg(user.getUserImg())
-                    .requesterLevel(user.getLevel())
+        public static FriendRequestResponseDto toDto(FriendRequest friendRequest) {
+            return FriendRequestResponseDto.builder()
+                    .requesterId(friendRequest.getRequester().getId())
+                    .requesterName(friendRequest.getRequester().getName())
+                    .requesterNickName(friendRequest.getRequester().getNickName())
+                    .requesterImg(friendRequest.getRequester().getUserImg())
+                    .requesterLevel(friendRequest.getRequester().getLevel())
+                    .build();
+        }
+    }
+
+    @Data
+    @Builder
+    public static class FriendRecipientResponseDto {
+        private Long recipientId;
+        private String recipientName;
+        private String recipientNickName;
+        private String recipientImg;
+        private String recipientLevel;
+
+        public static FriendRecipientResponseDto toDto(FriendRequest friendRequest) {
+            return FriendRecipientResponseDto.builder()
+                    .recipientId(friendRequest.getRecipient().getId())
+                    .recipientName(friendRequest.getRecipient().getName())
+                    .recipientNickName(friendRequest.getRecipient().getNickName())
+                    .recipientImg(friendRequest.getRecipient().getUserImg())
+                    .recipientLevel(friendRequest.getRecipient().getLevel())
                     .build();
         }
     }
