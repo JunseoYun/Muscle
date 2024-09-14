@@ -168,6 +168,26 @@ public class FriendService {
                 .collect(Collectors.toList());
     }
 
+    // 친구 삭제
+    @Transactional
+    public void removeFriend(Optional<String> token) {
+        String email = null;
+        if (token.isPresent()) {
+            JwtAuthToken jwtAuthToken = jwtAuthTokenProvider.convertAuthToken(token.get());
+            email = jwtAuthToken.getClaims().getSubject();
+        }
+        Auth user = authRepository.findByEmail(email);
+        Auth friend = user.getMuscleFriend();
+
+        user.setMuscleFriend(null);
+        friend.setMuscleFriend(null);
+
+        authRepository.save(user);
+        authRepository.save(friend);
+
+    }
+
+
 
 
 }
