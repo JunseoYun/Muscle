@@ -132,4 +132,22 @@ public class FriendController {
                 .build();
         return ResponseEntity.status(HttpStatus.OK).body(responseMessage);
     }
+
+    // 친구 삭제
+    @DeleteMapping("/remove")
+    public ResponseEntity<ResponseMessage> removeFriend (HttpServletRequest request) {
+        Optional<String> token = null;
+        if (request != null) {
+            token = jwtAuthTokenProvider.getAuthToken(request);
+        }
+        friendService.removeFriend(token);
+        ResponseMessage responseMessage = ResponseMessage.builder()
+                .message("Muscle friend removed successfully.")
+                .build();
+        return ResponseEntity.status(HttpStatus.OK).body(responseMessage);
+    }
+
+
+
+
 }
