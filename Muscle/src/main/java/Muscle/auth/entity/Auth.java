@@ -50,6 +50,12 @@ public class Auth {
     @Column(name = "kakaoId")
     private String kakaoId;
 
+    @Column(name = "follower")
+    private Long followerCount = 0L;
+
+    @Column(name = "following")
+    private Long followingCount = 0L;
+
     // 친구 관계
     @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "muscleFriend_id")
@@ -94,6 +100,11 @@ public class Auth {
         this.password = password;
         this.salt = salt;
     }
+
+    public void increaseFollowerCount(){ this. followerCount++; }
+    public void decreaseFollowerCount(){ this. followerCount--; }
+    public void increaseFollowingCount(){ this. followingCount++; }
+    public void decreaseFollowingCount(){ this. followingCount--; }
 
 
 }

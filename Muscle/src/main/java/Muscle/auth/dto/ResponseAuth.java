@@ -2,6 +2,7 @@ package Muscle.auth.dto;
 
 
 import Muscle.auth.entity.Auth;
+import Muscle.auth.entity.Follow;
 import Muscle.auth.entity.FriendRequest;
 import lombok.Builder;
 import lombok.Data;
@@ -111,6 +112,46 @@ public class ResponseAuth {
             this.name = name;
             this.email = email;
 
+        }
+    }
+
+    @Data
+    @Builder
+    public static class FollowerResponseDto {
+        private Long followerId;
+        private String followerName;
+        private String followerMuscleId;
+        private String followerImg;
+        private String followerLevel;
+
+        public static FollowerResponseDto toDto(Follow follow) {
+            return FollowerResponseDto.builder()
+                    .followerId(follow.getFollower().getId())
+                    .followerName(follow.getFollower().getName())
+                    .followerMuscleId(follow.getFollower().getMuscleId())
+                    .followerImg(follow.getFollower().getUserImg())
+                    .followerLevel(follow.getFollower().getLevel())
+                    .build();
+        }
+    }
+
+    @Data
+    @Builder
+    public static class FollowingResponseDto {
+        private Long followingId;
+        private String followingName;
+        private String followingMuscleId;
+        private String followingImg;
+        private String followingLevel;
+
+        public static FollowingResponseDto toDto(Follow follow) {
+            return FollowingResponseDto.builder()
+                    .followingId(follow.getFollowing().getId())
+                    .followingName(follow.getFollowing().getName())
+                    .followingMuscleId(follow.getFollowing().getMuscleId())
+                    .followingImg(follow.getFollowing().getUserImg())
+                    .followingLevel(follow.getFollowing().getLevel())
+                    .build();
         }
     }
 }

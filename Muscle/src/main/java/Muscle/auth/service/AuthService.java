@@ -75,9 +75,6 @@ public class AuthService {
 
 
 
-
-
-
 //    @Transactional
 //    public String uploadImg(MultipartFile file, Optional<String> token) {
 //        String email = null;
@@ -222,14 +219,31 @@ public class AuthService {
         Auth user = authRepository.findByMuscleId(muscleId);
         String linked = null;
 
-        if(user.getPassword() != null && user.getNaverId() != null) {
-            linked = "Muscle & Naver";
+        if (user.getPassword() != null && user.getNaverId() != null && user.getKakaoId() != null) {
+            linked = "Muscle & Naver & Kakao";  // Muscle, Naver, Kakao 모두 연동된 경우
         }
-        else if(user.getPassword() != null) {
-            linked = "Muscle";
-        } else {
-            linked = "Naver";
+        else if (user.getPassword() != null && user.getNaverId() != null && user.getKakaoId() == null) {
+            linked = "Muscle & Naver";  // Muscle과 Naver만 연동된 경우
         }
+        else if (user.getPassword() != null && user.getKakaoId() != null && user.getNaverId() == null) {
+            linked = "Muscle & Kakao";  // Muscle과 Kakao만 연동된 경우
+        }
+        else if(user.getNaverId() != null & user.getKakaoId() != null & user.getPassword() == null) {
+            linked = "Naver & Kakao";
+        }
+        else if (user.getPassword() != null) {
+            linked = "Muscle";  // Muscle만 연동된 경우
+        }
+        else if (user.getNaverId() != null && user.getKakaoId() == null) {
+            linked = "Naver";  // Naver만 연동된 경우
+        }
+        else if (user.getKakaoId() != null && user.getNaverId() == null) {
+            linked = "Kakao";  // Kakao만 연동된 경우
+        }
+        else {
+            linked = "Unknown";  // 아무것도 연동되지 않은 경우
+        }
+
 
         ResponseMessage responseMessage = ResponseMessage.builder()
                 .message("Account linking list.")
@@ -237,4 +251,6 @@ public class AuthService {
                 .build();
         return responseMessage;
     }
+
+
 }
