@@ -77,9 +77,9 @@ public class NaverLoginService {
         user = authRepository.findByEmail(oauthData.getEmail());
         if(user != null){
             //네이버 계정 연동
-            ResponseAuth.LoginUserRsDto response = naverConnect(user, oauthData.getNaverId()).orElseThrow(() -> new LoginFailedException());
+            ResponseAuth.LoginUserRsDto response = naverLinking(user, oauthData.getNaverId()).orElseThrow(() -> new LoginFailedException());
             ResponseMessage responseMessage = ResponseMessage.builder()
-                    .message("User connected successfully with Naver.")
+                    .message("User linked successfully with Naver.")
                     .data(response)
                     .build();
             return responseMessage;
@@ -113,7 +113,7 @@ public class NaverLoginService {
 
     }
 
-    public Optional<ResponseAuth.LoginUserRsDto> naverConnect(Auth user, String naverId) {
+    public Optional<ResponseAuth.LoginUserRsDto> naverLinking(Auth user, String naverId) {
         user.setNaverId(naverId);
         authRepository.save(user);
 

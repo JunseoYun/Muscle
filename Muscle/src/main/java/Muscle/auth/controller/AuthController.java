@@ -200,4 +200,14 @@ public class AuthController {
         return ResponseEntity.status(HttpStatus.OK).body(responseMessage);
     }
 
+    @GetMapping("/userlinking")
+    public ResponseEntity<ResponseMessage> userlinking(HttpServletRequest request) {
+        Optional<String> token = null;
+        if (request != null) {
+            token = jwtAuthTokenProvider.getAuthToken(request);
+        }
+        ResponseMessage responseMessage = authService.userlinking(token);
+        return ResponseEntity.status(HttpStatus.OK).body(responseMessage);
+    }
+
 }

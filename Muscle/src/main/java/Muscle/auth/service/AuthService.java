@@ -181,8 +181,6 @@ public class AuthService {
     }
 
 
-
-
     @Transactional
     public ResponseAuth.GetUserDto getUser(Optional<String> token) {
 
@@ -210,6 +208,32 @@ public class AuthService {
 
         ResponseMessage responseMessage = ResponseMessage.builder()
                 .message("User registered successfully with Naver.")
+                .build();
+        return responseMessage;
+    }
+
+    public ResponseMessage userlinking(Optional<String> token) {
+        String muscleId = null;
+        if(token.isPresent()){
+            JwtAuthToken jwtAuthToken = jwtAuthTokenProvider.convertAuthToken(token.get());
+            muscleId = jwtAuthToken.getClaims().getSubject();
+        }
+
+        Auth user = authRepository.findByMuscleId(muscleId);
+        String linked = null;
+
+        if(user.getPassword() != null && user.getNaverId() != null) {
+            linked = "Muscle & Naver";
+        }
+        else if(user.getPassword() != null) {
+            linked = "Muscle";
+        } else {
+            linked = "Naver";
+        }
+
+        ResponseMessage responseMessage = ResponseMessage.builder()
+                .message("Account linking list.")
+                .data(linked)
                 .build();
         return responseMessage;
     }
