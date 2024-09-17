@@ -5,14 +5,17 @@ import Muscle.auth.dto.ResponseAuth;
 import Muscle.auth.security.JwtAuthTokenProvider;
 import Muscle.auth.service.AuthService;
 import Muscle.auth.service.EmailService;
+import Muscle.auth.service.NaverLoginService;
 import Muscle.common.dto.ResponseDto;
 import Muscle.common.dto.ResponseMessage;
 import Muscle.common.exception.error.LoginFailedException;
+import Muscle.common.exception.error.UserAlreadyRegisteredException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.servlet.view.RedirectView;
 
 import jakarta.servlet.http.HttpServletRequest;
 
@@ -27,14 +30,47 @@ public class AuthController {
     private final AuthService authService;
     private final JwtAuthTokenProvider jwtAuthTokenProvider;
     private final EmailService emailService;
+    private final NaverLoginService naverLoginService;
 
 
     @PostMapping("/register")
     public ResponseEntity<ResponseMessage> registerUser(@Valid @RequestBody RequestAuth.RegisterUserDto registerUserDto) {
-        authService.registerUser(registerUserDto);
+        try {
+            authService.registerUser(registerUserDto);
+            ResponseMessage responseMessage = ResponseMessage.builder()
+                    .message("User registered successfully.")
+                    .build();
+            return ResponseEntity.status(HttpStatus.OK).body(responseMessage);
+        } catch (UserAlreadyRegisteredException ex) {
+            // 이미 등록된 경우 409 Conflict 반환
+            ResponseMessage responseMessage = ResponseMessage.builder()
+                    .message(ex.getMessage())
+                    .build();
+            return ResponseEntity.status(HttpStatus.CONFLICT).body(responseMessage);
+        } catch (Exception ex) {
+            // 다른 예외 처리
+            ResponseMessage responseMessage = ResponseMessage.builder()
+                    .message("An error occurred while registering the user.")
+                    .build();
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(responseMessage);
+        }
+    }
+
+    @GetMapping("/login/naver")
+    public ResponseEntity<ResponseMessage> redirectToNaverLogin () {
+        String naverLoginUrl = naverLoginService.generateNaverLoginUrl();
         ResponseMessage responseMessage = ResponseMessage.builder()
-                .message("User registered successfully.")
+                .message("Naver login requested successfully.")
+                .data(naverLoginUrl)
                 .build();
+        return ResponseEntity.status(HttpStatus.OK).body(responseMessage);
+
+    }
+
+
+    @GetMapping("/login/oauth2/code/naver")
+    public ResponseEntity<ResponseMessage> callbackNaverLogin (@RequestParam String code, @RequestParam String state) {
+        ResponseMessage responseMessage = naverLoginService.processNaverLogin(code, state);
         return ResponseEntity.status(HttpStatus.OK).body(responseMessage);
     }
 
@@ -151,6 +187,16 @@ public class AuthController {
                 .message("User information retrieved successfully.")
                 .data(response)
                 .build();
+        return ResponseEntity.status(HttpStatus.OK).body(responseMessage);
+    }
+
+    @DeleteMapping("/remove")
+    public ResponseEntity<ResponseMessage> remove (HttpServletRequest request) {
+        Optional<String> token = null;
+        if (request != null) {
+            token = jwtAuthTokenProvider.getAuthToken(request);
+        }
+        ResponseMessage responseMessage = authService.remove(token);
         return ResponseEntity.status(HttpStatus.OK).body(responseMessage);
     }
 

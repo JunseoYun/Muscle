@@ -37,12 +37,12 @@ public class PostService {
 
     public Long createPost(RequestPost.CreatePostDto createPostDto, Optional<String> token) {
 
-        String email = null;
+        String muscleId = null;
         if (token.isPresent()) {
             JwtAuthToken jwtAuthToken = jwtAuthTokenProvider.convertAuthToken(token.get());
-            email = jwtAuthToken.getClaims().getSubject();
+            muscleId = jwtAuthToken.getClaims().getSubject();
         }
-        Long writerId = authRepository.findByEmail(email).getId();
+        Long writerId = authRepository.findByMuscleId(muscleId).getId();
         Post post = RequestPost.CreatePostDto.toEntity(createPostDto, writerId);
         postRepository.save(post);
         return post.getPostId();
@@ -52,12 +52,12 @@ public class PostService {
 
 
     public void likePost(Long postId, Optional<String> token){
-        String email = null;
+        String muscleId = null;
         if (token.isPresent()) {
             JwtAuthToken jwtAuthToken = jwtAuthTokenProvider.convertAuthToken(token.get());
-            email = jwtAuthToken.getClaims().getSubject();
+            muscleId = jwtAuthToken.getClaims().getSubject();
         }
-        Long userId = authRepository.findByEmail(email).getId();
+        Long userId = authRepository.findByMuscleId(muscleId).getId();
         LikedPost likedPost = LikedPost.builder()
                 .postId(postId)
                 .userId(userId)
@@ -69,12 +69,12 @@ public class PostService {
     }
 
     public void unlikePost(Long postId, Optional<String> token){
-        String email = null;
+        String muscleId = null;
         if (token.isPresent()) {
             JwtAuthToken jwtAuthToken = jwtAuthTokenProvider.convertAuthToken(token.get());
-            email = jwtAuthToken.getClaims().getSubject();
+            muscleId = jwtAuthToken.getClaims().getSubject();
         }
-        Long userId = authRepository.findByEmail(email).getId();
+        Long userId = authRepository.findByMuscleId(muscleId).getId();
         LikedPost likedPost = likedPostRepository.findByUserIdAndPostId(userId, postId);
         likedPostRepository.delete(likedPost);
         Post post = postRepository.findById(postId).get();
@@ -84,12 +84,12 @@ public class PostService {
 
 
     public void savePost(Long postId, Optional<String> token){
-        String email = null;
+        String muscleId = null;
         if (token.isPresent()) {
             JwtAuthToken jwtAuthToken = jwtAuthTokenProvider.convertAuthToken(token.get());
-            email = jwtAuthToken.getClaims().getSubject();
+            muscleId = jwtAuthToken.getClaims().getSubject();
         }
-        Long userId = authRepository.findByEmail(email).getId();
+        Long userId = authRepository.findByMuscleId(muscleId).getId();
         SavedPost savedPost = SavedPost.builder()
                 .postId(postId)
                 .userId(userId)
@@ -100,12 +100,12 @@ public class PostService {
     }
 
     public void unSavePost(Long postId, Optional<String> token){
-        String email = null;
+        String muscleId = null;
         if (token.isPresent()) {
             JwtAuthToken jwtAuthToken = jwtAuthTokenProvider.convertAuthToken(token.get());
-            email = jwtAuthToken.getClaims().getSubject();
+            muscleId = jwtAuthToken.getClaims().getSubject();
         }
-        Long userId = authRepository.findByEmail(email).getId();
+        Long userId = authRepository.findByMuscleId(muscleId).getId();
         SavedPost savedPost = savedPostRepository.findByUserIdAndPostId(userId, postId);
         savedPostRepository.delete(savedPost);
         Post post = postRepository.findById(postId).get();
@@ -115,13 +115,13 @@ public class PostService {
 
 
     public List<ResponsePost.GetAllPostDto> getAllPost(Optional<String> token) {
-        String email = null;
+        String muscleId = null;
         List<Post> entityList = postRepository.findAll();
         List<ResponsePost.GetAllPostDto> dtoList = new ArrayList<>();
         if (token.isPresent()) {
             JwtAuthToken jwtAuthToken = jwtAuthTokenProvider.convertAuthToken(token.get());
-            email = jwtAuthToken.getClaims().getSubject();
-            Long userId = authRepository.findByEmail(email).getId();
+            muscleId = jwtAuthToken.getClaims().getSubject();
+            Long userId = authRepository.findByMuscleId(muscleId).getId();
 
             entityList.stream().forEach(post -> {
                 boolean isPostLiked = false;
@@ -144,14 +144,14 @@ public class PostService {
     public ResponsePost.GetPostDto getPost(Long postId, Optional<String> token) {
         Post post = postRepository.findById(postId).get();
 
-        String email = null;
+        String muscleId = null;
         boolean isPostLiked = false;
         boolean isPostSaved = false;
 
         if (token.isPresent()) {
             JwtAuthToken jwtAuthToken = jwtAuthTokenProvider.convertAuthToken(token.get());
-            email = jwtAuthToken.getClaims().getSubject();
-            Long userId = authRepository.findByEmail(email).getId();
+            muscleId = jwtAuthToken.getClaims().getSubject();
+            Long userId = authRepository.findByMuscleId(muscleId).getId();
             LikedPost likedPost = likedPostRepository.findByUserIdAndPostId(userId, postId);
             if(likedPost != null)
                 isPostLiked = true;
@@ -164,12 +164,12 @@ public class PostService {
 
 
     public List<ResponsePost.GetSavedPostDto> getSavedPost(Optional<String> token){
-        String email = null;
+        String muscleId = null;
         List<ResponsePost.GetSavedPostDto> dtoList = new ArrayList<>();
         if (token.isPresent()) {
             JwtAuthToken jwtAuthToken = jwtAuthTokenProvider.convertAuthToken(token.get());
-            email = jwtAuthToken.getClaims().getSubject();
-            Long userId = authRepository.findByEmail(email).getId();
+            muscleId = jwtAuthToken.getClaims().getSubject();
+            Long userId = authRepository.findByMuscleId(muscleId).getId();
             List<SavedPost> entityList = savedPostRepository.findAllByUserId(userId);
 
             entityList.stream().forEach(savedPost -> {
@@ -193,13 +193,13 @@ public class PostService {
 
 
     public List<ResponsePost.GetAllPostDto> getPostByBoard(String board, Optional<String> token) {
-        String email = null;
+        String muscleId = null;
         List<ResponsePost.GetAllPostDto> dtoList = new ArrayList<>();
 
         if (token.isPresent()) {
             JwtAuthToken jwtAuthToken = jwtAuthTokenProvider.convertAuthToken(token.get());
-            email = jwtAuthToken.getClaims().getSubject();
-            Long userId = authRepository.findByEmail(email).getId();
+            muscleId = jwtAuthToken.getClaims().getSubject();
+            Long userId = authRepository.findByMuscleId(muscleId).getId();
             List<Post> entityList = postRepository.findByBoard(board);
 
             entityList.stream().forEach(post -> {
@@ -224,12 +224,12 @@ public class PostService {
 
 
     public List<ResponsePost.GetAllPostDto> getByWriterPost(Optional<String> token) {
-        String email = null;
+        String muscleId = null;
         List<ResponsePost.GetAllPostDto> dtoList = new ArrayList<>();
         if (token.isPresent()) {
             JwtAuthToken jwtAuthToken = jwtAuthTokenProvider.convertAuthToken(token.get());
-            email = jwtAuthToken.getClaims().getSubject();
-            Long writerId = authRepository.findByEmail(email).getId();
+            muscleId = jwtAuthToken.getClaims().getSubject();
+            Long writerId = authRepository.findByMuscleId(muscleId).getId();
             List<Post> entityList = postRepository.findAllByWriterId(writerId);
 
             entityList.stream().forEach(post -> {
@@ -257,12 +257,12 @@ public class PostService {
 
 
     public void updatePost(RequestPost.UpdatePostDto updatePostDto, Optional<String> token) {
-        String email = null;
+        String muscleId = null;
         if(token.isPresent()) {
             JwtAuthToken jwtAuthToken = jwtAuthTokenProvider.convertAuthToken(token.get());
-            email = jwtAuthToken.getClaims().getSubject();
+            muscleId = jwtAuthToken.getClaims().getSubject();
         }
-        Long writerId = authRepository.findByEmail(email).getId();
+        Long writerId = authRepository.findByMuscleId(muscleId).getId();
         Post originalPost = postRepository.findById(updatePostDto.getPostId()).get();
         if(Objects.equals(writerId, originalPost.getWriterId())) {
             Post updatedPost = RequestPost.UpdatePostDto.toEntity(originalPost, updatePostDto);
@@ -274,12 +274,12 @@ public class PostService {
 
     //Delete permission exception handling required.
     public void deletePost(Long postId, Optional<String> token) {
-        String email = null;
+        String muscleId = null;
         if(token.isPresent()) {
             JwtAuthToken jwtAuthToken = jwtAuthTokenProvider.convertAuthToken(token.get());
-            email = jwtAuthToken.getClaims().getSubject();
+            muscleId = jwtAuthToken.getClaims().getSubject();
         }
-        Long writerId = authRepository.findByEmail(email).getId();
+        Long writerId = authRepository.findByMuscleId(muscleId).getId();
         Post post = postRepository.findById(postId).get();
         if(Objects.equals(writerId, post.getWriterId())) {
             postRepository.delete(post);

@@ -30,14 +30,14 @@ public class FriendService {
     // 친구 요청 보내기
     @Transactional
     public void sendFriendRequest(Optional<String> token, RequestAuth.FriendRequestDto friendRequestDto) {
-        String email = null;
+        String muscleId = null;
         if (token.isPresent()) {
             JwtAuthToken jwtAuthToken = jwtAuthTokenProvider.convertAuthToken(token.get());
-            email = jwtAuthToken.getClaims().getSubject();
+            muscleId = jwtAuthToken.getClaims().getSubject();
         }
 
 
-        Auth sender = authRepository.findByEmail(email);
+        Auth sender = authRepository.findByMuscleId(muscleId);
         if (sender.getMuscleFriend() != null) {
             throw new IllegalArgumentException("You have already Muscle Friend.");
         }
@@ -59,12 +59,12 @@ public class FriendService {
     //친구 요청 취소
     @Transactional
     public void cancelFriendRequest(Optional<String> token) {
-        String email = null;
+        String muscleId = null;
         if (token.isPresent()) {
             JwtAuthToken jwtAuthToken = jwtAuthTokenProvider.convertAuthToken(token.get());
-            email = jwtAuthToken.getClaims().getSubject();
+            muscleId = jwtAuthToken.getClaims().getSubject();
         }
-        Auth sender = authRepository.findByEmail(email);
+        Auth sender = authRepository.findByMuscleId(muscleId);
         FriendRequest friendRequest = friendRequestRepository.findByRequester(sender);
         if(friendRequest == null || !friendRequest.getStatus().equals("PENDING")) {
             throw new IllegalArgumentException("취소할 친구 요청이 없습니다.");
@@ -75,12 +75,12 @@ public class FriendService {
     // 친구 요청 수락
     @Transactional
     public void acceptFriendRequest(Optional<String> token, RequestAuth.FriendRequestDto friendRequestDto) {
-        String email = null;
+        String muscleId = null;
         if (token.isPresent()) {
             JwtAuthToken jwtAuthToken = jwtAuthTokenProvider.convertAuthToken(token.get());
-            email = jwtAuthToken.getClaims().getSubject();
+            muscleId = jwtAuthToken.getClaims().getSubject();
         }
-        Auth recipient = authRepository.findByEmail(email);
+        Auth recipient = authRepository.findByMuscleId(muscleId);
         Auth sender = authRepository.findById(friendRequestDto.getUserId()).get();
         FriendRequest friendRequest = friendRequestRepository.findByRequester(sender);
         friendRequest.setStatus("ACCEPTED");
@@ -99,12 +99,12 @@ public class FriendService {
     //친구 요청 거절
     @Transactional
     public void rejectFriendRequest(Optional<String> token, RequestAuth.FriendRequestDto friendRequestDto) {
-        String email = null;
+        String muscleId = null;
         if (token.isPresent()) {
             JwtAuthToken jwtAuthToken = jwtAuthTokenProvider.convertAuthToken(token.get());
-            email = jwtAuthToken.getClaims().getSubject();
+            muscleId = jwtAuthToken.getClaims().getSubject();
         }
-        Auth recipient = authRepository.findByEmail(email);
+        Auth recipient = authRepository.findByMuscleId(muscleId);
         Auth sender = authRepository.findById(friendRequestDto.getUserId()).get();
         FriendRequest friendRequest = friendRequestRepository.findByRequester(sender);
 
@@ -120,12 +120,12 @@ public class FriendService {
     // 친구 목록 조회
     @Transactional(readOnly = true)
     public ResponseAuth.FriendResponseDto getFriend(Optional<String> token) {
-        String email = null;
+        String muscleId = null;
         if (token.isPresent()) {
             JwtAuthToken jwtAuthToken = jwtAuthTokenProvider.convertAuthToken(token.get());
-            email = jwtAuthToken.getClaims().getSubject();
+            muscleId = jwtAuthToken.getClaims().getSubject();
         }
-        Auth user = authRepository.findByEmail(email);
+        Auth user = authRepository.findByMuscleId(muscleId);
 
         Auth friend = user.getMuscleFriend(); // 1대1 친구 관계
 
@@ -139,12 +139,12 @@ public class FriendService {
     // 보낸 친구 요청 조회
     @Transactional
     public ResponseAuth.FriendRecipientResponseDto getSendFriendRequest(Optional<String> token) {
-        String email = null;
+        String muscleId = null;
         if (token.isPresent()) {
             JwtAuthToken jwtAuthToken = jwtAuthTokenProvider.convertAuthToken(token.get());
-            email = jwtAuthToken.getClaims().getSubject();
+            muscleId = jwtAuthToken.getClaims().getSubject();
         }
-        Auth sender = authRepository.findByEmail(email);
+        Auth sender = authRepository.findByMuscleId(muscleId);
 
         FriendRequest friendRequest = friendRequestRepository.findByRequester(sender);
 
@@ -154,12 +154,12 @@ public class FriendService {
     // 받은 친구 요청 목록 조회
     @Transactional(readOnly = true)
     public List<ResponseAuth.FriendRequestResponseDto> getReceivedFriendRequests(Optional<String> token) {
-        String email = null;
+        String muscleId = null;
         if (token.isPresent()) {
             JwtAuthToken jwtAuthToken = jwtAuthTokenProvider.convertAuthToken(token.get());
-            email = jwtAuthToken.getClaims().getSubject();
+            muscleId = jwtAuthToken.getClaims().getSubject();
         }
-        Auth recipient  = authRepository.findByEmail(email);
+        Auth recipient  = authRepository.findByMuscleId(muscleId);
 
         List<FriendRequest> receivedFriendRequests = friendRequestRepository.findAllByRecipientAndStatus(recipient, "PENDING");
 
@@ -171,12 +171,12 @@ public class FriendService {
     // 친구 삭제
     @Transactional
     public void removeFriend(Optional<String> token) {
-        String email = null;
+        String muscleId = null;
         if (token.isPresent()) {
             JwtAuthToken jwtAuthToken = jwtAuthTokenProvider.convertAuthToken(token.get());
-            email = jwtAuthToken.getClaims().getSubject();
+            muscleId = jwtAuthToken.getClaims().getSubject();
         }
-        Auth user = authRepository.findByEmail(email);
+        Auth user = authRepository.findByMuscleId(muscleId);
         Auth friend = user.getMuscleFriend();
 
         user.setMuscleFriend(null);

@@ -31,8 +31,8 @@ public class Auth {
     @Column(name="name")
     private String name;
 
-    @Column(name="nickName")
-    private String nickName;
+    @Column(name="muscleId")
+    private String muscleId;
 
     @Column(name="level")
     private String level;
@@ -44,6 +44,9 @@ public class Auth {
     @Column(name = "userImg")
     private String userImg;
 
+    @Column(name = "naverId")
+    private String naverId;
+
     // 친구 관계
     @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "muscleFriend_id")
@@ -53,19 +56,22 @@ public class Auth {
 
 
     @Builder
-    public Auth(String email, String password, String name, String nickName, String salt, String userImg){
+    public Auth(String email, String password, String name, String muscleId, String salt, String userImg, String naverId){
         this.email = email;
         this.password = password;
         this.name = name;
-        this.nickName = nickName;
+        this.muscleId = muscleId;
         this.salt = salt;
         this.userImg = userImg;
+        this.naverId = naverId;
     }
 
-    public void update(String password, String name, String nickName, String salt) {
+
+
+    public void update(String password, String name, String muscleId, String salt) {
         this.password = password;
         this.name = name;
-        this.nickName = nickName;
+        this.muscleId = muscleId;
         this.salt = salt;
     }
 

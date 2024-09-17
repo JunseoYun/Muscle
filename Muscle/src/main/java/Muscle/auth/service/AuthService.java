@@ -10,6 +10,7 @@ import Muscle.auth.security.JwtAuthTokenProvider;
 import Muscle.auth.security.role.Role;
 import Muscle.auth.util.RedisUtil;
 import Muscle.auth.util.SHA256Util;
+import Muscle.common.dto.ResponseMessage;
 import Muscle.common.exception.error.*;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -26,7 +27,7 @@ import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
-public class AuthService implements AuthServiceInterface {
+public class AuthService {
 
     private final AuthRepository authRepository;
     private final JwtAuthTokenProvider jwtAuthTokenProvider;
@@ -34,14 +35,17 @@ public class AuthService implements AuthServiceInterface {
     private final RedisUtil redisUtil;
 
     @Transactional
-    @Override
     public void registerUser(RequestAuth.RegisterUserDto registerUserDto) {
 
         Auth user = authRepository.findByEmail(registerUserDto.getEmail());
         if(user != null){
+
+            if(user.getNaverId() != null && user.getPassword() == null) {
+                throw new UserAlreadyRegisteredException("Already registered with Naver.");
+            }
             throw new ExistingEmailException();
         }
-        user = authRepository.findByNickName(registerUserDto.getNickName());
+        user = authRepository.findByMuscleId(registerUserDto.getMuscleId());
         if(user != null){
             throw new ExistingNicknameException();
         }
@@ -52,7 +56,6 @@ public class AuthService implements AuthServiceInterface {
         authRepository.save(user);
     }
 
-    @Override
     @Transactional
     public Optional<ResponseAuth.LoginUserRsDto> loginUser(RequestAuth.LoginUserRqDto loginUserRqDto) {
         Auth user = authRepository.findByEmail(loginUserRqDto.getEmail());
@@ -64,14 +67,17 @@ public class AuthService implements AuthServiceInterface {
         if(user == null)
             throw new LoginFailedException();
 
-        String accessToken = createAccessToken(user.getEmail());
+        String accessToken = createAccessToken(user.getMuscleId());
         return Optional.ofNullable(ResponseAuth.LoginUserRsDto.toDto(accessToken));
     }
 
 
 
 
-//    @Override
+
+
+
+
 //    @Transactional
 //    public String uploadImg(MultipartFile file, Optional<String> token) {
 //        String email = null;
@@ -93,14 +99,13 @@ public class AuthService implements AuthServiceInterface {
 //        return url;
 //    }
 
-    @Override
     public String createAccessToken(String userid) {
         Date expiredDate = Date.from(LocalDateTime.now().plusDays(1).atZone(ZoneId.systemDefault()).toInstant());
         JwtAuthToken accessToken = jwtAuthTokenProvider.createAuthToken(userid, Role.USER.getCode(),expiredDate);
         return accessToken.getToken();
     }
 
-    @Override
+
     public String getTempToken(String email, String verificationCode){
         JwtAuthToken tempToken = null;
         if(redisUtil.getData(verificationCode)==null){
@@ -114,20 +119,20 @@ public class AuthService implements AuthServiceInterface {
     }
 
 
-    @Override
+
     @Transactional
     public void updateUser(Optional<String> token, RequestAuth.UpdateUserDto updateUserDto) {
 
-        String email = null;
+        String muscleId = null;
         if (token.isPresent()) {
             JwtAuthToken jwtAuthToken = jwtAuthTokenProvider.convertAuthToken(token.get());
-            email = jwtAuthToken.getClaims().getSubject();
+            muscleId = jwtAuthToken.getClaims().getSubject();
         }
 
-        Auth originalUser = authRepository.findByEmail(email);
+        Auth originalUser = authRepository.findByMuscleId(muscleId);
         if(originalUser == null)
             throw new NotFoundUserException();
-        Auth nameUser = authRepository.findByNickName(updateUserDto.getNickName());
+        Auth nameUser = authRepository.findByMuscleId(updateUserDto.getMuscleId());
         if(nameUser != null && !originalUser.equals(nameUser))
             throw new RegisterFailedException();
 
@@ -137,15 +142,15 @@ public class AuthService implements AuthServiceInterface {
         authRepository.save(updatedUser);
     }
 
-    @Override
+
     @Transactional
     public void setUserLevel(Optional<String> token, RequestAuth.SetUserLevelDto setUserLevelDto) {
-        String email = null;
+        String muscleId = null;
         if (token.isPresent()) {
             JwtAuthToken jwtAuthToken = jwtAuthTokenProvider.convertAuthToken(token.get());
-            email = jwtAuthToken.getClaims().getSubject();
+            muscleId = jwtAuthToken.getClaims().getSubject();
         }
-        Auth user = authRepository.findByEmail(email);
+        Auth user = authRepository.findByMuscleId(muscleId);
         if(user == null)
             throw new NotFoundUserException();
         if(Objects.equals(user.getLevel(), setUserLevelDto.getLevel())) {
@@ -156,16 +161,16 @@ public class AuthService implements AuthServiceInterface {
         authRepository.save(levelSetUser);
     }
 
-    @Override
+
     @Transactional
     public void changePassword(Optional<String> token, String password){
-        String email = null;
+        String muscleId = null;
         if (token.isPresent()) {
             JwtAuthToken jwtAuthToken = jwtAuthTokenProvider.convertAuthToken(token.get());
-            email = jwtAuthToken.getClaims().getSubject();
+            muscleId = jwtAuthToken.getClaims().getSubject();
         }
 
-        Auth user = authRepository.findByEmail(email);
+        Auth user = authRepository.findByMuscleId(muscleId);
         if(user == null)
             throw new NotFoundUserException();
 
@@ -177,19 +182,35 @@ public class AuthService implements AuthServiceInterface {
 
 
 
-    @Override
+
     @Transactional
     public ResponseAuth.GetUserDto getUser(Optional<String> token) {
 
-        String email = null;
+        String muscleId = null;
         if(token.isPresent()){
             JwtAuthToken jwtAuthToken = jwtAuthTokenProvider.convertAuthToken(token.get());
-            email = jwtAuthToken.getClaims().getSubject();
+            muscleId = jwtAuthToken.getClaims().getSubject();
         }
-        Auth user = authRepository.findByEmail(email);
+        Auth user = authRepository.findByMuscleId(muscleId);
         if (user == null)
             throw new NotFoundUserException();
 
         return ResponseAuth.GetUserDto.toDto(user);
+    }
+
+    public ResponseMessage remove(Optional<String> token) {
+        String muscleId = null;
+        if(token.isPresent()){
+            JwtAuthToken jwtAuthToken = jwtAuthTokenProvider.convertAuthToken(token.get());
+            muscleId = jwtAuthToken.getClaims().getSubject();
+        }
+
+        Auth user = authRepository.findByMuscleId(muscleId);
+        authRepository.delete(user);
+
+        ResponseMessage responseMessage = ResponseMessage.builder()
+                .message("User registered successfully with Naver.")
+                .build();
+        return responseMessage;
     }
 }

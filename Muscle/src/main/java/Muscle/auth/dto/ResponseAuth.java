@@ -24,7 +24,7 @@ public class ResponseAuth {
     public static class GetUserDto{
         private String email;
         private String name;
-        private String nickName;
+        private String muscleId;
         private String level;
         private String userImg;
 
@@ -32,7 +32,7 @@ public class ResponseAuth {
             return GetUserDto.builder()
                     .email(user.getEmail())
                     .name(user.getName())
-                    .nickName(user.getNickName())
+                    .muscleId(user.getMuscleId())
                     .level(user.getLevel())
                     .userImg(user.getUserImg())
                     .build();
@@ -44,7 +44,7 @@ public class ResponseAuth {
     public static class FriendResponseDto {
         private Long friendId;
         private String friendName;
-        private String friendNickName;
+        private String friendMuscleId;
         private String friendImg;
         private String friendLevel;
 
@@ -52,7 +52,7 @@ public class ResponseAuth {
             return FriendResponseDto.builder()
                     .friendId(user.getId())
                     .friendName(user.getName())
-                    .friendNickName(user.getNickName())
+                    .friendMuscleId(user.getMuscleId())
                     .friendImg(user.getUserImg())
                     .friendLevel(user.getLevel())
                     .build();
@@ -64,7 +64,7 @@ public class ResponseAuth {
     public static class FriendRequestResponseDto  {
         private Long requesterId;
         private String requesterName;
-        private String requesterNickName;
+        private String requesterMuscleId;
         private String requesterImg;
         private String requesterLevel;
 
@@ -72,7 +72,7 @@ public class ResponseAuth {
             return FriendRequestResponseDto.builder()
                     .requesterId(friendRequest.getRequester().getId())
                     .requesterName(friendRequest.getRequester().getName())
-                    .requesterNickName(friendRequest.getRequester().getNickName())
+                    .requesterMuscleId(friendRequest.getRequester().getMuscleId())
                     .requesterImg(friendRequest.getRequester().getUserImg())
                     .requesterLevel(friendRequest.getRequester().getLevel())
                     .build();
@@ -84,7 +84,7 @@ public class ResponseAuth {
     public static class FriendRecipientResponseDto {
         private Long recipientId;
         private String recipientName;
-        private String recipientNickName;
+        private String recipientMuscleId;
         private String recipientImg;
         private String recipientLevel;
 
@@ -92,10 +92,25 @@ public class ResponseAuth {
             return FriendRecipientResponseDto.builder()
                     .recipientId(friendRequest.getRecipient().getId())
                     .recipientName(friendRequest.getRecipient().getName())
-                    .recipientNickName(friendRequest.getRecipient().getNickName())
+                    .recipientMuscleId(friendRequest.getRecipient().getMuscleId())
                     .recipientImg(friendRequest.getRecipient().getUserImg())
                     .recipientLevel(friendRequest.getRecipient().getLevel())
                     .build();
+        }
+    }
+
+    @Data
+    @Builder
+    public static class OauthResponseDto {
+        private String naverId;
+        private String name;
+        private String email;
+
+        public OauthResponseDto(String naverId, String name, String email) {
+            this.naverId = naverId;
+            this.name = name;
+            this.email = email;
+
         }
     }
 }

@@ -32,12 +32,12 @@ public class CommentService {
 
     public Long createComment(RequestComment.CreateCommentDto createCommentDto, Optional<String> token) {
 
-        String email = null;
+        String muscleId = null;
         if(token.isPresent()) {
             JwtAuthToken jwtAuthToken = jwtAuthTokenProvider.convertAuthToken(token.get());
-            email = jwtAuthToken.getClaims().getSubject();
+            muscleId = jwtAuthToken.getClaims().getSubject();
         }
-        Long commentWriterId = authRepository.findByEmail(email).getId();
+        Long commentWriterId = authRepository.findByMuscleId(muscleId).getId();
         Post post = postRepository.findById(createCommentDto.getPostId()).get();
         if(post == null) {
             throw new EntityNotFoundException();
@@ -62,12 +62,12 @@ public class CommentService {
     }
 
     public void updateComment(RequestComment.UpdateCommentDto updateCommentDto, Optional<String> token) {
-        String email = null;
+        String muscleId = null;
         if(token.isPresent()) {
             JwtAuthToken jwtAuthToken = jwtAuthTokenProvider.convertAuthToken(token.get());
-            email = jwtAuthToken.getClaims().getSubject();
+            muscleId = jwtAuthToken.getClaims().getSubject();
         }
-        Long commentWriterId = authRepository.findByEmail(email).getId();
+        Long commentWriterId = authRepository.findByMuscleId(muscleId).getId();
         Comment originalComment = commentRepository.findById(updateCommentDto.getCommentId()).get();
         if(Objects.equals(commentWriterId, originalComment.getCommentWriterId())) {
             Comment updatedComment = RequestComment.UpdateCommentDto.toEntity(originalComment, updateCommentDto);
@@ -79,12 +79,12 @@ public class CommentService {
     }
 
     public void deleteComment(Long commentId, Optional<String> token) {
-        String email = null;
+        String muscleId = null;
         if(token.isPresent()) {
             JwtAuthToken jwtAuthToken = jwtAuthTokenProvider.convertAuthToken(token.get());
-            email = jwtAuthToken.getClaims().getSubject();
+            muscleId = jwtAuthToken.getClaims().getSubject();
         }
-        Long userId = authRepository.findByEmail(email).getId();
+        Long userId = authRepository.findByMuscleId(muscleId).getId();
         Comment comment = commentRepository.findById(commentId).get();
         Long postWriterId = comment.getPost().getWriterId();
 

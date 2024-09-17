@@ -20,17 +20,36 @@ public class RequestAuth {
         private String email;
         private String password;
         private String name;
-        private String nickName;
+        private String muscleId;
 
         public static Auth toEntity(RegisterUserDto registerUserDto, String salt, String encryptedPassword){
             return Auth.builder()
                     .email(registerUserDto.getEmail())
                     .password(encryptedPassword)
                     .name(registerUserDto.getName())
-                    .nickName(registerUserDto.getNickName())
+                    .muscleId(registerUserDto.getMuscleId())
                     .salt(salt)
                     .build();
         }
+    }
+
+    @Builder
+    @Data
+    public static class naverRegister {
+        private String naverId;
+        private String email;
+        private String name;
+        private String muscleId;
+
+        public static Auth toEntity(String naverId, String email, String name,  String muscleId) {
+            return Auth.builder()
+                    .naverId(naverId)
+                    .email(email)
+                    .name(name)
+                    .muscleId(muscleId)
+                    .build();
+        }
+
     }
 
     @Builder
@@ -45,10 +64,10 @@ public class RequestAuth {
     public static class UpdateUserDto{
         private String password;
         private String name;
-        private String nickName;
+        private String muscleId;
 
         public static Auth toEntity(Auth user, UpdateUserDto updateUserDto, String salt, String encryptedPassword){
-            user.update(encryptedPassword, updateUserDto.getName(), updateUserDto.getNickName(), salt);
+            user.update(encryptedPassword, updateUserDto.getName(), updateUserDto.getMuscleId(), salt);
             return user;
         }
     }
@@ -118,4 +137,6 @@ public class RequestAuth {
         private String email;
         private String verificationCode;
     }
+
+
 }
