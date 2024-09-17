@@ -5,6 +5,7 @@ import Muscle.auth.dto.ResponseAuth;
 import Muscle.auth.security.JwtAuthTokenProvider;
 import Muscle.auth.service.AuthService;
 import Muscle.auth.service.EmailService;
+import Muscle.auth.service.KakaoLoginService;
 import Muscle.auth.service.NaverLoginService;
 import Muscle.common.dto.ResponseDto;
 import Muscle.common.dto.ResponseMessage;
@@ -31,6 +32,7 @@ public class AuthController {
     private final JwtAuthTokenProvider jwtAuthTokenProvider;
     private final EmailService emailService;
     private final NaverLoginService naverLoginService;
+    private final KakaoLoginService kakaoLoginService;
 
 
     @PostMapping("/register")
@@ -57,7 +59,7 @@ public class AuthController {
     }
 
     @GetMapping("/login/naver")
-    public ResponseEntity<ResponseMessage> redirectToNaverLogin () {
+    public ResponseEntity<ResponseMessage> naverLogin () {
         String naverLoginUrl = naverLoginService.generateNaverLoginUrl();
         ResponseMessage responseMessage = ResponseMessage.builder()
                 .message("Naver login requested successfully.")
@@ -73,6 +75,23 @@ public class AuthController {
         ResponseMessage responseMessage = naverLoginService.processNaverLogin(code, state);
         return ResponseEntity.status(HttpStatus.OK).body(responseMessage);
     }
+
+    @GetMapping("/login/kakao")
+    public ResponseEntity<ResponseMessage> kakaoLogin() {
+        String kakaoLoginUrl = kakaoLoginService.generateKakaoLoginUrl();
+        ResponseMessage responseMessage = ResponseMessage.builder()
+                .message("Kakao login requested successfully.")
+                .data(kakaoLoginUrl)
+                .build();
+        return ResponseEntity.status(HttpStatus.OK).body(responseMessage);
+    }
+
+    @GetMapping("/login/oauth2/code/kakao")
+    public ResponseEntity<ResponseMessage> callbackKakaoLogin (@RequestParam String code, @RequestParam String state) {
+        ResponseMessage responseMessage = kakaoLoginService.processKakaoLogin(code, state);
+        return ResponseEntity.status(HttpStatus.OK).body(responseMessage);
+    }
+
 
     @PostMapping("/login")
     public ResponseEntity<ResponseMessage> loginUser(@Valid @RequestBody RequestAuth.LoginUserRqDto loginUserRqDto) {

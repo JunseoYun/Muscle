@@ -54,6 +54,24 @@ public class RequestAuth {
 
     @Builder
     @Data
+    public static class kakaoRegister {
+        private String kakaoId;
+        private String email;
+        private String name;
+        private String muscleId;
+
+        public static Auth toEntity(String kakaoId, String email, String name, String muscleId) {
+            return Auth.builder()
+                    .kakaoId(kakaoId)
+                    .email(email)
+                    .name(name)
+                    .muscleId(muscleId)
+                    .build();
+        }
+    }
+
+    @Builder
+    @Data
     public static class LoginUserRqDto{
         private String email;
         private String password;

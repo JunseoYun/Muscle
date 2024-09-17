@@ -102,12 +102,12 @@ public class ResponseAuth {
     @Data
     @Builder
     public static class OauthResponseDto {
-        private String naverId;
+        private String oauthId;
         private String name;
         private String email;
 
-        public OauthResponseDto(String naverId, String name, String email) {
-            this.naverId = naverId;
+        public OauthResponseDto(String oauthId, String name, String email) {
+            this.oauthId = oauthId;
             this.name = name;
             this.email = email;
 

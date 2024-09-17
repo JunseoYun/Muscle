@@ -8,5 +8,6 @@ public interface AuthRepository extends JpaRepository<Auth, Long> {
     Auth findByMuscleId(String muscleId);
     Auth findByEmailAndPassword(String email, String password);
     Auth findByNaverId(String naverId);
+    Auth findByKakaoId(String kakaoId);
 
 }

@@ -6,12 +6,10 @@ import Muscle.auth.entity.Auth;
 import Muscle.auth.repository.AuthRepository;
 import Muscle.common.dto.ResponseMessage;
 import Muscle.common.exception.error.LoginFailedException;
+import Muscle.common.exception.error.RegisterFailedException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import io.swagger.v3.oas.annotations.tags.Tags;
 import lombok.RequiredArgsConstructor;
-import lombok.Value;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
@@ -21,33 +19,29 @@ import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.UriComponentsBuilder;
 
+import javax.crypto.spec.OAEPParameterSpec;
 import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
-public class NaverLoginService {
-
+public class KakaoLoginService {
     private final AuthRepository authRepository;
 
     private final AuthService authService;
 
-    private static final String NAVER_AUTH_BASE_URL = "https://nid.naver.com/oauth2.0/authorize";
-    private static final String CLIENT_ID = "7IkNK1KlVLSR0SAiMAiS";
-    private static final String CLIENT_SECRET = "A1fpi0bgFt";
-    private static final String REDIRECT_URI = "http://localhost:8080/api/auth/login/oauth2/code/naver";
+    private static final String KAKAO_AUTH_BASE_URL = "https://kauth.kakao.com/oauth/authorize";
+    private static final String CLIENT_ID = "10a2cf156a1962c0fe80bfd2d221f76f";
+    private static final String REDIRECT_URI = "http://localhost:8080/api/auth/login/oauth2/code/kakao";
     private static final String STATE_STRING = "123";  // CSRF 방지용 상태값
-    private static final String TOKEN_URL = "https://nid.naver.com/oauth2.0/token";
-    private static final String USER_INFO_URL = "https://openapi.naver.com/v1/nid/me";
-
+    private static final String TOKEN_URL = "https://kauth.kakao.com/oauth/token";
+    private static final String USER_INFO_URL = "https://kapi.kakao.com/v2/user/me";
 
     private final RestTemplate restTemplate = new RestTemplate();
 
 
-
-
-    // 네이버 로그인 URL 생성
-    public String generateNaverLoginUrl() {
-        return UriComponentsBuilder.fromHttpUrl(NAVER_AUTH_BASE_URL)
+    // 카카오 로그인 URL 생성
+    public String generateKakaoLoginUrl () {
+        return UriComponentsBuilder.fromHttpUrl(KAKAO_AUTH_BASE_URL)
                 .queryParam("response_type", "code")
                 .queryParam("client_id", CLIENT_ID)
                 .queryParam("state", STATE_STRING)
@@ -55,79 +49,54 @@ public class NaverLoginService {
                 .toUriString();
     }
 
-    // 네이버 로그인 처리
-    public ResponseMessage processNaverLogin(String code, String state) {
+    //카카오 로그인 처리
+    public ResponseMessage processKakaoLogin(String code, String state) {
+
         // 1. Authorization Code로 Access Token 요청
-        String naverAccessToken = getAccessTokenFromNaver(code, state);
+        String kakaoAccessToken = getAccessTokenFromKakao(code, state);
+        // 2. Access Token으로 카카오 사용자 정보 요청
+        ResponseAuth.OauthResponseDto oauthData = getUserInfoFromKakao(kakaoAccessToken);
 
-        // 2. Access Token으로 네이버 사용자 정보 요청
-        ResponseAuth.OauthResponseDto oauthData = getUserInfoFromNaver(naverAccessToken);
 
-        Auth user = authRepository.findByNaverId(oauthData.getOauthId());
-        if(user != null){
-            ResponseAuth.LoginUserRsDto response = naverLogin(user).orElseThrow(() -> new LoginFailedException());
+        Auth user = authRepository.findByKakaoId(oauthData.getOauthId());
+        if(user != null) {
+            ResponseAuth.LoginUserRsDto response = kakaoLogin(user).orElseThrow(() -> new LoginFailedException());
             ResponseMessage responseMessage = ResponseMessage.builder()
-                    .message("Naver login successfully.")
+                    .message("Kakao login successfully.")
                     .data(response)
                     .build();
             return responseMessage;
         }
 
         user = authRepository.findByEmail(oauthData.getEmail());
-        if(user != null){
-            //네이버 계정 연동
-            ResponseAuth.LoginUserRsDto response = naverLinking(user, oauthData.getOauthId()).orElseThrow(() -> new LoginFailedException());
+        if(user != null) {
+            //카카오 계정 연동
+            ResponseAuth.LoginUserRsDto response = kakaoLinking(user, oauthData.getOauthId()).orElseThrow(() -> new LoginFailedException());
             ResponseMessage responseMessage = ResponseMessage.builder()
-                    .message("User linked successfully with Naver.")
+                    .message("User linked successfully with Kakao.")
                     .data(response)
                     .build();
             return responseMessage;
         }
-        // 네이버 회원가입
+
+        //카카오 회원가입
         String tempMuscleId = oauthData.getName() + oauthData.getEmail();
-        ResponseAuth.LoginUserRsDto response = naverRegister(oauthData.getOauthId(), oauthData.getEmail(), oauthData.getName(), tempMuscleId).orElseThrow(() -> new LoginFailedException());
+        ResponseAuth.LoginUserRsDto response = kakaoRegister(oauthData.getOauthId(), oauthData.getEmail(), oauthData.getName(), tempMuscleId).orElseThrow(() -> new LoginFailedException());
         ResponseMessage responseMessage = ResponseMessage.builder()
-                .message("User registered successfully with Naver.")
+                .message("User registered successfully with Kakao.")
                 .data(response)
                 .build();
         return responseMessage;
 
-
-
     }
 
 
-    public Optional<ResponseAuth.LoginUserRsDto> naverLogin (Auth user) {
-
-        String accessToken = authService.createAccessToken(user.getMuscleId());
-        return Optional.ofNullable(ResponseAuth.LoginUserRsDto.toDto(accessToken));
-    }
-
-    public Optional<ResponseAuth.LoginUserRsDto> naverRegister(String naverId, String email, String name, String muscleId) {
-        Auth user = RequestAuth.naverRegister.toEntity(naverId, email, name, muscleId);
-        authRepository.save(user);
-
-        String accessToken = authService.createAccessToken(user.getMuscleId());
-        return Optional.ofNullable(ResponseAuth.LoginUserRsDto.toDto(accessToken));
-
-    }
-
-    public Optional<ResponseAuth.LoginUserRsDto> naverLinking(Auth user, String naverId) {
-        user.setNaverId(naverId);
-        authRepository.save(user);
-
-        String accessToken = authService.createAccessToken(user.getMuscleId());
-        return Optional.ofNullable(ResponseAuth.LoginUserRsDto.toDto(accessToken));
-    }
-
-
-
-    // 네이버에 Access Token 요청
-    private String getAccessTokenFromNaver(String code, String state) {
+    // 카카오에 Access Token 요청
+    private String getAccessTokenFromKakao(String code, String state) {
         String requestUrl = UriComponentsBuilder.fromHttpUrl(TOKEN_URL)
                 .queryParam("grant_type", "authorization_code")
                 .queryParam("client_id", CLIENT_ID)
-                .queryParam("client_secret", CLIENT_SECRET)
+                .queryParam("redirect_uri", REDIRECT_URI)
                 .queryParam("code", code)
                 .queryParam("state", state)
                 .toUriString();
@@ -138,7 +107,7 @@ public class NaverLoginService {
             String responseBody = response.getBody();
 
             // 응답 출력 (디버깅용)
-            System.out.println("Naver Token Response: " + responseBody);
+            System.out.println("Kakao Token Response: " + responseBody);
 
             // ObjectMapper를 사용하여 JSON 파싱
             ObjectMapper objectMapper = new ObjectMapper();
@@ -158,9 +127,8 @@ public class NaverLoginService {
         }
     }
 
-    // Access Token으로 네이버 사용자 정보 요청
-    private ResponseAuth.OauthResponseDto getUserInfoFromNaver(String accessToken) {
-        String requestUrl = "https://openapi.naver.com/v1/nid/me";
+    private ResponseAuth.OauthResponseDto getUserInfoFromKakao(String accessToken) {
+        String requestUrl = "https://kapi.kakao.com/v2/user/me";
 
         HttpHeaders headers = new HttpHeaders();
         headers.add("Authorization", "Bearer " + accessToken);
@@ -175,31 +143,52 @@ public class NaverLoginService {
 
         String responseBody = response.getBody();
 
-
         System.out.println("responseBody = " + responseBody);
         // ObjectMapper를 사용하여 JSON 파싱
         try {
             ObjectMapper objectMapper = new ObjectMapper();
             JsonNode rootNode = objectMapper.readTree(responseBody);
 
-            if (rootNode.has("response")) {
-                JsonNode userInfo = rootNode.path("response");
+            String kakaoId = rootNode.path("id").asText();
+            String name = rootNode.path("properties").path("nickname").asText();
+            String email = rootNode.path("kakao_account").path("email").asText();
 
 
-                String naverId = userInfo.path("id").asText();
-                String email = userInfo.path("email").asText();
-                String name = userInfo.path("name").asText();
-
-                return new ResponseAuth.OauthResponseDto(naverId, name, email);
-            } else {
-                throw new RuntimeException("Failed to retrieve user info from Naver");
+            if(email == null) {
+                throw new RuntimeException("Set up your Kakao email.");
             }
+            if (name == null) {
+                System.out.println("Name NULL");
+                name = email.split("@")[0];
+            }
+
+
+            return new ResponseAuth.OauthResponseDto(kakaoId, name, email);
         } catch (Exception e) {
-            throw new RuntimeException("Failed to parse user info response from Naver: " + e.getMessage(), e);
+            throw new RuntimeException("Failed to parse user info response from Kakao: " + e.getMessage(), e);
         }
     }
 
+    public Optional<ResponseAuth.LoginUserRsDto> kakaoLogin (Auth user) {
 
+        String accessToken = authService.createAccessToken(user.getMuscleId());
+        return Optional.ofNullable(ResponseAuth.LoginUserRsDto.toDto(accessToken));
+    }
 
+    public Optional<ResponseAuth.LoginUserRsDto> kakaoRegister(String kakaoId, String email, String name, String muscleId) {
+        Auth user = RequestAuth.kakaoRegister.toEntity(kakaoId, email, name, muscleId);
+        authRepository.save(user);
 
+        String accessToken = authService.createAccessToken(user.getMuscleId());
+        return Optional.ofNullable(ResponseAuth.LoginUserRsDto.toDto(accessToken));
+
+    }
+
+    public Optional<ResponseAuth.LoginUserRsDto> kakaoLinking(Auth user, String kakaoId) {
+        user.setKakaoId(kakaoId);
+        authRepository.save(user);
+
+        String accessToken = authService.createAccessToken(user.getMuscleId());
+        return Optional.ofNullable(ResponseAuth.LoginUserRsDto.toDto(accessToken));
+    }
 }
