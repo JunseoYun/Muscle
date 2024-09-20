@@ -96,11 +96,10 @@ public class RequestAuth {
         private String level;
         private String temp;
 
-        public static Auth toEntity(Auth user, SetUserLevelDto setUserLevelDto){
-            user.setUserLevel(setUserLevelDto.getLevel());
-            return user;
-        }
+
     }
+
+
 
 
     @Builder

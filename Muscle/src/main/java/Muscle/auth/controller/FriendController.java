@@ -46,7 +46,7 @@ public class FriendController {
 
 
     //친구 요청 취소
-    @PostMapping("/cancel")
+    @DeleteMapping("/cancel")
     public ResponseEntity<ResponseMessage> cancelFriendRequest(HttpServletRequest request) {
         Optional<String> token = null;
         if (request != null) {

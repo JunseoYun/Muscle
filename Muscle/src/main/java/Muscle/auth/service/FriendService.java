@@ -87,6 +87,7 @@ public class FriendService {
         recipient.setMuscleFriend(sender);
         sender.setMuscleFriend(recipient);
 
+
         //친구 요청 받은 후 자신에게 온 친구 요청 리스트 안 지움
         authRepository.save(recipient);
         authRepository.save(sender);

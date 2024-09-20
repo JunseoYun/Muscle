@@ -4,6 +4,7 @@ package Muscle.auth.service;
 import Muscle.auth.dto.RequestAuth;
 import Muscle.auth.dto.ResponseAuth;
 import Muscle.auth.entity.Auth;
+import Muscle.auth.entity.UserRole;
 import Muscle.auth.repository.AuthRepository;
 import Muscle.auth.security.JwtAuthToken;
 import Muscle.auth.security.JwtAuthTokenProvider;
@@ -153,9 +154,10 @@ public class AuthService {
         if(Objects.equals(user.getLevel(), setUserLevelDto.getLevel())) {
             throw new RegisterFailedException();
         }
-        Auth levelSetUser = RequestAuth.SetUserLevelDto.toEntity(user, setUserLevelDto);
 
-        authRepository.save(levelSetUser);
+        user.setLevel(setUserLevelDto.getLevel());
+
+        authRepository.save(user);
     }
 
 
@@ -248,6 +250,24 @@ public class AuthService {
         ResponseMessage responseMessage = ResponseMessage.builder()
                 .message("Account linking list.")
                 .data(linked)
+                .build();
+        return responseMessage;
+    }
+
+
+    public ResponseMessage setAdmin(Optional<String> token) {
+        String muscleId = null;
+        if(token.isPresent()){
+            JwtAuthToken jwtAuthToken = jwtAuthTokenProvider.convertAuthToken(token.get());
+            muscleId = jwtAuthToken.getClaims().getSubject();
+        }
+
+        Auth user = authRepository.findByMuscleId(muscleId);
+        user.setRole(UserRole.ADMIN);
+        authRepository.save(user);
+
+        ResponseMessage responseMessage = ResponseMessage.builder()
+                .message("Set admin successfully.")
                 .build();
         return responseMessage;
     }

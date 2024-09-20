@@ -36,10 +36,10 @@ public class Auth {
 
     @Enumerated(EnumType.STRING)
     @Column(name = "role")
-    private UserRole role;
+    private UserRole role = UserRole.AMATEUR;
 
     @Column(name="level")
-    private String level;
+    private String level = "등급 미정";
 
 
     @Column(name="salt")
@@ -90,13 +90,6 @@ public class Auth {
     }
 
 
-
-
-
-
-    public void setUserLevel(String level) {
-        this.level = level;
-    }
 
 
 

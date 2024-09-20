@@ -105,7 +105,7 @@ public class AuthController {
 
 
 
-    @PutMapping("/setUserLevel")
+    @PostMapping("/setUserLevel")
     public ResponseEntity<ResponseMessage> setUserLevel(HttpServletRequest request, @Valid @RequestBody RequestAuth.SetUserLevelDto setUserLevelDto) {
         Optional<String> token = null;
         if (request != null) {
@@ -118,6 +118,8 @@ public class AuthController {
                 .build();
         return ResponseEntity.status(HttpStatus.OK).body(responseMessage);
     }
+
+
 
     @PostMapping ("/sendEmail")
     public String sendEmail(@RequestBody @Valid RequestAuth.SendEmailDto sendEmailDto){
@@ -226,6 +228,16 @@ public class AuthController {
             token = jwtAuthTokenProvider.getAuthToken(request);
         }
         ResponseMessage responseMessage = authService.userlinking(token);
+        return ResponseEntity.status(HttpStatus.OK).body(responseMessage);
+    }
+
+    @PostMapping("setAdmin")
+    public ResponseEntity<ResponseMessage> setAdmin(HttpServletRequest request) {
+        Optional<String> token = null;
+        if (request != null) {
+            token = jwtAuthTokenProvider.getAuthToken(request);
+        }
+        ResponseMessage responseMessage = authService.setAdmin(token);
         return ResponseEntity.status(HttpStatus.OK).body(responseMessage);
     }
 
