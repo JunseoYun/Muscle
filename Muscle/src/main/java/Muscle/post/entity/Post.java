@@ -55,18 +55,18 @@ public class Post {
 
 
     @Builder
-    public Post(Long writerId, String title, String content, String board, LocalDateTime postDate) {
+    public Post(Long writerId, String title, String content, String board) {
         this.writerId = writerId;
         this.title = title;
         this.content = content;
         this.board = board;
-        this.postDate = postDate;
+        this.postDate = LocalDateTime.now();
     }
 
-    public  void update(String title, String content, LocalDateTime postDate) {
+    public  void update(String title, String content) {
         this.title = title;
         this.content = content;
-        this.postDate = postDate;
+        this.postDate = LocalDateTime.now();
     }
 
     public void addComment(Comment comment) {

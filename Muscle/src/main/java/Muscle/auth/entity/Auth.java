@@ -34,6 +34,10 @@ public class Auth {
     @Column(name="muscleId")
     private String muscleId;
 
+    @Enumerated(EnumType.STRING)
+    @Column(name = "role")
+    private UserRole role;
+
     @Column(name="level")
     private String level;
 

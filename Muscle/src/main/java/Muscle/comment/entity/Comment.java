@@ -37,15 +37,15 @@ public class Comment {
     private Post post;
 
     @Builder
-    public Comment(Long commentWriterId, String commentContent, LocalDateTime commentDate, Post post) {
+    public Comment(Long commentWriterId, String commentContent, Post post) {
         this.commentWriterId = commentWriterId;
         this.commentContent = commentContent;
-        this.commentDate = commentDate;
+        this.commentDate = LocalDateTime.now();
         this.post = post;
     }
 
-    public void update(String commentContent, LocalDateTime commentDate) {
+    public void update(String commentContent) {
         this.commentContent = commentContent;
-        this.commentDate = commentDate;
+        this.commentDate = LocalDateTime.now();
     }
 }

@@ -17,14 +17,12 @@ public class RequestPost {
         private String title;
         private String content;
         private String board;
-        private LocalDateTime postDate;
 
         public static Post toEntity(CreatePostDto createPostDto, Long writerId) {
             return Post.builder()
                     .writerId(writerId)
                     .title(createPostDto.getTitle())
                     .board(createPostDto.getBoard())
-                    .postDate(createPostDto.getPostDate())
                     .build();
         }
     }
@@ -35,10 +33,9 @@ public class RequestPost {
         private Long postId;
         private String title;
         private String content;
-        private LocalDateTime postDate;
 
         public static Post toEntity(Post post, UpdatePostDto updatePostDto) {
-            post.update(updatePostDto.getTitle(), updatePostDto.getContent(), updatePostDto.getPostDate());
+            post.update(updatePostDto.getTitle(), updatePostDto.getContent());
             return post;
         }
     }

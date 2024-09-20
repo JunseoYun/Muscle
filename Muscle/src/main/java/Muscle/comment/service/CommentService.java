@@ -86,10 +86,12 @@ public class CommentService {
         }
         Long userId = authRepository.findByMuscleId(muscleId).getId();
         Comment comment = commentRepository.findById(commentId).get();
+        Post post = comment.getPost();
         Long postWriterId = comment.getPost().getWriterId();
 
         if(Objects.equals(userId, comment.getCommentWriterId()) || Objects.equals(userId, postWriterId)) {
             commentRepository.delete(comment);
+            post.decreasePostCommentCount();
         } else {
             throw new IllegalArgumentException("Isn't your comment or post.");
         }
