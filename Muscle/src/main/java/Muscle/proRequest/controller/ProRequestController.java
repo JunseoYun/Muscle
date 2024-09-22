@@ -4,6 +4,7 @@ import Muscle.auth.dto.RequestAuth;
 import Muscle.auth.security.JwtAuthTokenProvider;
 import Muscle.common.dto.ResponseMessage;
 import Muscle.proRequest.dto.RequestPro;
+import Muscle.proRequest.dto.ResponsePro;
 import Muscle.proRequest.service.ProRequestService;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
@@ -12,6 +13,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
+import java.util.List;
 import java.util.Optional;
 
 @RestController
@@ -29,7 +31,10 @@ public class ProRequestController {
         if (request != null) {
             token = jwtAuthTokenProvider.getAuthToken(request);
         }
-        ResponseMessage responseMessage = proRequestService.send(token, proRequestDto);
+        proRequestService.send(token, proRequestDto);
+        ResponseMessage responseMessage = ResponseMessage.builder()
+                .message("Pro registered successfully.")
+                .build();
         return ResponseEntity.status(HttpStatus.OK).body(responseMessage);
     }
 
@@ -40,7 +45,10 @@ public class ProRequestController {
         if (request != null) {
             token = jwtAuthTokenProvider.getAuthToken(request);
         }
-        ResponseMessage responseMessage = proRequestService.cancelProRequest(token);
+        proRequestService.cancelProRequest(token);
+        ResponseMessage responseMessage = ResponseMessage.builder()
+                .message("ProRequest canceled successfully.")
+                .build();
         return ResponseEntity.status(HttpStatus.OK).body(responseMessage);
     }
 
@@ -51,7 +59,10 @@ public class ProRequestController {
         if (request != null) {
             token = jwtAuthTokenProvider.getAuthToken(request);
         }
-        ResponseMessage responseMessage = proRequestService.acceptProRequest(token, proAcceptDto);
+        proRequestService.acceptProRequest(token, proAcceptDto);
+        ResponseMessage responseMessage = ResponseMessage.builder()
+                .message("ProRequest accepted successfully.")
+                .build();
         return ResponseEntity.status(HttpStatus.OK).body(responseMessage);
     }
 
@@ -62,7 +73,10 @@ public class ProRequestController {
         if (request != null) {
             token = jwtAuthTokenProvider.getAuthToken(request);
         }
-        ResponseMessage responseMessage = proRequestService.rejectProRequest(token, proRejectDto);
+        proRequestService.rejectProRequest(token, proRejectDto);
+        ResponseMessage responseMessage = ResponseMessage.builder()
+                .message("ProRequest rejected successfully.")
+                .build();
         return ResponseEntity.status(HttpStatus.OK).body(responseMessage);
     }
 
@@ -73,7 +87,11 @@ public class ProRequestController {
         if (request != null) {
             token = jwtAuthTokenProvider.getAuthToken(request);
         }
-        ResponseMessage responseMessage = proRequestService.getProRequest(token, proRequestId);
+        ResponsePro.ProRequesterDto response = proRequestService.getProRequest(token, proRequestId);
+        ResponseMessage responseMessage = ResponseMessage.builder()
+                .message("ProRequest retrieved successfully.")
+                .data(response)
+                .build();
         return ResponseEntity.status(HttpStatus.OK).body(responseMessage);
     }
 
@@ -84,7 +102,11 @@ public class ProRequestController {
         if (request != null) {
             token = jwtAuthTokenProvider.getAuthToken(request);
         }
-        ResponseMessage responseMessage = proRequestService.getAllProRequest(token);
+        List<ResponsePro.ProRequestListDto> response = proRequestService.getAllProRequest(token);
+        ResponseMessage responseMessage = ResponseMessage.builder()
+                .message("ProRequest retrieved successfully.")
+                .data(response)
+                .build();
         return ResponseEntity.status(HttpStatus.OK).body(responseMessage);
     }
 
@@ -95,18 +117,26 @@ public class ProRequestController {
         if (request != null) {
             token = jwtAuthTokenProvider.getAuthToken(request);
         }
-        ResponseMessage responseMessage = proRequestService.getStatusProRequest(token, status);
+        List<ResponsePro.ProRequestListDto> dtoList = proRequestService.getStatusProRequest(token, status);
+        ResponseMessage responseMessage = ResponseMessage.builder()
+                .message("ProRequest retrieved successfully.")
+                .data(dtoList)
+                .build();
         return ResponseEntity.status(HttpStatus.OK).body(responseMessage);
     }
 
-    //프로 신청 목록 조회(전체)
+    //프로 신청 목록 조회(유저)
     @GetMapping("getUserProRequest")
     public ResponseEntity<ResponseMessage> getUserProRequest (HttpServletRequest request, @RequestParam String requesterMuscleId) {
         Optional<String> token = null;
         if (request != null) {
             token = jwtAuthTokenProvider.getAuthToken(request);
         }
-        ResponseMessage responseMessage = proRequestService.getUserProRequest(token, requesterMuscleId);
+        ResponsePro.ProRequestListDto response = proRequestService.getUserProRequest(token, requesterMuscleId);
+        ResponseMessage responseMessage = ResponseMessage.builder()
+                .message("ProRequest retrieved successfully.")
+                .data(response)
+                .build();
         return ResponseEntity.status(HttpStatus.OK).body(responseMessage);
     }
 
