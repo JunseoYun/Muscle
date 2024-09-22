@@ -272,7 +272,7 @@ public class PostService {
         }
     }
 
-    //Delete permission exception handling required.
+
     public void deletePost(Long postId, Optional<String> token) {
         String muscleId = null;
         if(token.isPresent()) {
