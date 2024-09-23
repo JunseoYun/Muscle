@@ -24,6 +24,7 @@ public class ResponseWorkoutPlan {
         private LocalDate date;
         private String bodyPart;
         private boolean isComplete;
+        private List<WorkoutListDto> workoutList;
 
         public static GetWorkoutPlanDto toDto(WorkoutPlan workoutPlan) {
             List<WorkoutListDto> workoutList = new ArrayList<>();
@@ -37,6 +38,7 @@ public class ResponseWorkoutPlan {
                     .date(workoutPlan.getDate())
                     .bodyPart(workoutPlan.getBodyPart())
                     .isComplete(workoutPlan.isComplete())
+                    .workoutList(workoutList)
                     .build();
         }
     }

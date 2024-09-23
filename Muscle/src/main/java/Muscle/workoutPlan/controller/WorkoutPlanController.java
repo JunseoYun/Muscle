@@ -19,7 +19,7 @@ import java.util.Optional;
 @Controller
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/api/workout")
+@RequestMapping("/api/workoutPlan")
 public class WorkoutPlanController {
 
     private final WorkoutPlanService workoutPlanService;

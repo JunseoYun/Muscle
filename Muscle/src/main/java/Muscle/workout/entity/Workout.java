@@ -37,4 +37,8 @@ public class Workout {
         this.workoutPlan = workoutPlan;
     }
 
+    public void update(String name) {
+        this.name = name;
+    }
+
 }

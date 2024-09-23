@@ -86,7 +86,6 @@ public class CommentController {
         ResponseDto responseDto = ResponseDto.builder()
                 .message("Comment deleted successfully.")
                 .build();
-
         return ResponseEntity.status(HttpStatus.OK).body(responseDto);
     }
 }

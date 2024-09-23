@@ -68,6 +68,16 @@ public class WorkoutPlan {
         checkCompletion();
     }
 
+    public void unCompleteWorkout(Long workoutId) {
+        workoutList.stream()
+                .filter(workout -> workout.getId().equals(workoutId))
+                .findFirst()
+                .ifPresent(workout -> workout.setStatus(WorkoutStatus.NOT_COMPLETED));
+        checkCompletion();
+    }
+
+
+
     private void checkCompletion() {
         this.isComplete = workoutList.stream().allMatch(workout -> workout.getStatus() == WorkoutStatus.COMPLETED);
     }
