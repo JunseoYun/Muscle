@@ -1,6 +1,7 @@
 package Muscle.post.service;
 
 
+import Muscle.auth.entity.Auth;
 import Muscle.auth.repository.AuthRepository;
 import Muscle.auth.security.JwtAuthToken;
 import Muscle.auth.security.JwtAuthTokenProvider;
@@ -114,26 +115,27 @@ public class PostService {
 
 
 
-    public List<ResponsePost.GetAllPostDto> getAllPost(Optional<String> token) {
+    public List<ResponsePost.GetPostDto> getAllPost(Optional<String> token) {
         String muscleId = null;
         List<Post> entityList = postRepository.findAll();
-        List<ResponsePost.GetAllPostDto> dtoList = new ArrayList<>();
+        List<ResponsePost.GetPostDto> dtoList = new ArrayList<>();
         if (token.isPresent()) {
             JwtAuthToken jwtAuthToken = jwtAuthTokenProvider.convertAuthToken(token.get());
             muscleId = jwtAuthToken.getClaims().getSubject();
-            Long userId = authRepository.findByMuscleId(muscleId).getId();
+            Auth user = authRepository.findByMuscleId(muscleId);
 
             entityList.stream().forEach(post -> {
+                Auth writer = authRepository.findById(post.getWriterId()).get();
                 boolean isPostLiked = false;
                 boolean isPostSaved = false;
 
-                LikedPost likedPost = likedPostRepository.findByUserIdAndPostId(userId, post.getPostId());
+                LikedPost likedPost = likedPostRepository.findByUserIdAndPostId(user.getId(), post.getPostId());
                 if(likedPost != null)
                     isPostLiked = true;
-                SavedPost savedPost = savedPostRepository.findByUserIdAndPostId(userId, post.getPostId());
+                SavedPost savedPost = savedPostRepository.findByUserIdAndPostId(user.getId(), post.getPostId());
                 if(savedPost != null)
                     isPostSaved = true;
-                dtoList.add(ResponsePost.GetAllPostDto.toDto(post, isPostLiked, isPostSaved));
+                dtoList.add(ResponsePost.GetPostDto.toDto(writer, post, isPostLiked, isPostSaved));
             });
         }
 
@@ -143,6 +145,7 @@ public class PostService {
 
     public ResponsePost.GetPostDto getPost(Long postId, Optional<String> token) {
         Post post = postRepository.findById(postId).get();
+        Auth writer = authRepository.findById(post.getWriterId()).get();
 
         String muscleId = null;
         boolean isPostLiked = false;
@@ -159,13 +162,13 @@ public class PostService {
             if(savedPost != null)
                 isPostSaved = true;
         }
-        return ResponsePost.GetPostDto.toDto(post, isPostLiked, isPostSaved);
+        return ResponsePost.GetPostDto.toDto(writer, post, isPostLiked, isPostSaved);
     }
 
 
-    public List<ResponsePost.GetSavedPostDto> getSavedPost(Optional<String> token){
+    public List<ResponsePost.GetPostDto> getSavedPost(Optional<String> token){
         String muscleId = null;
-        List<ResponsePost.GetSavedPostDto> dtoList = new ArrayList<>();
+        List<ResponsePost.GetPostDto> dtoList = new ArrayList<>();
         if (token.isPresent()) {
             JwtAuthToken jwtAuthToken = jwtAuthTokenProvider.convertAuthToken(token.get());
             muscleId = jwtAuthToken.getClaims().getSubject();
@@ -182,7 +185,8 @@ public class PostService {
 
 
                 Post post = postRepository.findById(savedPost.getPostId()).get();
-                dtoList.add(ResponsePost.GetSavedPostDto.toDto(post, isPostLiked, isPostSaved));
+                Auth writer = authRepository.findById(post.getWriterId()).get();
+                dtoList.add(ResponsePost.GetPostDto.toDto(writer, post, isPostLiked, isPostSaved));
             });
         }
 
@@ -192,9 +196,9 @@ public class PostService {
 
 
 
-    public List<ResponsePost.GetAllPostDto> getPostByBoard(String board, Optional<String> token) {
+    public List<ResponsePost.GetPostDto> getPostByBoard(String board, Optional<String> token) {
         String muscleId = null;
-        List<ResponsePost.GetAllPostDto> dtoList = new ArrayList<>();
+        List<ResponsePost.GetPostDto> dtoList = new ArrayList<>();
 
         if (token.isPresent()) {
             JwtAuthToken jwtAuthToken = jwtAuthTokenProvider.convertAuthToken(token.get());
@@ -212,8 +216,9 @@ public class PostService {
                 SavedPost savedPost = savedPostRepository.findByUserIdAndPostId(userId, post.getPostId());
                 if(savedPost != null)
                     isPostSaved = true;
+                Auth writer = authRepository.findById(post.getWriterId()).get();
 
-                dtoList.add(ResponsePost.GetAllPostDto.toDto(post, isPostLiked, isPostSaved));
+                dtoList.add(ResponsePost.GetPostDto.toDto(writer, post, isPostLiked, isPostSaved));
             });
         }
 
@@ -223,9 +228,10 @@ public class PostService {
 
 
 
-    public List<ResponsePost.GetAllPostDto> getByWriterPost(Optional<String> token) {
+    //내가 작성한 게시글
+    public List<ResponsePost.GetPostDto> getByWriterPost(Optional<String> token) {
         String muscleId = null;
-        List<ResponsePost.GetAllPostDto> dtoList = new ArrayList<>();
+        List<ResponsePost.GetPostDto> dtoList = new ArrayList<>();
         if (token.isPresent()) {
             JwtAuthToken jwtAuthToken = jwtAuthTokenProvider.convertAuthToken(token.get());
             muscleId = jwtAuthToken.getClaims().getSubject();
@@ -243,7 +249,8 @@ public class PostService {
                 if(savedPost != null)
                     isPostSaved = true;
 
-                dtoList.add(ResponsePost.GetAllPostDto.toDto(post, isPostLiked, isPostSaved));
+                Auth writer = authRepository.findById(post.getWriterId()).get();
+                dtoList.add(ResponsePost.GetPostDto.toDto(writer, post, isPostLiked, isPostSaved));
             });
         }
         return dtoList;
@@ -262,11 +269,11 @@ public class PostService {
             JwtAuthToken jwtAuthToken = jwtAuthTokenProvider.convertAuthToken(token.get());
             muscleId = jwtAuthToken.getClaims().getSubject();
         }
-        Long writerId = authRepository.findByMuscleId(muscleId).getId();
-        Post originalPost = postRepository.findById(updatePostDto.getPostId()).get();
-        if(Objects.equals(writerId, originalPost.getWriterId())) {
-            Post updatedPost = RequestPost.UpdatePostDto.toEntity(originalPost, updatePostDto);
-            postRepository.save(updatedPost);
+        Long userId = authRepository.findByMuscleId(muscleId).getId();
+        Post post = postRepository.findById(updatePostDto.getPostId()).get();
+        if(Objects.equals(userId, post.getWriterId())) {
+            post.update(updatePostDto.getTitle(), updatePostDto.getContent());
+            postRepository.save(post);
         } else {
             throw new IllegalArgumentException("Isn't your post.");
         }
@@ -279,9 +286,9 @@ public class PostService {
             JwtAuthToken jwtAuthToken = jwtAuthTokenProvider.convertAuthToken(token.get());
             muscleId = jwtAuthToken.getClaims().getSubject();
         }
-        Long writerId = authRepository.findByMuscleId(muscleId).getId();
+        Long userId = authRepository.findByMuscleId(muscleId).getId();
         Post post = postRepository.findById(postId).get();
-        if(Objects.equals(writerId, post.getWriterId())) {
+        if(Objects.equals(userId, post.getWriterId())) {
             postRepository.delete(post);
         } else {
             throw new IllegalArgumentException("Isn't your post.");

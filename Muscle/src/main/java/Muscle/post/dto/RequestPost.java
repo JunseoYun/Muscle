@@ -33,10 +33,5 @@ public class RequestPost {
         private Long postId;
         private String title;
         private String content;
-
-        public static Post toEntity(Post post, UpdatePostDto updatePostDto) {
-            post.update(updatePostDto.getTitle(), updatePostDto.getContent());
-            return post;
-        }
     }
 }

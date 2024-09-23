@@ -100,7 +100,7 @@ public class PostController {
         if (request != null) {
             token = jwtAuthTokenProvider.getAuthToken(request);
         }
-        List<ResponsePost.GetAllPostDto> response = PostService.getAllPost(token);
+        List<ResponsePost.GetPostDto> response = PostService.getAllPost(token);
         ResponseDto responseDto = ResponseDto.builder()
                 .message("Post list retrieved successfully.")
                 .data(response)
@@ -126,7 +126,7 @@ public class PostController {
     @GetMapping("/getSavedPost")
     public ResponseEntity<ResponseDto> getSavedPost(HttpServletRequest request){
         Optional<String> token = jwtAuthTokenProvider.getAuthToken(request);
-        List<ResponsePost.GetSavedPostDto> response = PostService.getSavedPost(token);
+        List<ResponsePost.GetPostDto> response = PostService.getSavedPost(token);
         ResponseDto responseDto = ResponseDto.builder()
                 .message("Saved Post list retrieved successfully.")
                 .data(response)
@@ -143,7 +143,7 @@ public class PostController {
         if (request != null) {
             token = jwtAuthTokenProvider.getAuthToken(request);
         }
-        List<ResponsePost.GetAllPostDto> response = PostService.getPostByBoard(board, token);
+        List<ResponsePost.GetPostDto> response = PostService.getPostByBoard(board, token);
         ResponseDto responseDto = ResponseDto.builder()
                 .message("Post list retrieved successfully.")
                 .data(response)
@@ -155,10 +155,10 @@ public class PostController {
 
 
     @Deprecated
-    @GetMapping("/getWrittenPost") //최근 방문 가게 리스트 구현하려다 자신이 작성한 가게 리스트 만듬...
+    @GetMapping("/getWrittenPost") //내가 작성한 게시글
     public ResponseEntity<ResponseDto> getWrittenPost(HttpServletRequest request) {
         Optional<String> token = jwtAuthTokenProvider.getAuthToken(request);
-        List<ResponsePost.GetAllPostDto> response = PostService.getByWriterPost(token);
+        List<ResponsePost.GetPostDto> response = PostService.getByWriterPost(token);
         ResponseDto responseDto = ResponseDto.builder()
                 .message("Post list retrieved successfully.")
                 .data(response)
