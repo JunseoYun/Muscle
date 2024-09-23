@@ -52,7 +52,7 @@ public class WorkoutPlanService {
         if(!Objects.equals(workoutPlan.getWriterId(), user.getId()) && !Objects.equals(workoutPlan.getWriterId(), user.getMuscleFriend().getId())) {
             throw new IllegalArgumentException("권한 없음");
         }
-        return ResponseWorkoutPlan.GetWorkoutPlanDto.toDto(workoutPlan);
+        return ResponseWorkoutPlan.GetWorkoutPlanDto.toDto(user, workoutPlan);
     }
 
     //친구 운동 계획 보기
@@ -69,7 +69,7 @@ public class WorkoutPlanService {
         if(!Objects.equals(workoutPlan.getWriterId(), user.getId()) && !Objects.equals(workoutPlan.getWriterId(), user.getMuscleFriend().getId())) {
             throw new IllegalArgumentException("권한 없음");
         }
-        return ResponseWorkoutPlan.GetWorkoutPlanDto.toDto(workoutPlan);
+        return ResponseWorkoutPlan.GetWorkoutPlanDto.toDto(user.getMuscleFriend(), workoutPlan);
     }
 
 

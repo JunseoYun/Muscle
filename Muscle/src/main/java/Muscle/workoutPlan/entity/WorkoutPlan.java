@@ -36,8 +36,8 @@ public class WorkoutPlan {
     @Column(name = "bodyPart")
     private String bodyPart;
 
-    @Column(name = "isComplete")
-    private boolean isComplete;
+    @Column(name = "completionPercentage")
+    private double completionPercentage;
 
     @OneToMany(mappedBy = "workoutPlan", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private List<Workout> workoutList;
@@ -79,7 +79,10 @@ public class WorkoutPlan {
 
 
     private void checkCompletion() {
-        this.isComplete = workoutList.stream().allMatch(workout -> workout.getStatus() == WorkoutStatus.COMPLETED);
+        long completedWorkouts = workoutList.stream()
+                .filter(workout -> workout.getStatus() == WorkoutStatus.COMPLETED)
+                .count();
+        this.completionPercentage = (double) completedWorkouts / workoutList.size() * 100;
     }
 
 

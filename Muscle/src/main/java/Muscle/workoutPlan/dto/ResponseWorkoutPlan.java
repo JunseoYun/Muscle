@@ -1,6 +1,6 @@
 package Muscle.workoutPlan.dto;
 
-import Muscle.auth.repository.AuthRepository;
+import Muscle.auth.entity.Auth;
 import Muscle.workout.entity.Workout;
 import Muscle.workout.entity.WorkoutStatus;
 import Muscle.workoutPlan.entity.WorkoutPlan;
@@ -19,25 +19,30 @@ public class ResponseWorkoutPlan {
     @Builder
     public static class GetWorkoutPlanDto {
         private Long writerId;
-        private String muscleId;
+        private String writerMuscleId;
+        private String writerLevel;
+        private String writerImg;
         private Long workoutPlanId;
         private LocalDate date;
         private String bodyPart;
-        private boolean isComplete;
+        private double completionPercentage;
         private List<WorkoutListDto> workoutList;
 
-        public static GetWorkoutPlanDto toDto(WorkoutPlan workoutPlan) {
+        public static GetWorkoutPlanDto toDto(Auth writer, WorkoutPlan workoutPlan) {
             List<WorkoutListDto> workoutList = new ArrayList<>();
             if(!workoutPlan.getWorkoutList().isEmpty()) {
                 workoutPlan.getWorkoutList().stream().forEach(workout -> workoutList.add(WorkoutListDto.toDto(workout)));
             }
 
             return GetWorkoutPlanDto.builder()
-                    .writerId(workoutPlan.getWriterId())
+                    .writerId(writer.getId())
+                    .writerMuscleId(writer.getMuscleId())
+                    .writerLevel(writer.getLevel())
+                    .writerImg(writer.getUserImg())
                     .workoutPlanId(workoutPlan.getId())
                     .date(workoutPlan.getDate())
                     .bodyPart(workoutPlan.getBodyPart())
-                    .isComplete(workoutPlan.isComplete())
+                    .completionPercentage(workoutPlan.getCompletionPercentage())
                     .workoutList(workoutList)
                     .build();
         }
