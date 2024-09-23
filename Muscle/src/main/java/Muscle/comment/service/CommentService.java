@@ -2,6 +2,7 @@ package Muscle.comment.service;
 
 
 import Muscle.auth.repository.AuthRepository;
+import Muscle.auth.entity.Auth;
 import Muscle.auth.security.JwtAuthToken;
 import Muscle.auth.security.JwtAuthTokenProvider;
 import Muscle.comment.dto.RequestComment;
@@ -30,7 +31,7 @@ public class CommentService {
     private final JwtAuthTokenProvider jwtAuthTokenProvider;
     private final AuthRepository authRepository;
 
-    public Long createComment(RequestComment.CreateCommentDto createCommentDto, Optional<String> token) {
+    public Long createComment(Optional<String> token, RequestComment.CreateCommentDto createCommentDto) {
 
         String muscleId = null;
         if(token.isPresent()) {
@@ -46,19 +47,37 @@ public class CommentService {
         commentRepository.save(comment);
         post.addComment(comment);
         post.increasePostCommentCount();
+        postRepository.save(post);
         return comment.getCommentId();
     }
 
-    public List<ResponseComment.GetAllCommentDto> getAllComment() {
+    public List<ResponseComment.GetCommentDto> getPostComment(Long postId) {
+
+        Post post = postRepository.findById(postId).get();
+        List<Comment> entityList = commentRepository.findAllByPost(post);
+        List<ResponseComment.GetCommentDto> dtoList = new ArrayList<>();
+        entityList.stream().forEach(comment -> {
+            Auth writer = authRepository.findById(comment.getCommentWriterId()).get();
+            dtoList.add(ResponseComment.GetCommentDto.toDto(writer, comment));
+        });
+        return dtoList;
+
+    }
+
+    public List<ResponseComment.GetCommentDto> getAllComment() {
         List<Comment> entityList = commentRepository.findAll();
-        List<ResponseComment.GetAllCommentDto> dtoList = new ArrayList<>();
-        entityList.stream().forEach(comment -> dtoList.add(ResponseComment.GetAllCommentDto.toDto(comment)));
+        List<ResponseComment.GetCommentDto> dtoList = new ArrayList<>();
+        entityList.stream().forEach(comment -> {
+            Auth writer = authRepository.findById(comment.getCommentWriterId()).get();
+            dtoList.add(ResponseComment.GetCommentDto.toDto(writer, comment));
+                });
         return dtoList;
     }
 
-    public ResponseComment.GetCommentDto getComment(Long id) {
-        Comment comment = commentRepository.findById(id).get();
-        return ResponseComment.GetCommentDto.toDto(comment);
+    public ResponseComment.GetCommentDto getComment(Long commentId) {
+        Comment comment = commentRepository.findById(commentId).get();
+        Auth writer = authRepository.findById(comment.getCommentWriterId()).get();
+        return ResponseComment.GetCommentDto.toDto(writer, comment);
     }
 
     public void updateComment(RequestComment.UpdateCommentDto updateCommentDto, Optional<String> token) {
@@ -68,10 +87,10 @@ public class CommentService {
             muscleId = jwtAuthToken.getClaims().getSubject();
         }
         Long commentWriterId = authRepository.findByMuscleId(muscleId).getId();
-        Comment originalComment = commentRepository.findById(updateCommentDto.getCommentId()).get();
-        if(Objects.equals(commentWriterId, originalComment.getCommentWriterId())) {
-            Comment updatedComment = RequestComment.UpdateCommentDto.toEntity(originalComment, updateCommentDto);
-            commentRepository.save(updatedComment);
+        Comment comment = commentRepository.findById(updateCommentDto.getCommentId()).get();
+        if(Objects.equals(commentWriterId, comment.getCommentWriterId())) {
+            comment.update(updateCommentDto.getCommentContent());
+            commentRepository.save(comment);
         } else {
             throw new IllegalArgumentException("Isn't your comment.");
         }
@@ -92,6 +111,7 @@ public class CommentService {
         if(Objects.equals(userId, comment.getCommentWriterId()) || Objects.equals(userId, postWriterId)) {
             commentRepository.delete(comment);
             post.decreasePostCommentCount();
+            postRepository.save(post);
         } else {
             throw new IllegalArgumentException("Isn't your comment or post.");
         }

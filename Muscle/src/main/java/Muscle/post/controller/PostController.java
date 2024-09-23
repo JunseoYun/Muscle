@@ -154,7 +154,7 @@ public class PostController {
 
 
 
-    @Deprecated
+
     @GetMapping("/getWrittenPost") //내가 작성한 게시글
     public ResponseEntity<ResponseDto> getWrittenPost(HttpServletRequest request) {
         Optional<String> token = jwtAuthTokenProvider.getAuthToken(request);

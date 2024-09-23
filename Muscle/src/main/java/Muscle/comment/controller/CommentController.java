@@ -32,7 +32,7 @@ public class CommentController {
         if (request != null) {
             token = jwtAuthTokenProvider.getAuthToken(request);
         }
-        Long commentId = commentService.createComment(createCommentDto, token);
+        Long commentId = commentService.createComment(token, createCommentDto);
         ResponseDto responseDto = ResponseDto.builder()
                 .message("Comment created successfully.")
                 .data(commentId)
@@ -43,7 +43,7 @@ public class CommentController {
     @GetMapping("/get")
     public ResponseEntity<ResponseDto> getAllComment() {
 
-        List<ResponseComment.GetAllCommentDto> response = commentService.getAllComment();
+        List<ResponseComment.GetCommentDto> response = commentService.getAllComment();
         ResponseDto responseDto = ResponseDto.builder()
                 .message("Comment list retrieved successfully.")
                 .data(response)
@@ -51,10 +51,20 @@ public class CommentController {
         return ResponseEntity.status(HttpStatus.OK).body(responseDto);
     }
 
-    @GetMapping("/get/{id}")
-    public ResponseEntity<ResponseDto> getComment(@PathVariable("id") Long id) {
+    @GetMapping("/getPostComment/{postId}")
+    public ResponseEntity<ResponseDto> getPostComment(@PathVariable("postId") Long postId) {
+        List<ResponseComment.GetCommentDto> response = commentService.getPostComment(postId);
+        ResponseDto responseDto = ResponseDto.builder()
+                .message("Post comment list retrieved successfully.")
+                .data(response)
+                .build();
+        return ResponseEntity.status(HttpStatus.OK).body(responseDto);
+    }
 
-        ResponseComment.GetCommentDto response = commentService.getComment(id);
+    @GetMapping("/get/{commentId}")
+    public ResponseEntity<ResponseDto> getComment(@PathVariable("commentId") Long commentId) {
+
+        ResponseComment.GetCommentDto response = commentService.getComment(commentId);
         ResponseDto responseDto = ResponseDto.builder()
                 .message("Comment retrieved successfully.")
                 .data(response)

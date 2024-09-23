@@ -15,8 +15,8 @@ public class RequestComment {
     @Data
     @Builder
     public static class CreateCommentDto {
-        private String commentContent;
         private Long postId;
+        private String commentContent;
 
         public static Comment toEntity(CreateCommentDto createCommentDto, Long commentWriterId, Post post) {
             return Comment.builder()
@@ -33,9 +33,5 @@ public class RequestComment {
         private Long commentId;
         private String commentContent;
 
-        public static Comment toEntity(Comment comment, UpdateCommentDto updateCommentDto) {
-            comment.update(updateCommentDto.getCommentContent());
-            return comment;
-        }
     }
 }
