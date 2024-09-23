@@ -22,6 +22,7 @@ import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.UriComponentsBuilder;
 
 import java.util.Optional;
+import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
@@ -35,7 +36,7 @@ public class NaverLoginService {
     private static final String CLIENT_ID = "7IkNK1KlVLSR0SAiMAiS";
     private static final String CLIENT_SECRET = "A1fpi0bgFt";
     private static final String REDIRECT_URI = "http://localhost:8080/api/auth/login/oauth2/code/naver";
-    private static final String STATE_STRING = "123";  // CSRF 방지용 상태값
+    private static final String STATE_STRING = generateRandomUUID();  // CSRF 방지용 상태값
     private static final String TOKEN_URL = "https://nid.naver.com/oauth2.0/token";
     private static final String USER_INFO_URL = "https://openapi.naver.com/v1/nid/me";
 
@@ -199,7 +200,9 @@ public class NaverLoginService {
         }
     }
 
-
+    private static String generateRandomUUID() {
+        return UUID.randomUUID().toString(); // UUID 형식으로 랜덤 문자열 생성
+    }
 
 
 }

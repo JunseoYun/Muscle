@@ -256,6 +256,36 @@ public class PostService {
         return dtoList;
     }
 
+    //게시글 검색
+    public List<ResponsePost.GetPostDto> searchPost(Optional<String> token, String title) {
+        String muscleId = null;
+        List<ResponsePost.GetPostDto> dtoList = new ArrayList<>();
+
+        if (token.isPresent()) {
+            JwtAuthToken jwtAuthToken = jwtAuthTokenProvider.convertAuthToken(token.get());
+            muscleId = jwtAuthToken.getClaims().getSubject();
+            Long writerId = authRepository.findByMuscleId(muscleId).getId();
+            List<Post> entityList = postRepository.findByTitleContainingOrdered(title);
+
+            entityList.stream().forEach(post -> {
+                boolean isPostLiked = false;
+                boolean isPostSaved = false;
+
+                LikedPost likedPost = likedPostRepository.findByUserIdAndPostId(writerId, post.getPostId());
+                if(likedPost != null)
+                    isPostLiked = true;
+                SavedPost savedPost = savedPostRepository.findByUserIdAndPostId(writerId, post.getPostId());
+                if(savedPost != null)
+                    isPostSaved = true;
+
+                Auth writer = authRepository.findById(post.getWriterId()).get();
+                dtoList.add(ResponsePost.GetPostDto.toDto(writer, post, isPostLiked, isPostSaved));
+            });
+        }
+        return dtoList;
+
+    }
+
 
 
 

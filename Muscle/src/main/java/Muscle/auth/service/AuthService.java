@@ -24,6 +24,7 @@ import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.util.Date;
 import java.util.Objects;
+import java.util.*;
 import java.util.Optional;
 
 @Service
@@ -270,6 +271,14 @@ public class AuthService {
                 .message("Set admin successfully.")
                 .build();
         return responseMessage;
+    }
+
+    public List<ResponseAuth.SearchUserDto> searchUser(String muscleId) {
+        List<Auth> entityList = authRepository.findByMuscleIdContainingOrdered(muscleId);
+        List<ResponseAuth.SearchUserDto> dtoList = new ArrayList<>();
+        entityList.stream().forEach(auth -> dtoList.add(ResponseAuth.SearchUserDto.toDto(auth)));
+
+        return dtoList;
     }
 
 

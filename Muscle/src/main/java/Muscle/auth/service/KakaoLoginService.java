@@ -21,6 +21,7 @@ import org.springframework.web.util.UriComponentsBuilder;
 
 import javax.crypto.spec.OAEPParameterSpec;
 import java.util.Optional;
+import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
@@ -32,7 +33,7 @@ public class KakaoLoginService {
     private static final String KAKAO_AUTH_BASE_URL = "https://kauth.kakao.com/oauth/authorize";
     private static final String CLIENT_ID = "10a2cf156a1962c0fe80bfd2d221f76f";
     private static final String REDIRECT_URI = "http://localhost:8080/api/auth/login/oauth2/code/kakao";
-    private static final String STATE_STRING = "123";  // CSRF 방지용 상태값
+    private static final String STATE_STRING = generateRandomUUID();  // CSRF 방지용 상태값
     private static final String TOKEN_URL = "https://kauth.kakao.com/oauth/token";
     private static final String USER_INFO_URL = "https://kapi.kakao.com/v2/user/me";
 
@@ -190,5 +191,9 @@ public class KakaoLoginService {
 
         String accessToken = authService.createAccessToken(user.getMuscleId());
         return Optional.ofNullable(ResponseAuth.LoginUserRsDto.toDto(accessToken));
+    }
+
+    private static String generateRandomUUID() {
+        return UUID.randomUUID().toString(); // UUID 형식으로 랜덤 문자열 생성
     }
 }

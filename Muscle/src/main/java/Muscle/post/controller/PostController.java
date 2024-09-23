@@ -166,6 +166,17 @@ public class PostController {
         return ResponseEntity.status(HttpStatus.OK).body(responseDto);
     }
 
+    @GetMapping("/search/{title}")
+    public ResponseEntity<ResponseDto> searchPost(HttpServletRequest request, @PathVariable("title") String title) {
+        Optional<String> token = jwtAuthTokenProvider.getAuthToken(request);
+        List<ResponsePost.GetPostDto> response = PostService.searchPost(token, title);
+        ResponseDto responseDto = ResponseDto.builder()
+                .message("Post searched successfully.")
+                .data(response)
+                .build();
+        return ResponseEntity.status(HttpStatus.OK).body(responseDto);
+    }
+
 
 
 

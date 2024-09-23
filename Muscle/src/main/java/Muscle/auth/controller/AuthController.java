@@ -21,6 +21,7 @@ import org.springframework.web.servlet.view.RedirectView;
 import jakarta.servlet.http.HttpServletRequest;
 
 import javax.validation.Valid;
+import java.util.List;
 import java.util.Optional;
 
 @RestController
@@ -239,6 +240,16 @@ public class AuthController {
         }
         ResponseMessage responseMessage = authService.setAdmin(token);
         return ResponseEntity.status(HttpStatus.OK).body(responseMessage);
+    }
+
+    @GetMapping("/search/{muscleId}")
+    public ResponseEntity<ResponseDto>  searchUser(@PathVariable("muscleId") String muscleId) {
+        List<ResponseAuth.SearchUserDto> response = authService.searchUser(muscleId);
+        ResponseDto responseDto = ResponseDto.builder()
+                .message("Post list retrieved successfully.")
+                .data(response)
+                .build();
+        return ResponseEntity.status(HttpStatus.OK).body(responseDto);
     }
 
 }
