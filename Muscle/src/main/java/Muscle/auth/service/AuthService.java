@@ -4,8 +4,10 @@ package Muscle.auth.service;
 import Muscle.auth.dto.RequestAuth;
 import Muscle.auth.dto.ResponseAuth;
 import Muscle.auth.entity.Auth;
+import Muscle.auth.entity.Follow;
 import Muscle.auth.entity.UserRole;
 import Muscle.auth.repository.AuthRepository;
+import Muscle.auth.repository.FollowRepository;
 import Muscle.auth.security.JwtAuthToken;
 import Muscle.auth.security.JwtAuthTokenProvider;
 import Muscle.auth.security.role.Role;
@@ -32,6 +34,7 @@ import java.util.Optional;
 public class AuthService {
 
     private final AuthRepository authRepository;
+    private final FollowRepository followRepository;
     private final JwtAuthTokenProvider jwtAuthTokenProvider;
 //    private final S3Service s3Service;
     private final RedisUtil redisUtil;
@@ -193,8 +196,32 @@ public class AuthService {
         if (user == null)
             throw new NotFoundUserException();
 
-        return ResponseAuth.GetUserDto.toDto(user);
+        Auth friend = user.getMuscleFriend();
+        return ResponseAuth.GetUserDto.toDto(user, friend);
     }
+
+    public ResponseAuth.GetUserInfoDto getUserInfo (Optional<String> token, Long targetId) {
+        String muscleId = null;
+        if(token.isPresent()){
+            JwtAuthToken jwtAuthToken = jwtAuthTokenProvider.convertAuthToken(token.get());
+            muscleId = jwtAuthToken.getClaims().getSubject();
+        }
+        Auth user = authRepository.findByMuscleId(muscleId);
+        if (user == null)
+            throw new NotFoundUserException();
+        Auth target = authRepository.findById(targetId).get();
+        Auth targetFriend = target.getMuscleFriend();
+
+
+        boolean isFollowed = false;
+        Follow follow = followRepository.findByFollowerAndFollowing(user, target);
+        if (follow != null) {
+            isFollowed = true;
+        }
+        return ResponseAuth.GetUserInfoDto.toDto(target, targetFriend, isFollowed);
+    }
+
+
 
     public ResponseMessage remove(Optional<String> token) {
         String muscleId = null;

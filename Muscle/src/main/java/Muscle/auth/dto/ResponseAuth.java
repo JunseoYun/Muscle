@@ -4,6 +4,7 @@ package Muscle.auth.dto;
 import Muscle.auth.entity.Auth;
 import Muscle.auth.entity.Follow;
 import Muscle.auth.entity.FriendRequest;
+import jdk.jfr.DataAmount;
 import lombok.Builder;
 import lombok.Data;
 
@@ -23,19 +24,97 @@ public class ResponseAuth {
     @Data
     @Builder
     public static class GetUserDto{
-        private String email;
-        private String name;
-        private String muscleId;
-        private String level;
+        private Long userId;
+        private String userEmail;
+        private String userMuscleId;
+        private String userName;
+        private String userLevel;
         private String userImg;
+        private Long userPostCount;
+        private Long userFollowerCount;
+        private Long userFollowingCount;
+        private Long friendId;
+        private String friendMuscleId;
+        private String friendLevel;
+        private String friendImg;
 
-        public static GetUserDto toDto(Auth user){
+        public static GetUserDto toDto(Auth user, Auth friend){
+            if(friend == null) {
+                return GetUserDto.builder()
+                        .userId(user.getId())
+                        .userEmail(user.getEmail())
+                        .userMuscleId(user.getMuscleId())
+                        .userName(user.getName())
+                        .userLevel(user.getLevel())
+                        .userImg(user.getUserImg())
+                        .userPostCount(user.getPostCount())
+                        .userFollowerCount(user.getFollowerCount())
+                        .userFollowingCount(user.getFollowingCount())
+                        .build();
+            }
             return GetUserDto.builder()
-                    .email(user.getEmail())
-                    .name(user.getName())
-                    .muscleId(user.getMuscleId())
-                    .level(user.getLevel())
+                    .userId(user.getId())
+                    .userEmail(user.getEmail())
+                    .userMuscleId(user.getMuscleId())
+                    .userName(user.getName())
+                    .userLevel(user.getLevel())
                     .userImg(user.getUserImg())
+                    .userPostCount(user.getPostCount())
+                    .userFollowerCount(user.getFollowerCount())
+                    .userFollowingCount(user.getFollowingCount())
+                    .friendId(friend.getId())
+                    .friendMuscleId(friend.getMuscleId())
+                    .friendLevel(friend.getLevel())
+                    .friendImg(friend.getUserImg())
+                    .build();
+        }
+    }
+
+    @Data
+    @Builder
+    public static class GetUserInfoDto {
+        private Long userId;
+        private String userMuscleId;
+        private String userName;
+        private String userLevel;
+        private String userImg;
+        private Long userPostCount;
+        private Long userFollowerCount;
+        private Long userFollowingCount;
+        private boolean isFollowed;
+        private Long friendId;
+        private String friendMuscleId;
+        private String friendLevel;
+        private String friendImg;
+
+        public static GetUserInfoDto toDto(Auth user, Auth friend, Boolean isFollowed) {
+            if(friend == null) {
+                return GetUserInfoDto.builder()
+                        .userId(user.getId())
+                        .userMuscleId(user.getMuscleId())
+                        .userName(user.getName())
+                        .userLevel(user.getLevel())
+                        .userImg(user.getUserImg())
+                        .userPostCount(user.getPostCount())
+                        .userFollowerCount(user.getFollowerCount())
+                        .userFollowingCount(user.getFollowingCount())
+                        .isFollowed(isFollowed)
+                        .build();
+            }
+            return GetUserInfoDto.builder()
+                    .userId(user.getId())
+                    .userMuscleId(user.getMuscleId())
+                    .userName(user.getName())
+                    .userLevel(user.getLevel())
+                    .userImg(user.getUserImg())
+                    .userPostCount(user.getPostCount())
+                    .userFollowerCount(user.getFollowerCount())
+                    .userFollowingCount(user.getFollowingCount())
+                    .isFollowed(isFollowed)
+                    .friendId(friend.getId())
+                    .friendMuscleId(friend.getMuscleId())
+                    .friendLevel(friend.getLevel())
+                    .friendImg(friend.getUserImg())
                     .build();
         }
     }

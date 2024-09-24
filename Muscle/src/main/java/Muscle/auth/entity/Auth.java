@@ -54,6 +54,9 @@ public class Auth {
     @Column(name = "kakaoId")
     private String kakaoId;
 
+    @Column(name = "postCount")
+    private Long postCount = 0L;
+
     @Column(name = "follower")
     private Long followerCount = 0L;
 

@@ -56,6 +56,8 @@ public class PostService {
         }
         Post post = RequestPost.CreatePostDto.toEntity(createPostDto, writer.getId(), postRole);
         postRepository.save(post);
+        writer.setPostCount(writer.getPostCount() + 1);
+        authRepository.save(writer);
         return post.getPostId();
     }
 
@@ -578,10 +580,15 @@ public class PostService {
             JwtAuthToken jwtAuthToken = jwtAuthTokenProvider.convertAuthToken(token.get());
             muscleId = jwtAuthToken.getClaims().getSubject();
         }
-        Long userId = authRepository.findByMuscleId(muscleId).getId();
+        Auth user = authRepository.findByMuscleId(muscleId);
         Post post = postRepository.findById(postId).get();
-        if (Objects.equals(userId, post.getWriterId())) {
-            postRepository.delete(post);
+        if (Objects.equals(user.getId(), post.getWriterId()) || Objects.equals(user.getRole(), UserRole.ADMIN)) {
+            Auth writer = authRepository.findById(post.getWriterId()).get();
+            if(writer.getPostCount() > 0) {
+                postRepository.delete(post);
+                writer.setPostCount(writer.getPostCount() - 1);
+                authRepository.save(writer);
+            }
         } else {
             throw new IllegalArgumentException("Isn't your post.");
         }

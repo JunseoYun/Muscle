@@ -212,6 +212,20 @@ public class AuthController {
         return ResponseEntity.status(HttpStatus.OK).body(responseMessage);
     }
 
+    @GetMapping("/getUserInfo/{targetId}")
+    public ResponseEntity<ResponseMessage> getUserInfo(HttpServletRequest request, @PathVariable("targetId") Long targetId) {
+        Optional<String> token = null;
+        if (request != null) {
+            token = jwtAuthTokenProvider.getAuthToken(request);
+        }
+        ResponseAuth.GetUserInfoDto response = authService.getUserInfo(token, targetId);
+        ResponseMessage responseMessage = ResponseMessage.builder()
+                .message("Target information retrieved successfully.")
+                .data(response)
+                .build();
+        return ResponseEntity.status(HttpStatus.OK).body(responseMessage);
+    }
+
     @DeleteMapping("/remove")
     public ResponseEntity<ResponseMessage> remove (HttpServletRequest request) {
         Optional<String> token = null;
