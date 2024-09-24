@@ -12,6 +12,8 @@ public interface AuthRepository extends JpaRepository<Auth, Long> {
     Auth findByMuscleId(String muscleId);
     Auth findByEmailAndPassword(String email, String password);
     Auth findByMuscleIdAndPassword(String muscleId, String password);
+    Auth findByNameAndEmail(String name, String email);
+    Auth findByMuscleIdAndNameAndEmail(String muscleId, String name, String email);
     Auth findByNaverId(String naverId);
     Auth findByKakaoId(String kakaoId);
     @Query("SELECT a FROM Auth a WHERE a.muscleId = :muscleId " +

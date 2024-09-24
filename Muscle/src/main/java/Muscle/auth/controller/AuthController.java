@@ -287,5 +287,27 @@ public class AuthController {
         return ResponseEntity.status(HttpStatus.OK).body(responseDto);
     }
 
+    //아이디 찾기
+    @GetMapping("/findMuscleId/{name}/{email}")
+    public ResponseEntity<ResponseDto> findMuscleId(@PathVariable("name") String name, @PathVariable("email") String email) {
+        String muscleId = authService.findMuscleId(name, email);
+        ResponseDto responseDto = ResponseDto.builder()
+                .message("MuscleId found successfully.")
+                .data(muscleId)
+                .build();
+        return ResponseEntity.status(HttpStatus.OK).body(responseDto);
+    }
+
+    //비밀번호 찾기(임시 비밀번호 부여)
+    @GetMapping("/findPassword/{muscleId}/{name}/{email}")
+    public ResponseEntity<ResponseDto> findPassword(@PathVariable("muscleId") String muscleId, @PathVariable("name") String name, @PathVariable("email") String email) {
+        String tempPassword = authService.findPassword(muscleId, name, email);
+        ResponseDto responseDto = ResponseDto.builder()
+                .message("Muscle password found successfully.")
+                .data(tempPassword)
+                .build();
+        return ResponseEntity.status(HttpStatus.OK).body(responseDto);
+    }
+
 
 }

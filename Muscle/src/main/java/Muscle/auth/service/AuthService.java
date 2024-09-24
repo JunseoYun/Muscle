@@ -304,5 +304,45 @@ public class AuthService {
         return isCheckId;
     }
 
+    //아이디 찾기
+    public String findMuscleId(String name, String email) {
+        Auth user = authRepository.findByNameAndEmail(name, email);
+        if(user == null) {
+            throw new LoginFailedException();
+        }
+
+        String muscleId = user.getMuscleId();
+
+        if(user.getNaverId() != null) {
+            return "네이버로 로그인 하셨습니다. MuscleId: " + muscleId;
+        } else if(user.getKakaoId() != null) {
+            return "카카오로 로그인 하셨습니다. MuscleId: " + muscleId;
+        }
+        return "MuscleId: " + muscleId;
+    }
+
+    //비밀번호 찾기(임시 비밀번호 부여)
+    public String findPassword(String muscleId, String name, String email) {
+        Auth user = authRepository.findByMuscleIdAndNameAndEmail(muscleId, name, email);
+        if(user == null) {
+            throw new LoginFailedException();
+        }
+        if(user.getPassword() == null) {
+            if(user.getNaverId() != null) {
+                return "네이버로 로그인 하셨습니다. ";
+            } else if(user.getKakaoId() != null) {
+                return "카카오로 로그인 하셨습니다. ";
+            }
+        }
+        String salt = SHA256Util.generateSalt();
+        String tempPassword = UUID.randomUUID().toString();
+        String encryptedPassword = SHA256Util.getEncrypt(tempPassword, salt);
+        user.changePassword(encryptedPassword, salt);
+        authRepository.save(user);
+
+        return tempPassword;
+
+
+    }
 
 }
