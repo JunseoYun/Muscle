@@ -73,22 +73,26 @@ public class RequestAuth {
     @Builder
     @Data
     public static class LoginUserRqDto{
-        private String email;
+        private String muscleId;
         private String password;
     }
 
     @Builder
     @Data
     public static class UpdateUserDto{
-        private String password;
         private String name;
         private String muscleId;
 
-        public static Auth toEntity(Auth user, UpdateUserDto updateUserDto, String salt, String encryptedPassword){
-            user.update(encryptedPassword, updateUserDto.getName(), updateUserDto.getMuscleId(), salt);
-            return user;
-        }
     }
+
+    @Builder
+    @Data
+    public static class ChangePasswordDto{
+        @NotNull
+        private String password;
+        private String temp;
+    }
+
 
     @Builder
     @Data
@@ -122,13 +126,8 @@ public class RequestAuth {
 
 
 
-    @Builder
-    @Data
-    public static class ChangePasswordDto{
-        @NotNull
-        private String password;
-        private String temp;
-    }
+
+
 
     @Builder
     @Data

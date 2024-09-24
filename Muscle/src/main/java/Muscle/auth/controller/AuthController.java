@@ -227,23 +227,30 @@ public class AuthController {
     }
 
     @DeleteMapping("/remove")
-    public ResponseEntity<ResponseMessage> remove (HttpServletRequest request) {
+    public ResponseEntity<ResponseDto> remove (HttpServletRequest request) {
         Optional<String> token = null;
         if (request != null) {
             token = jwtAuthTokenProvider.getAuthToken(request);
         }
-        ResponseMessage responseMessage = authService.remove(token);
-        return ResponseEntity.status(HttpStatus.OK).body(responseMessage);
+        authService.remove(token);
+        ResponseDto responseDto = ResponseDto.builder()
+                .message("User deleted successfully. ")
+                .build();
+        return ResponseEntity.status(HttpStatus.OK).body(responseDto);
     }
 
     @GetMapping("/userlinking")
-    public ResponseEntity<ResponseMessage> userlinking(HttpServletRequest request) {
+    public ResponseEntity<ResponseDto> userlinking(HttpServletRequest request) {
         Optional<String> token = null;
         if (request != null) {
             token = jwtAuthTokenProvider.getAuthToken(request);
         }
-        ResponseMessage responseMessage = authService.userlinking(token);
-        return ResponseEntity.status(HttpStatus.OK).body(responseMessage);
+        String linked = authService.userlinking(token);
+        ResponseDto responseDto = ResponseDto.builder()
+                .message("Account linking list. ")
+                .data(linked)
+                .build();
+        return ResponseEntity.status(HttpStatus.OK).body(responseDto);
     }
 
     @PostMapping("setAdmin")
@@ -252,7 +259,10 @@ public class AuthController {
         if (request != null) {
             token = jwtAuthTokenProvider.getAuthToken(request);
         }
-        ResponseMessage responseMessage = authService.setAdmin(token);
+        authService.setAdmin(token);
+        ResponseMessage responseMessage = ResponseMessage.builder()
+                .message("Set admin successfully.")
+                .build();
         return ResponseEntity.status(HttpStatus.OK).body(responseMessage);
     }
 
@@ -260,10 +270,22 @@ public class AuthController {
     public ResponseEntity<ResponseDto>  searchUser(@PathVariable("muscleId") String muscleId) {
         List<ResponseAuth.SearchUserDto> response = authService.searchUser(muscleId);
         ResponseDto responseDto = ResponseDto.builder()
-                .message("Post list retrieved successfully.")
+                .message("User searched successfully.")
                 .data(response)
                 .build();
         return ResponseEntity.status(HttpStatus.OK).body(responseDto);
     }
+
+    //아이디 중복 검사
+    @PostMapping("/checkId/{muscleId}")
+    public ResponseEntity<ResponseDto> checkId(@PathVariable("muscleId") String muscleId) {
+        Boolean response = authService.checkId(muscleId);
+        ResponseDto responseDto = ResponseDto.builder()
+                .message("MuscleId checked successfully.")
+                .data(response)
+                .build();
+        return ResponseEntity.status(HttpStatus.OK).body(responseDto);
+    }
+
 
 }

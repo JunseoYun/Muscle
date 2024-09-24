@@ -85,11 +85,9 @@ public class Auth {
 
 
 
-    public void update(String password, String name, String muscleId, String salt) {
-        this.password = password;
+    public void update(String name, String muscleId) {
         this.name = name;
         this.muscleId = muscleId;
-        this.salt = salt;
     }
 
 

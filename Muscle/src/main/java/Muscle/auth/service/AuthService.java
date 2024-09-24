@@ -63,12 +63,12 @@ public class AuthService {
 
     @Transactional
     public Optional<ResponseAuth.LoginUserRsDto> loginUser(RequestAuth.LoginUserRqDto loginUserRqDto) {
-        Auth user = authRepository.findByEmail(loginUserRqDto.getEmail());
+        Auth user = authRepository.findByMuscleId(loginUserRqDto.getMuscleId());
         if(user == null)
             throw new LoginFailedException();
 
         String salt = user.getSalt();
-        user = authRepository.findByEmailAndPassword(loginUserRqDto.getEmail(), SHA256Util.getEncrypt(loginUserRqDto.getPassword(),salt));
+        user = authRepository.findByMuscleIdAndPassword(loginUserRqDto.getMuscleId(), SHA256Util.getEncrypt(loginUserRqDto.getPassword(),salt));
         if(user == null)
             throw new LoginFailedException();
 
@@ -131,19 +131,35 @@ public class AuthService {
             muscleId = jwtAuthToken.getClaims().getSubject();
         }
 
-        Auth originalUser = authRepository.findByMuscleId(muscleId);
-        if(originalUser == null)
+        Auth user = authRepository.findByMuscleId(muscleId);
+        if(user == null)
             throw new NotFoundUserException();
         Auth nameUser = authRepository.findByMuscleId(updateUserDto.getMuscleId());
-        if(nameUser != null && !originalUser.equals(nameUser))
+        if(nameUser != null && !user.equals(nameUser))
             throw new RegisterFailedException();
 
-        String salt = SHA256Util.generateSalt();
-        String encryptedPassword = SHA256Util.getEncrypt(updateUserDto.getPassword(), salt);
-        Auth updatedUser = RequestAuth.UpdateUserDto.toEntity(originalUser, updateUserDto, salt, encryptedPassword);
-        authRepository.save(updatedUser);
+        user.update(updateUserDto.getName(), updateUserDto.getMuscleId());
+
+        authRepository.save(user);
     }
 
+    @Transactional
+    public void changePassword(Optional<String> token, String password){
+        String muscleId = null;
+        if (token.isPresent()) {
+            JwtAuthToken jwtAuthToken = jwtAuthTokenProvider.convertAuthToken(token.get());
+            muscleId = jwtAuthToken.getClaims().getSubject();
+        }
+
+        Auth user = authRepository.findByMuscleId(muscleId);
+        if(user == null)
+            throw new NotFoundUserException();
+
+        String salt = SHA256Util.generateSalt();
+        String encryptedPassword = SHA256Util.getEncrypt(password, salt);
+        user.changePassword(encryptedPassword, salt);
+        authRepository.save(user);
+    }
 
     @Transactional
     public void setUserLevel(Optional<String> token, RequestAuth.SetUserLevelDto setUserLevelDto) {
@@ -165,23 +181,6 @@ public class AuthService {
     }
 
 
-    @Transactional
-    public void changePassword(Optional<String> token, String password){
-        String muscleId = null;
-        if (token.isPresent()) {
-            JwtAuthToken jwtAuthToken = jwtAuthTokenProvider.convertAuthToken(token.get());
-            muscleId = jwtAuthToken.getClaims().getSubject();
-        }
-
-        Auth user = authRepository.findByMuscleId(muscleId);
-        if(user == null)
-            throw new NotFoundUserException();
-
-        String salt = SHA256Util.generateSalt();
-        String encryptedPassword = SHA256Util.getEncrypt(password, salt);
-        user.changePassword(encryptedPassword, salt);
-        authRepository.save(user);
-    }
 
 
     @Transactional
@@ -223,7 +222,7 @@ public class AuthService {
 
 
 
-    public ResponseMessage remove(Optional<String> token) {
+    public void remove(Optional<String> token) {
         String muscleId = null;
         if(token.isPresent()){
             JwtAuthToken jwtAuthToken = jwtAuthTokenProvider.convertAuthToken(token.get());
@@ -233,13 +232,9 @@ public class AuthService {
         Auth user = authRepository.findByMuscleId(muscleId);
         authRepository.delete(user);
 
-        ResponseMessage responseMessage = ResponseMessage.builder()
-                .message("User registered successfully with Naver.")
-                .build();
-        return responseMessage;
     }
 
-    public ResponseMessage userlinking(Optional<String> token) {
+    public String userlinking(Optional<String> token) {
         String muscleId = null;
         if(token.isPresent()){
             JwtAuthToken jwtAuthToken = jwtAuthTokenProvider.convertAuthToken(token.get());
@@ -275,15 +270,11 @@ public class AuthService {
         }
 
 
-        ResponseMessage responseMessage = ResponseMessage.builder()
-                .message("Account linking list.")
-                .data(linked)
-                .build();
-        return responseMessage;
+        return linked;
     }
 
 
-    public ResponseMessage setAdmin(Optional<String> token) {
+    public void setAdmin(Optional<String> token) {
         String muscleId = null;
         if(token.isPresent()){
             JwtAuthToken jwtAuthToken = jwtAuthTokenProvider.convertAuthToken(token.get());
@@ -293,11 +284,6 @@ public class AuthService {
         Auth user = authRepository.findByMuscleId(muscleId);
         user.setRole(UserRole.ADMIN);
         authRepository.save(user);
-
-        ResponseMessage responseMessage = ResponseMessage.builder()
-                .message("Set admin successfully.")
-                .build();
-        return responseMessage;
     }
 
     public List<ResponseAuth.SearchUserDto> searchUser(String muscleId) {
@@ -306,6 +292,16 @@ public class AuthService {
         entityList.stream().forEach(auth -> dtoList.add(ResponseAuth.SearchUserDto.toDto(auth)));
 
         return dtoList;
+    }
+
+    //아이디 중복 검사
+    public Boolean checkId(String muscleId) {
+        boolean isCheckId = false;
+        Auth auth = authRepository.findByMuscleId(muscleId);
+        if(auth == null) {
+            isCheckId = true;
+        }
+        return isCheckId;
     }
 
 
