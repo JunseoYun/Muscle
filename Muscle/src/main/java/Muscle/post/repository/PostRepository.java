@@ -40,6 +40,11 @@ public interface PostRepository extends JpaRepository<Post, Long> {
     List<Post> findAllByWriterIdOrderByPostDateDesc(Long writerId);
 
 
+    //내가 팔로우한 사람들의 최신 게시글 순 조회 - 로그인
+    List<Post> findAllByWriterIdInOrderByPostDateDesc(List<Long> writerIds);
+
+
+
 
 
 

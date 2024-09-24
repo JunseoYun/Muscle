@@ -452,6 +452,46 @@ public class PostService {
         return dtoList;
     }
 
+    //내가 팔로우한 사람들의 최신 게시글 순 조회 - 로그인
+    public List<ResponsePost.GetPostDto> getFollowingPosts(Optional<String> token) {
+        String muscleId = null;
+        if (token.isPresent()) {
+            JwtAuthToken jwtAuthToken = jwtAuthTokenProvider.convertAuthToken(token.get());
+            muscleId = jwtAuthToken.getClaims().getSubject();
+        }
+
+
+        Auth user = authRepository.findByMuscleId(muscleId);
+        List<Follow> followList = followRepository.findByFollower(user);
+        List<Long> followingIds = followList.stream()
+                .map(follow -> follow.getFollowing().getId()) // following의 ID를 가져옵니다.
+                .collect(Collectors.toList()); // List로 수집합니다.
+
+
+
+        List<Post> entityList = postRepository.findAllByWriterIdInOrderByPostDateDesc(followingIds);
+        List<ResponsePost.GetPostDto> dtoList = new ArrayList<>();
+        entityList.stream().forEach(post -> {
+            boolean isPostLiked = false;
+            boolean isPostSaved = false;
+            boolean isFollowed = false;
+
+            LikedPost likedPost = likedPostRepository.findByUserIdAndPostId(user.getId(), post.getPostId());
+            if (likedPost != null)
+                isPostLiked = true;
+            SavedPost savedPost = savedPostRepository.findByUserIdAndPostId(user.getId(), post.getPostId());
+            if (savedPost != null)
+                isPostSaved = true;
+            Auth writer = authRepository.findById(post.getWriterId()).get();
+            Follow follow = followRepository.findByFollowerAndFollowing(user, writer);
+            if (follow != null) {
+                isFollowed = true;
+            }
+            dtoList.add(ResponsePost.GetPostDto.toDto(writer, post, isPostLiked, isPostSaved, isFollowed));
+        });
+        return dtoList;
+    }
+
 
     //게시글 검색
     public List<ResponsePost.GetPostDto> searchPost(Optional<String> token, String title) {
@@ -555,6 +595,8 @@ public class PostService {
         });
         return dtoList;
     }
+
+
 
 
     public void updatePost(RequestPost.UpdatePostDto updatePostDto, Optional<String> token) {

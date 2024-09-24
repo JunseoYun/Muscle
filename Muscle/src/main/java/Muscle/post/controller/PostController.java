@@ -234,8 +234,8 @@ public class PostController {
         return ResponseEntity.status(HttpStatus.OK).body(responseDto);
     }
 
-    //특정 유저 게시글 조회 - 로그인
 
+    //특정 유저 게시글 조회 - 로그인
     @GetMapping("/getUserNewPosts/{targetId}")
     public ResponseEntity<ResponseDto> getUserNewPosts(HttpServletRequest request, @PathVariable("targetId") Long targetId) {
         Optional<String> token = null;
@@ -250,6 +250,20 @@ public class PostController {
         return ResponseEntity.status(HttpStatus.OK).body(responseDto);
     }
 
+    //내가 팔로우한 사람들의 최신 게시글 순 조회 - 로그인
+    @GetMapping("/getFollowingPosts")
+    public ResponseEntity<ResponseDto> getFollowingPosts(HttpServletRequest request) {
+        Optional<String> token = null;
+        if (request != null) {
+            token = jwtAuthTokenProvider.getAuthToken(request);
+        }
+        List<ResponsePost.GetPostDto> response = PostService.getFollowingPosts(token);
+        ResponseDto responseDto = ResponseDto.builder()
+                .message("User by Following post list retrieved successfully.")
+                .data(response)
+                .build();
+        return ResponseEntity.status(HttpStatus.OK).body(responseDto);
+    }
 
 
     @GetMapping("/search/{title}")
