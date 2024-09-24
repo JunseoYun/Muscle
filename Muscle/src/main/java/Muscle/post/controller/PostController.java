@@ -170,6 +170,72 @@ public class PostController {
         return ResponseEntity.status(HttpStatus.OK).body(responseDto);
     }
 
+
+    //베스트 게시글 조회(전체 게시글 중 좋아요 많은 순 10걔) - 비로그인
+    @GetMapping("/getBestPosts")
+    public ResponseEntity<ResponseDto> getWrittenPost() {
+        List<ResponsePost.GetPostDto> response = PostService.getBestPosts();
+        ResponseDto responseDto = ResponseDto.builder()
+                .message("Best post list retrieved successfully.")
+                .data(response)
+                .build();
+        return ResponseEntity.status(HttpStatus.OK).body(responseDto);
+    }
+
+    //투데이 베스트 게시글 조회(24시간이 지나지 않은 게시글 중 좋아요 많은 순 10개) - 비로그인
+    @GetMapping("/getTodayBestPosts")
+    public ResponseEntity<ResponseDto> getTodayBestPosts() {
+        List<ResponsePost.GetPostDto> response = PostService.getTodayBestPosts();
+        ResponseDto responseDto = ResponseDto.builder()
+                .message("Today best post list retrieved successfully.")
+                .data(response)
+                .build();
+        return ResponseEntity.status(HttpStatus.OK).body(responseDto);
+    }
+
+    //각 게시판 최근 게시글 10개 - 비로그인
+    @GetMapping("/geTopBoardNewPosts/{postRoleString}")
+    public ResponseEntity<ResponseDto> geTopBoardNewPosts(@PathVariable("postRoleString") String postRoleString) {
+        List<ResponsePost.GetPostSimpleDto> response = PostService.geTopBoardNewPosts(postRoleString);
+        ResponseDto responseDto = ResponseDto.builder()
+                .message("PostRole by Best post list retrieved successfully.")
+                .data(response)
+                .build();
+        return ResponseEntity.status(HttpStatus.OK).body(responseDto);
+    }
+
+    //세부 게시판 베스트 게시글 조회(좋아요 많은 순 10개) - 로그인
+    @GetMapping("/getBoardBestPosts/{board}")
+    public ResponseEntity<ResponseDto> getBoardBestPosts(HttpServletRequest request, @PathVariable("board") String board) {
+        Optional<String> token = null;
+        if (request != null) {
+            token = jwtAuthTokenProvider.getAuthToken(request);
+        }
+        List<ResponsePost.GetPostDto> response = PostService.getBoardBestPosts(token, board);
+        ResponseDto responseDto = ResponseDto.builder()
+                .message("Board by Best post list retrieved successfully.")
+                .data(response)
+                .build();
+        return ResponseEntity.status(HttpStatus.OK).body(responseDto);
+    }
+
+    //세부 게시판 게시글 최신 순 조회 - 로그인
+    @GetMapping("/getBoardNewPosts/{board}")
+    public ResponseEntity<ResponseDto> getBoardNewPosts(HttpServletRequest request, @PathVariable("board") String board) {
+        Optional<String> token = null;
+        if (request != null) {
+            token = jwtAuthTokenProvider.getAuthToken(request);
+        }
+        List<ResponsePost.GetPostDto> response = PostService.getBoardNewPosts(token, board);
+        ResponseDto responseDto = ResponseDto.builder()
+                .message("Board by New post list retrieved successfully.")
+                .data(response)
+                .build();
+        return ResponseEntity.status(HttpStatus.OK).body(responseDto);
+    }
+
+
+
     @GetMapping("/search/{title}")
     public ResponseEntity<ResponseDto> searchPost(HttpServletRequest request, @PathVariable("title") String title) {
         Optional<String> token = null;

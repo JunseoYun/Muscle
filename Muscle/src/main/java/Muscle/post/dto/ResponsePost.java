@@ -2,6 +2,7 @@ package Muscle.post.dto;
 
 import Muscle.post.entity.Post;
 import Muscle.auth.entity.Auth;
+import Muscle.post.entity.PostRole;
 import lombok.Builder;
 import lombok.Getter;
 
@@ -16,6 +17,7 @@ public class ResponsePost {
         private String writerMuscleId;
         private String writerLevel;
         private String writerImg;
+        private PostRole postRole;
         private Long postId;
         private String title;
         private String content;
@@ -39,6 +41,7 @@ public class ResponsePost {
                     .postId(post.getPostId())
                     .title(post.getTitle())
                     .content(post.getContent())
+                    .postRole(post.getPostRole())
                     .board(post.getBoard())
                     .postDate(post.getPostDate())
                     .likeCount(post.getLikeCount())
@@ -53,6 +56,29 @@ public class ResponsePost {
 
     @Getter
     @Builder
+    public static class GetPostSimpleDto {
+        private Long writerId;
+        private String writerMuscleId;
+        private String writerLevel;
+        private String writerImg;
+        private Long postId;
+        private String title;
+        public static GetPostSimpleDto toDto(Auth writer, Post post) {
+
+            return GetPostSimpleDto.builder()
+                    .writerId(writer.getId())
+                    .writerMuscleId(writer.getMuscleId())
+                    .writerLevel(writer.getLevel())
+                    .writerImg(writer.getUserImg())
+                    .postId(post.getPostId())
+                    .title(post.getTitle())
+                    .build();
+        }
+    }
+
+
+    @Getter
+    @Builder
     public static class GetReportPostListDto {
         private Long writerId;
         private String writerMuscleId;
@@ -60,6 +86,7 @@ public class ResponsePost {
         private String writerImg;
         private Long postId;
         private String title;
+        private PostRole postRole;
         private String board;
         private LocalDateTime postDate;
         private Long reportCount;
@@ -74,6 +101,7 @@ public class ResponsePost {
                     .writerImg(writer.getUserImg())
                     .postId(post.getPostId())
                     .title(post.getTitle())
+                    .postRole(post.getPostRole())
                     .board(post.getBoard())
                     .postDate(post.getPostDate())
                     .reportCount(post.getReportCount())

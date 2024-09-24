@@ -13,6 +13,7 @@ import Muscle.post.dto.RequestPost;
 import Muscle.post.dto.ResponsePost;
 import Muscle.post.entity.LikedPost;
 import Muscle.post.entity.Post;
+import Muscle.post.entity.PostRole;
 import Muscle.post.entity.SavedPost;
 import Muscle.post.repository.LikedPostRepository;
 import Muscle.post.repository.PostRepository;
@@ -48,11 +49,17 @@ public class PostService {
             JwtAuthToken jwtAuthToken = jwtAuthTokenProvider.convertAuthToken(token.get());
             muscleId = jwtAuthToken.getClaims().getSubject();
         }
-        Long writerId = authRepository.findByMuscleId(muscleId).getId();
-        Post post = RequestPost.CreatePostDto.toEntity(createPostDto, writerId);
+        Auth writer = authRepository.findByMuscleId(muscleId);
+        PostRole postRole = getPostRole(createPostDto.getPostRole());
+        if (postRole == PostRole.PRO && (writer.getRole() != UserRole.PRO && writer.getRole() != UserRole.ADMIN)) {
+            throw new IllegalArgumentException("PRO 글 작성 권한 없음.");
+        }
+        Post post = RequestPost.CreatePostDto.toEntity(createPostDto, writer.getId(), postRole);
         postRepository.save(post);
         return post.getPostId();
     }
+
+
 
 
     public void likePost(Optional<String> token, RequestPost.SendPostIdDto sendPostIdDto) {
@@ -272,25 +279,141 @@ public class PostService {
         if (token.isPresent()) {
             JwtAuthToken jwtAuthToken = jwtAuthTokenProvider.convertAuthToken(token.get());
             muscleId = jwtAuthToken.getClaims().getSubject();
-            Long writerId = authRepository.findByMuscleId(muscleId).getId();
-            List<Post> entityList = postRepository.findAllByWriterId(writerId);
-
-            entityList.stream().forEach(post -> {
-                boolean isPostLiked = false;
-                boolean isPostSaved = false;
-                boolean isFollowed = false;
-
-                LikedPost likedPost = likedPostRepository.findByUserIdAndPostId(writerId, post.getPostId());
-                if (likedPost != null)
-                    isPostLiked = true;
-                SavedPost savedPost = savedPostRepository.findByUserIdAndPostId(writerId, post.getPostId());
-                if (savedPost != null)
-                    isPostSaved = true;
-
-                Auth writer = authRepository.findById(post.getWriterId()).get();
-                dtoList.add(ResponsePost.GetPostDto.toDto(writer, post, isPostLiked, isPostSaved, isFollowed));
-            });
         }
+        Long writerId = authRepository.findByMuscleId(muscleId).getId();
+        List<Post> entityList = postRepository.findAllByWriterId(writerId);
+
+        entityList.stream().forEach(post -> {
+            boolean isPostLiked = false;
+            boolean isPostSaved = false;
+            boolean isFollowed = false;
+
+            LikedPost likedPost = likedPostRepository.findByUserIdAndPostId(writerId, post.getPostId());
+            if (likedPost != null)
+                isPostLiked = true;
+            SavedPost savedPost = savedPostRepository.findByUserIdAndPostId(writerId, post.getPostId());
+            if (savedPost != null)
+                isPostSaved = true;
+
+            Auth writer = authRepository.findById(post.getWriterId()).get();
+            dtoList.add(ResponsePost.GetPostDto.toDto(writer, post, isPostLiked, isPostSaved, isFollowed));
+        });
+
+        return dtoList;
+    }
+
+    //베스트 게시글 조회(전체 게시글 중 좋아요 많은 순 10걔) - 비로그인
+    public List<ResponsePost.GetPostDto> getBestPosts() {
+        List<Post> entityList = postRepository.findTop10ByOrderByLikeCountDesc();
+        List<ResponsePost.GetPostDto> dtoList = new ArrayList<>();
+
+        boolean isPostLiked = false;
+        boolean isPostSaved = false;
+        boolean isFollowed = false;
+
+        entityList.stream().forEach(post -> {
+            Auth writer = authRepository.findById(post.getWriterId()).get();
+            dtoList.add(ResponsePost.GetPostDto.toDto(writer, post, isPostLiked, isPostSaved, isFollowed));
+        });
+
+        return dtoList;
+    }
+
+    //투데이 베스트 게시글 조회(24시간이 지나지 않은 게시글 중 좋아요 많은 순 10개) - 비로그인
+    public List<ResponsePost.GetPostDto> getTodayBestPosts() {
+        LocalDateTime now = LocalDateTime.now();
+        LocalDateTime twentyFourHoursAgo = now.minusHours(24);
+        List<Post> entityList = postRepository.findTop10ByPostDateAfterOrderByLikeCountDesc(twentyFourHoursAgo);
+        List<ResponsePost.GetPostDto> dtoList = new ArrayList<>();
+
+        boolean isPostLiked = false;
+        boolean isPostSaved = false;
+        boolean isFollowed = false;
+
+        entityList.stream().forEach(post -> {
+            Auth writer = authRepository.findById(post.getWriterId()).get();
+            dtoList.add(ResponsePost.GetPostDto.toDto(writer, post, isPostLiked, isPostSaved, isFollowed));
+        });
+
+        return dtoList;
+    }
+
+    //각 게시판 최근 게시글 10개 - 비로그인
+    public List<ResponsePost.GetPostSimpleDto> geTopBoardNewPosts(String postRoleString) {
+        PostRole postRole = getPostRole(postRoleString);
+        List<Post> entityList = postRepository.findTop10ByPostRoleOrderByPostDateDesc(postRole);
+        List<ResponsePost.GetPostSimpleDto> dtoList = new ArrayList<>();
+
+        entityList.stream().forEach(post -> {
+            Auth writer = authRepository.findById(post.getWriterId()).get();
+            dtoList.add(ResponsePost.GetPostSimpleDto.toDto(writer, post));
+        });
+        return dtoList;
+    }
+
+    //세부 게시판 베스트 게시글 조회(좋아요 많은 순 10개) - 로그인
+    public List<ResponsePost.GetPostDto> getBoardBestPosts(Optional<String> token, String board) {
+        String muscleId = null;
+        List<ResponsePost.GetPostDto> dtoList = new ArrayList<>();
+
+        if (token.isPresent()) {
+            JwtAuthToken jwtAuthToken = jwtAuthTokenProvider.convertAuthToken(token.get());
+            muscleId = jwtAuthToken.getClaims().getSubject();
+        }
+        Auth user = authRepository.findByMuscleId(muscleId);
+        List<Post> entityList = postRepository.findTop10ByBoardOrderByLikeCountDesc(board);
+
+        entityList.stream().forEach(post -> {
+            boolean isPostLiked = false;
+            boolean isPostSaved = false;
+            boolean isFollowed = false;
+
+            LikedPost likedPost = likedPostRepository.findByUserIdAndPostId(user.getId(), post.getPostId());
+            if (likedPost != null)
+                isPostLiked = true;
+            SavedPost savedPost = savedPostRepository.findByUserIdAndPostId(user.getId(), post.getPostId());
+            if (savedPost != null)
+                isPostSaved = true;
+            Auth writer = authRepository.findById(post.getWriterId()).get();
+            Follow follow = followRepository.findByFollowerAndFollowing(writer, user);
+            if (follow != null) {
+                isFollowed = true;
+            }
+            dtoList.add(ResponsePost.GetPostDto.toDto(writer, post, isPostLiked, isPostSaved, isFollowed));
+        });
+        return dtoList;
+    }
+
+    //세부 게시판 게시글 최신 순 조회 - 로그인
+    public List<ResponsePost.GetPostDto> getBoardNewPosts(Optional<String> token, String board) {
+        String muscleId = null;
+        List<ResponsePost.GetPostDto> dtoList = new ArrayList<>();
+
+        if (token.isPresent()) {
+            JwtAuthToken jwtAuthToken = jwtAuthTokenProvider.convertAuthToken(token.get());
+            muscleId = jwtAuthToken.getClaims().getSubject();
+        }
+        Auth user = authRepository.findByMuscleId(muscleId);
+        List<Post> entityList = postRepository.findByBoardOrderByPostDateDesc(board);
+
+        entityList.stream().forEach(post -> {
+            boolean isPostLiked = false;
+            boolean isPostSaved = false;
+            boolean isFollowed = false;
+
+            LikedPost likedPost = likedPostRepository.findByUserIdAndPostId(user.getId(), post.getPostId());
+            if (likedPost != null)
+                isPostLiked = true;
+            SavedPost savedPost = savedPostRepository.findByUserIdAndPostId(user.getId(), post.getPostId());
+            if (savedPost != null)
+                isPostSaved = true;
+            Auth writer = authRepository.findById(post.getWriterId()).get();
+            Follow follow = followRepository.findByFollowerAndFollowing(writer, user);
+            if (follow != null) {
+                isFollowed = true;
+            }
+            dtoList.add(ResponsePost.GetPostDto.toDto(writer, post, isPostLiked, isPostSaved, isFollowed));
+        });
         return dtoList;
     }
 
@@ -428,6 +551,15 @@ public class PostService {
         } else {
             throw new IllegalArgumentException("Isn't your post.");
         }
+    }
+
+    private static PostRole getPostRole(String postRoleString) {
+        return switch (postRoleString) {
+            case "PRO" -> PostRole.PRO;
+            case "AMATEUR" -> PostRole.AMATEUR;
+            case "FREE" -> PostRole.FREE;
+            default -> throw new IllegalArgumentException("Invalid post role: " + postRoleString);
+        };
     }
 
     //    public String uploadImg(MultipartFile file, long storeId){

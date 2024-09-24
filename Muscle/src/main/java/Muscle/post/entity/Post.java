@@ -36,6 +36,10 @@ public class Post {
     @Column(name = "content")
     private String content;
 
+    @Enumerated(EnumType.STRING)
+    @Column(name = "postRole")
+    private PostRole postRole;
+
     @Column(name = "board")
     private String board;
 
@@ -61,10 +65,11 @@ public class Post {
     private List<PostReport> reportList = new ArrayList<>();
 
     @Builder
-    public Post(Long writerId, String title, String content, String board) {
+    public Post(Long writerId, String title, String content, String board, PostRole postRole) {
         this.writerId = writerId;
         this.title = title;
         this.content = content;
+        this.postRole = postRole;
         this.board = board;
         this.postDate = LocalDateTime.now();
     }

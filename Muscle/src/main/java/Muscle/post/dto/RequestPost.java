@@ -2,6 +2,7 @@ package Muscle.post.dto;
 
 
 import Muscle.post.entity.Post;
+import Muscle.post.entity.PostRole;
 import lombok.Builder;
 import lombok.Data;
 
@@ -16,12 +17,14 @@ public class RequestPost {
     public static class CreatePostDto {
         private String title;
         private String content;
+        private String postRole;
         private String board;
 
-        public static Post toEntity(CreatePostDto createPostDto, Long writerId) {
+        public static Post toEntity(CreatePostDto createPostDto, Long writerId, PostRole postRole) {
             return Post.builder()
                     .writerId(writerId)
                     .title(createPostDto.getTitle())
+                    .postRole(postRole)
                     .board(createPostDto.getBoard())
                     .build();
         }
