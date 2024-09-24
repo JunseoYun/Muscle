@@ -43,18 +43,24 @@ public class ResponseAuth {
     @Data
     @Builder
     public static class SearchUserDto {
+        private Long userId;
         private String muscleId;
         private String level;
         private String userImg;
 
         public static SearchUserDto toDto(Auth user) {
             return SearchUserDto.builder()
+                    .userId(user.getId())
                     .muscleId(user.getMuscleId())
                     .level(user.getLevel())
                     .userImg(user.getUserImg())
                     .build();
         }
     }
+
+
+
+
 
     @Data
     @Builder

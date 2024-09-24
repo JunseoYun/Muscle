@@ -18,7 +18,7 @@ public class LikedPost {
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Long likedPostId;
 
-    @Column(name = "storeId")
+    @Column(name = "postId")
     private Long postId;
 
     @Column(name = "userId")

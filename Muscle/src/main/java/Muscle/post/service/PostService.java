@@ -1,6 +1,7 @@
 package Muscle.post.service;
 
 
+import Muscle.auth.dto.ResponseAuth;
 import Muscle.auth.entity.Auth;
 import Muscle.auth.entity.UserRole;
 import Muscle.auth.repository.AuthRepository;
@@ -53,33 +54,39 @@ public class PostService {
 
 
 
-    public void likePost(Long postId, Optional<String> token){
+    public void likePost(Optional<String> token, RequestPost.SendPostIdDto sendPostIdDto){
         String muscleId = null;
         if (token.isPresent()) {
             JwtAuthToken jwtAuthToken = jwtAuthTokenProvider.convertAuthToken(token.get());
             muscleId = jwtAuthToken.getClaims().getSubject();
         }
         Long userId = authRepository.findByMuscleId(muscleId).getId();
+
+        Post post = postRepository.findById(sendPostIdDto.getPostId()).get();
+        if(post == null) {
+            throw new IllegalArgumentException("게시글 없음");
+        }
         LikedPost likedPost = LikedPost.builder()
-                .postId(postId)
+                .postId(post.getPostId())
                 .userId(userId)
                 .build();
         likedPostRepository.save(likedPost);
-        Post post = postRepository.findById(postId).get();
         post.setLikeCount(post.getLikeCount()+1);
         postRepository.save(post);
     }
 
-    public void unlikePost(Long postId, Optional<String> token){
+    public void unlikePost(Optional<String> token, RequestPost.SendPostIdDto sendPostIdDto){
         String muscleId = null;
         if (token.isPresent()) {
             JwtAuthToken jwtAuthToken = jwtAuthTokenProvider.convertAuthToken(token.get());
             muscleId = jwtAuthToken.getClaims().getSubject();
         }
         Long userId = authRepository.findByMuscleId(muscleId).getId();
-        LikedPost likedPost = likedPostRepository.findByUserIdAndPostId(userId, postId);
+        Post post = postRepository.findById(sendPostIdDto.getPostId()).get();
+        LikedPost likedPost = likedPostRepository.findByUserIdAndPostId(userId, post.getPostId());
+
         likedPostRepository.delete(likedPost);
-        Post post = postRepository.findById(postId).get();
+
         if(post.getLikeCount() > 0) {
             post.setLikeCount(post.getLikeCount()-1);
         }
@@ -87,32 +94,38 @@ public class PostService {
     }
 
 
-    public void savePost(Long postId, Optional<String> token){
+    public void savePost(Optional<String> token, RequestPost.SendPostIdDto sendPostIdDto){
         String muscleId = null;
         if (token.isPresent()) {
             JwtAuthToken jwtAuthToken = jwtAuthTokenProvider.convertAuthToken(token.get());
             muscleId = jwtAuthToken.getClaims().getSubject();
         }
         Long userId = authRepository.findByMuscleId(muscleId).getId();
+        Post post = postRepository.findById(sendPostIdDto.getPostId()).get();
+        if(post == null) {
+            throw new IllegalArgumentException("게시글 없음");
+        }
         SavedPost savedPost = SavedPost.builder()
-                .postId(postId)
+                .postId(post.getPostId())
                 .userId(userId)
                 .build();
         savedPostRepository.save(savedPost);
-        Post post = postRepository.findById(postId).get();
         postRepository.save(post);
     }
 
-    public void unSavePost(Long postId, Optional<String> token){
+    public void unSavePost(Optional<String> token, RequestPost.SendPostIdDto sendPostIdDto){
         String muscleId = null;
         if (token.isPresent()) {
             JwtAuthToken jwtAuthToken = jwtAuthTokenProvider.convertAuthToken(token.get());
             muscleId = jwtAuthToken.getClaims().getSubject();
         }
         Long userId = authRepository.findByMuscleId(muscleId).getId();
-        SavedPost savedPost = savedPostRepository.findByUserIdAndPostId(userId, postId);
+        Post post = postRepository.findById(sendPostIdDto.getPostId()).get();
+        if(post == null) {
+            throw new IllegalArgumentException("게시글 없음");
+        }
+        SavedPost savedPost = savedPostRepository.findByUserIdAndPostId(userId, post.getPostId());
         savedPostRepository.delete(savedPost);
-        Post post = postRepository.findById(postId).get();
         postRepository.save(post);
     }
 
@@ -329,7 +342,32 @@ public class PostService {
     }
 
 
+    //게시글 좋아요한 회원 조회
+    public List<ResponseAuth.SearchUserDto> getPostLikeUsers(Optional<String> token, Long postId) {
+        String muscleId = null;
 
+        if (token.isPresent()) {
+            JwtAuthToken jwtAuthToken = jwtAuthTokenProvider.convertAuthToken(token.get());
+            muscleId = jwtAuthToken.getClaims().getSubject();
+        }
+        Auth admin = authRepository.findByMuscleId(muscleId);
+        if(admin == null) {
+            throw new IllegalArgumentException("비회원 접근 제어");
+        }
+        List<LikedPost> entityList = likedPostRepository.findAllByPostId(postId);
+        List<Auth> userList = new ArrayList<>();
+        List<ResponseAuth.SearchUserDto> dtoList = new ArrayList<>();
+
+        entityList.stream().forEach(likedPost -> {
+            Auth user = authRepository.findById(likedPost.getUserId()).get();
+            userList.add(user);
+        });
+
+        userList.stream().forEach(auth -> {
+            dtoList.add(ResponseAuth.SearchUserDto.toDto(auth));
+        });
+        return dtoList;
+    }
 
 
 

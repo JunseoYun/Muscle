@@ -1,5 +1,6 @@
 package Muscle.post.controller;
 
+import Muscle.auth.dto.ResponseAuth;
 import Muscle.auth.security.JwtAuthTokenProvider;
 import Muscle.common.dto.ResponseDto;
 import Muscle.post.dto.RequestPost;
@@ -42,52 +43,52 @@ public class PostController {
     }
 
 
-    @PostMapping("/like/{postId}")
-    public ResponseEntity<ResponseDto> likePost(@PathVariable("postId") Long postId, HttpServletRequest request){
+    @PostMapping("/like")
+    public ResponseEntity<ResponseDto> likePost(HttpServletRequest request, @RequestBody RequestPost.SendPostIdDto sendPostIdDto){
         Optional<String> token = null;
         if (request != null) {
             token = jwtAuthTokenProvider.getAuthToken(request);
         }
-        PostService.likePost(postId, token);
+        PostService.likePost(token, sendPostIdDto);
         ResponseDto responseDto = ResponseDto.builder()
                 .message("Post liked successfully.")
                 .build();
         return ResponseEntity.status(HttpStatus.OK).body(responseDto);
     }
 
-    @PostMapping("/unlike/{postId}")
-    public ResponseEntity<ResponseDto> unlikePost(@PathVariable("postId") Long postId, HttpServletRequest request){
+    @PostMapping("/unlike")
+    public ResponseEntity<ResponseDto> unlikePost(HttpServletRequest request, @RequestBody RequestPost.SendPostIdDto sendPostIdDto){
         Optional<String> token = null;
         if (request != null) {
             token = jwtAuthTokenProvider.getAuthToken(request);
         }
-        PostService.unlikePost(postId, token);
+        PostService.unlikePost(token, sendPostIdDto);
         ResponseDto responseDto = ResponseDto.builder()
                 .message("Post unliked successfully.")
                 .build();
         return ResponseEntity.status(HttpStatus.OK).body(responseDto);
     }
 
-    @PostMapping("/save/{postId}")
-    public ResponseEntity<ResponseDto> savePost(@PathVariable("postId") Long postId, HttpServletRequest request){
+    @PostMapping("/save")
+    public ResponseEntity<ResponseDto> savePost(HttpServletRequest request, @RequestBody RequestPost.SendPostIdDto sendPostIdDto){
         Optional<String> token = null;
         if (request != null) {
             token = jwtAuthTokenProvider.getAuthToken(request);
         }
-        PostService.savePost(postId, token);
+        PostService.savePost(token, sendPostIdDto);
         ResponseDto responseDto = ResponseDto.builder()
                 .message("Post saved successfully.")
                 .build();
         return ResponseEntity.status(HttpStatus.OK).body(responseDto);
     }
 
-    @PostMapping("/unSave/{postId}")
-    public ResponseEntity<ResponseDto> unSavePost(@PathVariable("postId") Long postId, HttpServletRequest request){
+    @PostMapping("/unSave")
+    public ResponseEntity<ResponseDto> unSavePost(HttpServletRequest request, @RequestBody RequestPost.SendPostIdDto sendPostIdDto){
         Optional<String> token = null;
         if (request != null) {
             token = jwtAuthTokenProvider.getAuthToken(request);
         }
-        PostService.unSavePost(postId, token);
+        PostService.unSavePost(token, sendPostIdDto);
         ResponseDto responseDto = ResponseDto.builder()
                 .message("Post unSaved successfully.")
                 .build();
@@ -213,6 +214,21 @@ public class PostController {
         return ResponseEntity.status(HttpStatus.OK).body(responseDto);
     }
 
+    //게시글 좋아요한 회원 조회
+    @GetMapping("/getLikeUser/{postId}")
+    public ResponseEntity<ResponseDto> getPostLikeUsers (HttpServletRequest request, @PathVariable("postId") Long postId) {
+        Optional<String> token = null;
+        if (request != null) {
+            token = jwtAuthTokenProvider.getAuthToken(request);
+        }
+        List<ResponseAuth.SearchUserDto> response = PostService.getPostLikeUsers(token, postId);
+        ResponseDto responseDto = ResponseDto.builder()
+                .message("Report post list retrieved successfully.")
+                .data(response)
+                .build();
+        return ResponseEntity.status(HttpStatus.OK).body(responseDto);
+    }
+
 
 
 
@@ -242,6 +258,8 @@ public class PostController {
                 .build();
         return ResponseEntity.status(HttpStatus.OK).body(responseDto);
     }
+
+
 
 //    @PostMapping("/uploadImg")
 //    public ResponseEntity<ResponseDto> uploadPostImg(@RequestPart(value = "file", required = false) MultipartFile file,

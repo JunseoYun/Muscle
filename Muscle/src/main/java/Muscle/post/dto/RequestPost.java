@@ -34,4 +34,11 @@ public class RequestPost {
         private String title;
         private String content;
     }
+
+    @Data
+    @Builder
+    public static class SendPostIdDto {
+        private Long postId;
+        private String temp;
+    }
 }

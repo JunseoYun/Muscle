@@ -18,7 +18,7 @@ public class SavedPost {
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Long savedPostId;
 
-    @Column(name = "storeId")
+    @Column(name = "postId")
     private Long postId;
 
     @Column(name = "userId")
