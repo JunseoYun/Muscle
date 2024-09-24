@@ -26,9 +26,10 @@ public class ResponsePost {
         private String postImg;
         private Boolean isPostLiked;
         private Boolean isPostSaved;
+        private Boolean isFollowed;
 
 
-        public static GetPostDto toDto(Auth writer, Post post, Boolean isPostLiked, Boolean isPostSaved) {
+        public static GetPostDto toDto(Auth writer, Post post, Boolean isPostLiked, Boolean isPostSaved, Boolean isFollowed) {
 
             return GetPostDto.builder()
                     .writerId(writer.getId())
@@ -45,6 +46,7 @@ public class ResponsePost {
                     .postImg(post.getPostImg())
                     .isPostLiked(isPostLiked)
                     .isPostSaved(isPostSaved)
+                    .isFollowed(isFollowed)
                     .build();
         }
     }
