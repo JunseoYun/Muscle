@@ -46,7 +46,6 @@ public class CommentService {
         Comment comment = RequestComment.CreateCommentDto.toEntity(createCommentDto, commentWriterId, post);
         commentRepository.save(comment);
         post.addComment(comment);
-        post.increasePostCommentCount();
         postRepository.save(post);
         return comment.getCommentId();
     }
@@ -110,7 +109,9 @@ public class CommentService {
 
         if(Objects.equals(userId, comment.getCommentWriterId()) || Objects.equals(userId, postWriterId)) {
             commentRepository.delete(comment);
-            post.decreasePostCommentCount();
+            if(post.getCommentCount() > 0) {
+                post.setCommentCount(post.getCommentCount()-1);
+            }
             postRepository.save(post);
         } else {
             throw new IllegalArgumentException("Isn't your comment or post.");

@@ -14,5 +14,6 @@ public interface PostRepository extends JpaRepository<Post, Long> {
     @Query("SELECT a FROM Post a WHERE a.title = :title " +
             "OR a.title LIKE %:title% ORDER BY CASE WHEN a.title = :title THEN 0 ELSE 1 END, a.title ASC")
     List<Post> findByTitleContainingOrdered(@PathVariable("title") String title);
+    List<Post> findByReportCountGreaterThanEqual(Long reportCount);
 
 }

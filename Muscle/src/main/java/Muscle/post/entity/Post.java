@@ -1,6 +1,7 @@
 package Muscle.post.entity;
 
 import Muscle.comment.entity.Comment;
+import Muscle.postReport.entity.PostReport;
 import lombok.Builder;
 import lombok.Data;
 import lombok.Getter;
@@ -38,14 +39,14 @@ public class Post {
     @Column(name = "board")
     private String board;
 
-    @Column(name = "postLikeCount")
-    private Long postLikeCount = 0L;
+    @Column(name = "likeCount")
+    private Long likeCount = 0L;
 
-    @Column(name = "postCommentCount")
-    private Long postCommentCount = 0L;
+    @Column(name = "commentCount")
+    private Long commentCount = 0L;
 
-    @Column(name = "postReportCount")
-    private Long postReportCount = 0L;
+    @Column(name = "reportCount")
+    private Long reportCount = 0L;
 
     @Column(name = "postDate")
     private LocalDateTime postDate;
@@ -56,6 +57,8 @@ public class Post {
     @OneToMany(mappedBy = "post", cascade = CascadeType.REMOVE, orphanRemoval = true)
     private List<Comment> commentList = new ArrayList<>();
 
+    @OneToMany(mappedBy = "post", cascade = CascadeType.REMOVE, orphanRemoval = true)
+    private List<PostReport> reportList = new ArrayList<>();
 
     @Builder
     public Post(Long writerId, String title, String content, String board) {
@@ -74,11 +77,12 @@ public class Post {
 
     public void addComment(Comment comment) {
         this.commentList.add(comment);
+        this.commentCount++;
+    }
+    public void addReport(PostReport postReport) {
+        this.reportList.add(postReport);
+        this.reportCount++;
     }
 
 
-    public void increasePostLikeCount(){ this. postLikeCount++; }
-    public void decreasePostLikeCount(){ this. postLikeCount--; }
-    public void increasePostCommentCount(){ this. postCommentCount++; }
-    public void decreasePostCommentCount(){ this. postCommentCount--; }
 }

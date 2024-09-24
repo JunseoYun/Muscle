@@ -2,6 +2,7 @@ package Muscle.post.service;
 
 
 import Muscle.auth.entity.Auth;
+import Muscle.auth.entity.UserRole;
 import Muscle.auth.repository.AuthRepository;
 import Muscle.auth.security.JwtAuthToken;
 import Muscle.auth.security.JwtAuthTokenProvider;
@@ -65,7 +66,7 @@ public class PostService {
                 .build();
         likedPostRepository.save(likedPost);
         Post post = postRepository.findById(postId).get();
-        post.increasePostLikeCount();
+        post.setLikeCount(post.getLikeCount()+1);
         postRepository.save(post);
     }
 
@@ -79,7 +80,9 @@ public class PostService {
         LikedPost likedPost = likedPostRepository.findByUserIdAndPostId(userId, postId);
         likedPostRepository.delete(likedPost);
         Post post = postRepository.findById(postId).get();
-        post.decreasePostLikeCount();
+        if(post.getLikeCount() > 0) {
+            post.setLikeCount(post.getLikeCount()-1);
+        }
         postRepository.save(post);
     }
 
@@ -284,6 +287,45 @@ public class PostService {
         }
         return dtoList;
 
+    }
+
+    //신고 게시글 목록 조회(count 이상)
+    public List<ResponsePost.GetReportPostListDto> getReportPostList(Optional<String> token, Long count) {
+        String muscleId = null;
+
+        if (token.isPresent()) {
+            JwtAuthToken jwtAuthToken = jwtAuthTokenProvider.convertAuthToken(token.get());
+            muscleId = jwtAuthToken.getClaims().getSubject();
+        }
+        Auth admin = authRepository.findByMuscleId(muscleId);
+        if(admin.getRole() != UserRole.ADMIN) {
+            throw new IllegalArgumentException("신고 확인 권한 없음");
+        }
+        List<ResponsePost.GetReportPostListDto> dtoList = new ArrayList<>();
+        List<Post> entityList = postRepository.findByReportCountGreaterThanEqual(count);
+        entityList.stream().forEach(post -> {
+            Auth writer = authRepository.findById(post.getWriterId()).get();
+            dtoList.add(ResponsePost.GetReportPostListDto.toDto(writer, post));
+        });
+        return dtoList;
+    }
+
+    //신고 게시글 조회
+    public ResponsePost.GetReportPostDto getReportPost(Optional<String> token, Long postId) {
+        String muscleId = null;
+
+        if (token.isPresent()) {
+            JwtAuthToken jwtAuthToken = jwtAuthTokenProvider.convertAuthToken(token.get());
+            muscleId = jwtAuthToken.getClaims().getSubject();
+        }
+        Auth admin = authRepository.findByMuscleId(muscleId);
+        if(admin.getRole() != UserRole.ADMIN) {
+            throw new IllegalArgumentException("신고 확인 권한 없음");
+        }
+        Post post = postRepository.findById(postId).get();
+        Auth writer = authRepository.findById(post.getWriterId()).get();
+
+        return ResponsePost.GetReportPostDto.toDto(writer, post);
     }
 
 

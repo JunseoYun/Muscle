@@ -157,7 +157,10 @@ public class PostController {
 
     @GetMapping("/getWrittenPost") //내가 작성한 게시글
     public ResponseEntity<ResponseDto> getWrittenPost(HttpServletRequest request) {
-        Optional<String> token = jwtAuthTokenProvider.getAuthToken(request);
+        Optional<String> token = null;
+        if (request != null) {
+            token = jwtAuthTokenProvider.getAuthToken(request);
+        }
         List<ResponsePost.GetPostDto> response = PostService.getByWriterPost(token);
         ResponseDto responseDto = ResponseDto.builder()
                 .message("Post list retrieved successfully.")
@@ -168,10 +171,43 @@ public class PostController {
 
     @GetMapping("/search/{title}")
     public ResponseEntity<ResponseDto> searchPost(HttpServletRequest request, @PathVariable("title") String title) {
-        Optional<String> token = jwtAuthTokenProvider.getAuthToken(request);
+        Optional<String> token = null;
+        if (request != null) {
+            token = jwtAuthTokenProvider.getAuthToken(request);
+        }
         List<ResponsePost.GetPostDto> response = PostService.searchPost(token, title);
         ResponseDto responseDto = ResponseDto.builder()
                 .message("Post searched successfully.")
+                .data(response)
+                .build();
+        return ResponseEntity.status(HttpStatus.OK).body(responseDto);
+    }
+
+    //신고 게시글 목록 조회(count 이상)
+    @GetMapping("/getReportPostList/{count}")
+    public ResponseEntity<ResponseDto> getReportPostList(HttpServletRequest request, @PathVariable("count") Long count) {
+        Optional<String> token = null;
+        if (request != null) {
+            token = jwtAuthTokenProvider.getAuthToken(request);
+        }
+        List<ResponsePost.GetReportPostListDto> response = PostService.getReportPostList(token, count);
+        ResponseDto responseDto = ResponseDto.builder()
+                .message("Report post list retrieved successfully.")
+                .data(response)
+                .build();
+        return ResponseEntity.status(HttpStatus.OK).body(responseDto);
+    }
+
+    //신고 게시글 조회
+    @GetMapping("/getReportPost/{postId}")
+    public ResponseEntity<ResponseDto> getReportPost(HttpServletRequest request, @PathVariable("postId") Long postId) {
+        Optional<String> token = null;
+        if (request != null) {
+            token = jwtAuthTokenProvider.getAuthToken(request);
+        }
+        ResponsePost.GetReportPostDto response = PostService.getReportPost(token, postId);
+        ResponseDto responseDto = ResponseDto.builder()
+                .message("Report post list retrieved successfully.")
                 .data(response)
                 .build();
         return ResponseEntity.status(HttpStatus.OK).body(responseDto);
