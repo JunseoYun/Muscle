@@ -36,6 +36,10 @@ public interface PostRepository extends JpaRepository<Post, Long> {
     List<Post> findByBoardOrderByPostDateDesc(String board);
 
 
+    //특정 유저 게시글 조회
+    List<Post> findAllByWriterIdOrderByPostDateDesc(Long writerId);
+
+
 
 
 

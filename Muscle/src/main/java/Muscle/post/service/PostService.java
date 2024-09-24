@@ -160,7 +160,7 @@ public class PostService {
             SavedPost savedPost = savedPostRepository.findByUserIdAndPostId(user.getId(), post.getPostId());
             if (savedPost != null)
                 isPostSaved = true;
-            Follow follow = followRepository.findByFollowerAndFollowing(writer, user);
+            Follow follow = followRepository.findByFollowerAndFollowing(user, writer);
             if (follow != null) {
                 isFollowed = true;
             }
@@ -193,7 +193,7 @@ public class PostService {
         SavedPost savedPost = savedPostRepository.findByUserIdAndPostId(user.getId(), postId);
         if (savedPost != null)
             isPostSaved = true;
-        Follow follow = followRepository.findByFollowerAndFollowing(writer, user);
+        Follow follow = followRepository.findByFollowerAndFollowing(user, writer);
         if (follow != null) {
             isFollowed = true;
         }
@@ -225,7 +225,7 @@ public class PostService {
             Post post = postRepository.findById(savedPost.getPostId()).get();
             Auth writer = authRepository.findById(post.getWriterId()).get();
 
-            Follow follow = followRepository.findByFollowerAndFollowing(writer, user);
+            Follow follow = followRepository.findByFollowerAndFollowing(user, writer);
             if (follow != null) {
                 isFollowed = true;
             }
@@ -260,7 +260,7 @@ public class PostService {
             if (savedPost != null)
                 isPostSaved = true;
             Auth writer = authRepository.findById(post.getWriterId()).get();
-            Follow follow = followRepository.findByFollowerAndFollowing(writer, user);
+            Follow follow = followRepository.findByFollowerAndFollowing(user, writer);
             if (follow != null) {
                 isFollowed = true;
             }
@@ -375,7 +375,7 @@ public class PostService {
             if (savedPost != null)
                 isPostSaved = true;
             Auth writer = authRepository.findById(post.getWriterId()).get();
-            Follow follow = followRepository.findByFollowerAndFollowing(writer, user);
+            Follow follow = followRepository.findByFollowerAndFollowing(user, writer);
             if (follow != null) {
                 isFollowed = true;
             }
@@ -408,7 +408,7 @@ public class PostService {
             if (savedPost != null)
                 isPostSaved = true;
             Auth writer = authRepository.findById(post.getWriterId()).get();
-            Follow follow = followRepository.findByFollowerAndFollowing(writer, user);
+            Follow follow = followRepository.findByFollowerAndFollowing(user, writer);
             if (follow != null) {
                 isFollowed = true;
             }
@@ -416,6 +416,40 @@ public class PostService {
         });
         return dtoList;
     }
+
+    //특정 유저 게시글 조회 - 로그인
+    public List<ResponsePost.GetPostDto> getUserNewPosts(Optional<String> token, Long targetId) {
+        String muscleId = null;
+        List<ResponsePost.GetPostDto> dtoList = new ArrayList<>();
+
+        if (token.isPresent()) {
+            JwtAuthToken jwtAuthToken = jwtAuthTokenProvider.convertAuthToken(token.get());
+            muscleId = jwtAuthToken.getClaims().getSubject();
+        }
+        Auth user = authRepository.findByMuscleId(muscleId);
+        List<Post> entityList = postRepository.findAllByWriterIdOrderByPostDateDesc(targetId);
+
+        Auth writer = authRepository.findById(targetId).get();
+        entityList.stream().forEach(post -> {
+            boolean isPostLiked = false;
+            boolean isPostSaved = false;
+            boolean isFollowed = false;
+
+            LikedPost likedPost = likedPostRepository.findByUserIdAndPostId(user.getId(), post.getPostId());
+            if (likedPost != null)
+                isPostLiked = true;
+            SavedPost savedPost = savedPostRepository.findByUserIdAndPostId(user.getId(), post.getPostId());
+            if (savedPost != null)
+                isPostSaved = true;
+            Follow follow = followRepository.findByFollowerAndFollowing(user, writer);
+            if (follow != null) {
+                isFollowed = true;
+            }
+            dtoList.add(ResponsePost.GetPostDto.toDto(writer, post, isPostLiked, isPostSaved, isFollowed));
+        });
+        return dtoList;
+    }
+
 
     //게시글 검색
     public List<ResponsePost.GetPostDto> searchPost(Optional<String> token, String title) {
@@ -442,7 +476,7 @@ public class PostService {
                 isPostSaved = true;
 
             Auth writer = authRepository.findById(post.getWriterId()).get();
-            Follow follow = followRepository.findByFollowerAndFollowing(writer, user);
+            Follow follow = followRepository.findByFollowerAndFollowing(user, writer);
             if (follow != null) {
                 isFollowed = true;
             }

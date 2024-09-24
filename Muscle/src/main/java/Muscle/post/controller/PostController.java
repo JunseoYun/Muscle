@@ -234,6 +234,22 @@ public class PostController {
         return ResponseEntity.status(HttpStatus.OK).body(responseDto);
     }
 
+    //특정 유저 게시글 조회 - 로그인
+
+    @GetMapping("/getUserNewPosts/{targetId}")
+    public ResponseEntity<ResponseDto> getUserNewPosts(HttpServletRequest request, @PathVariable("targetId") Long targetId) {
+        Optional<String> token = null;
+        if (request != null) {
+            token = jwtAuthTokenProvider.getAuthToken(request);
+        }
+        List<ResponsePost.GetPostDto> response = PostService.getUserNewPosts(token, targetId);
+        ResponseDto responseDto = ResponseDto.builder()
+                .message("User by New post list retrieved successfully.")
+                .data(response)
+                .build();
+        return ResponseEntity.status(HttpStatus.OK).body(responseDto);
+    }
+
 
 
     @GetMapping("/search/{title}")
