@@ -111,8 +111,8 @@ public class ProRequestController {
     }
 
     //프로 신청 목록 조회(status)
-    @GetMapping("getStatusProRequest")
-    public ResponseEntity<ResponseMessage> getStatusProRequest (HttpServletRequest request, @RequestParam String status) {
+    @GetMapping("getStatusProRequest/{status}")
+    public ResponseEntity<ResponseMessage> getStatusProRequest (HttpServletRequest request, @PathVariable("status") String status) {
         Optional<String> token = null;
         if (request != null) {
             token = jwtAuthTokenProvider.getAuthToken(request);
@@ -126,13 +126,13 @@ public class ProRequestController {
     }
 
     //프로 신청 목록 조회(유저)
-    @GetMapping("getUserProRequest")
-    public ResponseEntity<ResponseMessage> getUserProRequest (HttpServletRequest request, @RequestParam String requesterMuscleId) {
+    @GetMapping("getUserProRequest/{muscleId}")
+    public ResponseEntity<ResponseMessage> getUserProRequest (HttpServletRequest request, @PathVariable("muscleId") String muscleId) {
         Optional<String> token = null;
         if (request != null) {
             token = jwtAuthTokenProvider.getAuthToken(request);
         }
-        ResponsePro.ProRequestListDto response = proRequestService.getUserProRequest(token, requesterMuscleId);
+        ResponsePro.ProRequestListDto response = proRequestService.getUserProRequest(token, muscleId);
         ResponseMessage responseMessage = ResponseMessage.builder()
                 .message("ProRequest retrieved successfully.")
                 .data(response)
