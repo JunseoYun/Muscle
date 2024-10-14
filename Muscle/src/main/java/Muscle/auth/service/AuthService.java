@@ -15,6 +15,7 @@ import Muscle.auth.util.RedisUtil;
 import Muscle.auth.util.SHA256Util;
 import Muscle.common.dto.ResponseMessage;
 import Muscle.common.exception.error.*;
+import Muscle.common.service.S3Service;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -36,7 +37,7 @@ public class AuthService {
     private final AuthRepository authRepository;
     private final FollowRepository followRepository;
     private final JwtAuthTokenProvider jwtAuthTokenProvider;
-//    private final S3Service s3Service;
+    private final S3Service s3Service;
     private final RedisUtil redisUtil;
 
     @Transactional
@@ -80,26 +81,44 @@ public class AuthService {
 
 
 
-//    @Transactional
-//    public String uploadImg(MultipartFile file, Optional<String> token) {
-//        String email = null;
-//        if(token.isPresent()){
-//            JwtAuthToken jwtAuthToken = jwtAuthTokenProvider.convertAuthToken(token.get());
-//            email = jwtAuthToken.getClaims().getSubject();
-//        }
-//        Auth user = authRepository.findByEmail(email);
-//        String url = "";
-//        try {
-//            url = s3Service.upload(file,"user");
-//        }
-//        catch (IOException e){
-//            System.out.println("S3 upload failed.");
-//        }
-//
-//        user.setUserImg(url);
-//        authRepository.save(user);
-//        return url;
-//    }
+    @Transactional
+    public String uploadImg(MultipartFile file, Optional<String> token) throws IOException {
+        String muscleId = null;
+        if (token.isPresent()) {
+            JwtAuthToken jwtAuthToken = jwtAuthTokenProvider.convertAuthToken(token.get());
+            muscleId = jwtAuthToken.getClaims().getSubject();
+        }
+        Auth user = authRepository.findByMuscleId(muscleId);
+        if(user.getUserImg() != null) {
+            s3Service.deleteFile(user.getUserImg());
+            user.setUserImg(null);
+        }
+        String url = "";
+        try {
+            url = s3Service.uploadFile(file,"user");
+        }
+        catch (IOException e){
+            System.out.println("S3 upload failed.");
+        }
+
+        user.setUserImg(url);
+        authRepository.save(user);
+        return url;
+    }
+
+    @Transactional
+    public void deleteImg(Optional<String> token) {
+        String muscleId = null;
+        if (token.isPresent()) {
+            JwtAuthToken jwtAuthToken = jwtAuthTokenProvider.convertAuthToken(token.get());
+            muscleId = jwtAuthToken.getClaims().getSubject();
+        }
+        Auth user = authRepository.findByMuscleId(muscleId);
+        s3Service.deleteFile(user.getUserImg());
+        user.setUserImg(null);
+
+        authRepository.save(user);
+    }
 
     public String createAccessToken(String userid) {
         Date expiredDate = Date.from(LocalDateTime.now().plusDays(1).atZone(ZoneId.systemDefault()).toInstant());

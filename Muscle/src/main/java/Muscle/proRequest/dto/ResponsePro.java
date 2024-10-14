@@ -1,11 +1,15 @@
 package Muscle.proRequest.dto;
 
+import Muscle.post.entity.PostImage;
+import Muscle.proRequest.entity.ProCertifyImage;
 import Muscle.proRequest.entity.ProRequest;
 import lombok.Builder;
 import lombok.Data;
 
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.PrimitiveIterator;
+import java.util.stream.Collectors;
 
 public class ResponsePro {
 
@@ -19,10 +23,16 @@ public class ResponsePro {
         private String proField;
         private String proGroup;
         private String proWorkExp;
-        private String proCertifyImg;
+        private String status;
+        private List<String> proCertifyImg;
         private LocalDateTime requestTime;
 
         public static ProRequesterDto toDto(ProRequest proRequest) {
+
+            List<String> imageUrls = proRequest.getImages().stream()
+                    .map(ProCertifyImage::getUrl)
+                    .collect(Collectors.toList());
+
             return ProRequesterDto.builder()
                     .requesterId(proRequest.getRequester().getId())
                     .requesterMuscleId(proRequest.getRequester().getMuscleId())
@@ -31,7 +41,8 @@ public class ResponsePro {
                     .proField(proRequest.getProField())
                     .proGroup(proRequest.getProGroup())
                     .proWorkExp(proRequest.getProWorkExp())
-                    .proCertifyImg(proRequest.getProCertifyImg())
+                    .status(proRequest.getStatus())
+                    .proCertifyImg(imageUrls)
                     .requestTime(proRequest.getRequestTime())
                     .build();
         }
@@ -47,6 +58,7 @@ public class ResponsePro {
         private String requesterImg;
         private String proName;
         private String proField;
+        private String status;
         private LocalDateTime requestTime;
 
         public static ProRequestListDto toDto(ProRequest proRequest) {
@@ -57,6 +69,7 @@ public class ResponsePro {
                     .requesterImg(proRequest.getRequester().getUserImg())
                     .proName(proRequest.getProName())
                     .proField(proRequest.getProField())
+                    .status(proRequest.getStatus())
                     .requestTime(proRequest.getRequestTime())
                     .build();
         }

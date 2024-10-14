@@ -14,7 +14,6 @@ public class RequestPro {
         private String proName;
         private String proGroup;
         private String proWorkExp;
-        private String proCertifyImg;
 
         public static ProRequest toEntity(ProRequestDto proRequestDto, Auth user) {
             return ProRequest.builder()
@@ -22,7 +21,6 @@ public class RequestPro {
                     .proName(proRequestDto.getProName())
                     .proGroup(proRequestDto.getProGroup())
                     .proWorkExp(proRequestDto.getProWorkExp())
-                    .proCertifyImg(proRequestDto.getProCertifyImg())
                     .user(user)
                     .build();
         }

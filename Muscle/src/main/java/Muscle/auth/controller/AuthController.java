@@ -21,6 +21,7 @@ import org.springframework.web.servlet.view.RedirectView;
 import jakarta.servlet.http.HttpServletRequest;
 
 import javax.validation.Valid;
+import java.io.IOException;
 import java.util.List;
 import java.util.Optional;
 
@@ -154,16 +155,29 @@ public class AuthController {
         return ResponseEntity.status(HttpStatus.OK).body(responseMessage);
     }
 
-//    @PostMapping("/uploadImg")
-//    public ResponseEntity<ResponseDto> uploadUserImg(@RequestPart(value = "file", required = false) MultipartFile file, HttpServletRequest request){
-//        Optional<String> token = jwtAuthTokenProvider.getAuthToken(request);
-//        String url = authService.uploadImg(file, token);
-//        ResponseDto responseDto = ResponseDto.builder()
-//                .message("Image uploaded successfully.")
-//                .data(url)
-//                .build();
-//        return ResponseEntity.status(HttpStatus.OK).body(responseDto);
-//    }
+    @PostMapping("/uploadImg")
+    public ResponseEntity<ResponseDto> uploadUserImg(@RequestPart(value = "file", required = false) MultipartFile file, HttpServletRequest request) throws IOException {
+        Optional<String> token = jwtAuthTokenProvider.getAuthToken(request);
+        String url = authService.uploadImg(file, token);
+        ResponseDto responseDto = ResponseDto.builder()
+                .message("Image uploaded successfully.")
+                .data(url)
+                .build();
+        return ResponseEntity.status(HttpStatus.OK).body(responseDto);
+    }
+
+    @DeleteMapping("/deleteImg")
+    public ResponseEntity<ResponseDto> deleteImg(HttpServletRequest request) {
+        Optional<String> token = null;
+        if (request != null) {
+            token = jwtAuthTokenProvider.getAuthToken(request);
+        }
+        authService.deleteImg(token);
+        ResponseDto responseDto = ResponseDto.builder()
+                .message("Image deleted successfully.")
+                .build();
+        return ResponseEntity.status(HttpStatus.OK).body(responseDto);
+    }
 
 
 

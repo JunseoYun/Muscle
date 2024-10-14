@@ -1,11 +1,14 @@
 package Muscle.proRequest.entity;
 
 import Muscle.auth.entity.Auth;
+import Muscle.post.entity.PostImage;
 import lombok.*;
 
 import jakarta.persistence.*;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 
 @Table(name="pro_request")
 @Entity
@@ -36,8 +39,8 @@ public class ProRequest {
     @Column(name = "proWorkExp")
     private String proWorkExp;
 
-    @Column(name = "proCertifyImg")
-    private String proCertifyImg;
+    @OneToMany(mappedBy = "proRequest", cascade = CascadeType.REMOVE, orphanRemoval = true)
+    private List<ProCertifyImage> images = new ArrayList<>();
 
     @Column(name = "status")
     private String status = "PENDING";
@@ -46,13 +49,12 @@ public class ProRequest {
     private LocalDateTime requestTime;
 
     @Builder
-    public ProRequest(Auth user, String proName, String proField,  String proGroup, String proWorkExp, String proCertifyImg) {
+    public ProRequest(Auth user, String proName, String proField,  String proGroup, String proWorkExp) {
         this.requester = user;
         this.proName = proName;
         this.proField = proField;
         this.proGroup = proGroup;
         this.proWorkExp = proWorkExp;
-        this.proCertifyImg = proCertifyImg;
         this.requestTime = LocalDateTime.now();
     }
 }

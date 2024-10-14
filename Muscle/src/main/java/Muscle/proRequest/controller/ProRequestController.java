@@ -2,6 +2,7 @@ package Muscle.proRequest.controller;
 
 import Muscle.auth.dto.RequestAuth;
 import Muscle.auth.security.JwtAuthTokenProvider;
+import Muscle.common.dto.ResponseDto;
 import Muscle.common.dto.ResponseMessage;
 import Muscle.proRequest.dto.RequestPro;
 import Muscle.proRequest.dto.ResponsePro;
@@ -11,8 +12,10 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import javax.validation.Valid;
+import java.io.IOException;
 import java.util.List;
 import java.util.Optional;
 
@@ -31,9 +34,10 @@ public class ProRequestController {
         if (request != null) {
             token = jwtAuthTokenProvider.getAuthToken(request);
         }
-        proRequestService.send(token, proRequestDto);
+        Long id = proRequestService.send(token, proRequestDto);
         ResponseMessage responseMessage = ResponseMessage.builder()
                 .message("Pro registered successfully.")
+                .data(id)
                 .build();
         return ResponseEntity.status(HttpStatus.OK).body(responseMessage);
     }
@@ -95,6 +99,21 @@ public class ProRequestController {
         return ResponseEntity.status(HttpStatus.OK).body(responseMessage);
     }
 
+    //내 프로 신청 조회
+    @GetMapping("getMyProRequest")
+    public ResponseEntity<ResponseMessage> getMyProRequest (HttpServletRequest request) {
+        Optional<String> token = null;
+        if (request != null) {
+            token = jwtAuthTokenProvider.getAuthToken(request);
+        }
+        ResponsePro.ProRequesterDto response = proRequestService.getMyProRequest(token);
+        ResponseMessage responseMessage = ResponseMessage.builder()
+                .message("ProRequest retrieved successfully.")
+                .data(response)
+                .build();
+        return ResponseEntity.status(HttpStatus.OK).body(responseMessage);
+    }
+
     //프로 신청 목록 조회(전체)
     @GetMapping("getAllProRequest")
     public ResponseEntity<ResponseMessage> getAllProRequest (HttpServletRequest request) {
@@ -138,6 +157,33 @@ public class ProRequestController {
                 .data(response)
                 .build();
         return ResponseEntity.status(HttpStatus.OK).body(responseMessage);
+    }
+
+    //인증 사진 자료 업로드
+    @PostMapping("/uploadImg/{proRequestId}")
+    public ResponseEntity<ResponseMessage> uploadProRequestImg(@RequestParam("files") MultipartFile[] files,
+                                                               @PathVariable("proRequestId") Long proRequestId) throws IOException {
+        List<String> url = proRequestService.uploadImg(files, proRequestId);
+
+        ResponseMessage responseMessage = ResponseMessage.builder()
+                .message("Image uploaded successfully.")
+                .data(url)
+                .build();
+        return ResponseEntity.status(HttpStatus.OK).body(responseMessage);
+    }
+
+    //프로 신청 삭제
+    @DeleteMapping("/delete/{proRequestId}")
+    public ResponseEntity<ResponseDto> deleteProRequest(@PathVariable("proRequestId") Long proRequestId, HttpServletRequest request){
+        Optional<String> token = null;
+        if (request != null) {
+            token = jwtAuthTokenProvider.getAuthToken(request);
+        }
+        proRequestService.deleteProRequest(token, proRequestId);
+        ResponseDto responseDto = ResponseDto.builder()
+                .message("ProRequestId deleted successfully.")
+                .build();
+        return ResponseEntity.status(HttpStatus.OK).body(responseDto);
     }
 
 
