@@ -9,17 +9,17 @@ import Muscle.auth.repository.AuthRepository;
 import Muscle.auth.repository.FollowRepository;
 import Muscle.auth.security.JwtAuthToken;
 import Muscle.auth.security.JwtAuthTokenProvider;
+import Muscle.common.service.S3Service;
 import Muscle.post.dto.RequestPost;
 import Muscle.post.dto.ResponsePost;
-import Muscle.post.entity.LikedPost;
-import Muscle.post.entity.Post;
-import Muscle.post.entity.PostRole;
-import Muscle.post.entity.SavedPost;
+import Muscle.post.entity.*;
 import Muscle.post.repository.LikedPostRepository;
+import Muscle.post.repository.PostImageRepository;
 import Muscle.post.repository.PostRepository;
 import Muscle.post.repository.SavedPostRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
@@ -39,7 +39,8 @@ public class PostService {
     private final JwtAuthTokenProvider jwtAuthTokenProvider;
     private final AuthRepository authRepository;
     private final FollowRepository followRepository;
-//    private final S3Service s3Service;
+    private final S3Service s3Service;
+    private final PostImageRepository postImageRepository;
 //    private final ReviewRepository reviewRepository;
 
     public Long createPost(RequestPost.CreatePostDto createPostDto, Optional<String> token) {
@@ -60,6 +61,37 @@ public class PostService {
         authRepository.save(writer);
         return post.getPostId();
     }
+
+    @Transactional
+    public List<String> uploadImg(MultipartFile[] files, long postId) throws IOException {
+        Post post = postRepository.findById(postId).orElseThrow(() -> new IllegalArgumentException("Post not found"));
+
+        List<String> imageUrls = s3Service.uploadFiles(files, "post");
+
+        List<PostImage> images = imageUrls.stream()
+                .map(url -> {
+                    PostImage postImage = new PostImage();
+                    postImage.setUrl(url);
+                    postImage.setFileName(url.substring(url.lastIndexOf("/") + 1));
+                    postImage.setPost(post);
+                    postImageRepository.save(postImage);
+                    return postImage;
+                })
+                .collect(Collectors.toList());
+
+        // 기존의 이미지 리스트를 비운다.
+        if (!post.getImages().isEmpty()) {
+            post.getImages().clear();  // Hibernate에서 orphan 상태로 관리되기 위해 리스트를 비운다.
+        }
+
+        // 새로운 이미지 리스트 설정
+        post.getImages().addAll(images);  // 새로운 이미지 리스트를 추가
+
+        postRepository.save(post);  // 변경 사항 저장
+
+        return imageUrls;
+    }
+
 
 
 
@@ -627,6 +659,10 @@ public class PostService {
         if (Objects.equals(user.getId(), post.getWriterId()) || Objects.equals(user.getRole(), UserRole.ADMIN)) {
             Auth writer = authRepository.findById(post.getWriterId()).get();
             if(writer.getPostCount() > 0) {
+                for (PostImage postImage : post.getImages()) {
+                    s3Service.deleteFile(postImage.getUrl());
+                }
+
                 postRepository.delete(post);
                 writer.setPostCount(writer.getPostCount() - 1);
                 authRepository.save(writer);
@@ -635,6 +671,8 @@ public class PostService {
             throw new IllegalArgumentException("Isn't your post.");
         }
     }
+
+
 
     private static PostRole getPostRole(String postRoleString) {
         return switch (postRoleString) {
@@ -645,24 +683,9 @@ public class PostService {
         };
     }
 
-    //    public String uploadImg(MultipartFile file, long storeId){
-//        Store store = storeRepository.findById(storeId).get();
-//
-////        if (!store.getImgUrl().isEmpty())
-////            s3Service.deleteFile(store.getImgUrl());
-//
-//        String url = "";
-//        try {
-//            url = s3Service.upload(file,"store");
-//        }
-//        catch (IOException e){
-//            System.out.println("S3 upload failed.");
-//        }
-//
-//        store.setImgUrl(url);
-//        storeRepository.save(store);
-//        return url;
-//    }
+
+
+
 
 }
 

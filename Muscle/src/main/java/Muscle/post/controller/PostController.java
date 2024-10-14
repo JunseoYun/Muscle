@@ -14,6 +14,8 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import jakarta.servlet.http.HttpServletRequest;
+
+import java.io.IOException;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
@@ -368,15 +370,15 @@ public class PostController {
 //        return ResponseEntity.status(HttpStatus.OK).body(responseDto);
 //    }
 
-//    @PostMapping("/uploadImg/{PostId}")
-//    public ResponseEntity<ResponseDto> uploadPostImg(@RequestPart(value = "file", required = false) MultipartFile file,
-//                                                      @PathVariable("PostId") Long PostId){
-//        String url = PostService.uploadImg(file, PostId);
-//
-//        ResponseDto responseDto = ResponseDto.builder()
-//                .message("Image uploaded successfully.")
-//                .data(url)
-//                .build();
-//        return ResponseEntity.status(HttpStatus.OK).body(responseDto);
-//    }
+    @PostMapping("/uploadImg/{postId}")
+    public ResponseEntity<ResponseDto> uploadPostImg(@RequestParam("files") MultipartFile[] files,
+                                                      @PathVariable("postId") Long PostId) throws IOException {
+        List<String> url = PostService.uploadImg(files, PostId);
+
+        ResponseDto responseDto = ResponseDto.builder()
+                .message("Image uploaded successfully.")
+                .data(url)
+                .build();
+        return ResponseEntity.status(HttpStatus.OK).body(responseDto);
+    }
 }

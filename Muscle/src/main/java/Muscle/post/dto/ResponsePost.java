@@ -3,10 +3,13 @@ package Muscle.post.dto;
 import Muscle.post.entity.Post;
 import Muscle.auth.entity.Auth;
 import Muscle.post.entity.PostRole;
+import Muscle.post.entity.PostImage;
 import lombok.Builder;
 import lombok.Getter;
 
 import java.time.LocalDateTime;
+import java.util.List;
+import java.util.stream.Collectors;
 
 public class ResponsePost {
 
@@ -25,13 +28,17 @@ public class ResponsePost {
         private LocalDateTime postDate;
         private Long likeCount;
         private Long commentCount;
-        private String postImg;
+        private List<String> postImg;
         private Boolean isPostLiked;
         private Boolean isPostSaved;
         private Boolean isFollowed;
 
 
         public static GetPostDto toDto(Auth writer, Post post, Boolean isPostLiked, Boolean isPostSaved, Boolean isFollowed) {
+
+            List<String> imageUrls = post.getImages().stream()
+                    .map(PostImage::getUrl)
+                    .collect(Collectors.toList());
 
             return GetPostDto.builder()
                     .writerId(writer.getId())
@@ -46,7 +53,7 @@ public class ResponsePost {
                     .postDate(post.getPostDate())
                     .likeCount(post.getLikeCount())
                     .commentCount(post.getCommentCount())
-                    .postImg(post.getPostImg())
+                    .postImg(imageUrls)
                     .isPostLiked(isPostLiked)
                     .isPostSaved(isPostSaved)
                     .isFollowed(isFollowed)
@@ -126,9 +133,13 @@ public class ResponsePost {
         private Long reportCount;
         private Long likeCount;
         private Long commentCount;
-        private String postImg;
+        private List<String> postImg;
 
         public static GetReportPostDto toDto(Auth writer, Post post) {
+
+            List<String> imageUrls = post.getImages().stream()
+                    .map(PostImage::getUrl)
+                    .collect(Collectors.toList());
 
             return GetReportPostDto.builder()
                     .writerId(writer.getId())
@@ -143,9 +154,10 @@ public class ResponsePost {
                     .reportCount(post.getReportCount())
                     .likeCount(post.getLikeCount())
                     .commentCount(post.getCommentCount())
-                    .postImg(post.getPostImg())
+                    .postImg(imageUrls)
                     .build();
         }
     }
+
     
 }

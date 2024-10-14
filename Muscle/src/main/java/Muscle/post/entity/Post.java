@@ -55,8 +55,8 @@ public class Post {
     @Column(name = "postDate")
     private LocalDateTime postDate;
 
-    @Column(name = "postImg")
-    private String postImg;
+    @OneToMany(mappedBy = "post", cascade = CascadeType.REMOVE, orphanRemoval = true)
+    private List<PostImage> images = new ArrayList<>();
 
     @OneToMany(mappedBy = "post", cascade = CascadeType.REMOVE, orphanRemoval = true)
     private List<Comment> commentList = new ArrayList<>();
