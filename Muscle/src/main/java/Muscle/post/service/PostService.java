@@ -41,7 +41,6 @@ public class PostService {
     private final FollowRepository followRepository;
     private final S3Service s3Service;
     private final PostImageRepository postImageRepository;
-//    private final ReviewRepository reviewRepository;
 
     public Long createPost(RequestPost.CreatePostDto createPostDto, Optional<String> token) {
 
