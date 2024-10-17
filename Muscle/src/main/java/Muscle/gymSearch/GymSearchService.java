@@ -34,7 +34,7 @@ public class GymSearchService {
             throw new IllegalArgumentException("비회원 접근 제어");
         }
 
-        String apiUrl = "https://openapi.naver.com/v1/search/local.json?query=" + query
+        String apiUrl = "https://openapi.naver.com/v1/search/local.json?query=" + query + "헬스장"
                 + "&display=" + display
                 + "&start=" + start
                 + "&sort=" + sort;
