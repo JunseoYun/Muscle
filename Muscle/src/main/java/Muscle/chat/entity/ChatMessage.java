@@ -19,8 +19,8 @@ public class ChatMessage {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long chatMessageId;
 
-    @Column(name = "sender")
-    private String sender;
+    @Column(name = "senderId")
+    private Long senderId;
 
     @Column(name = "content")
     private String content;
@@ -39,14 +39,14 @@ public class ChatMessage {
     // 생성자
     public ChatMessage(
             @JsonProperty("chatMessageId") Long chatMessageId,
-            @JsonProperty("sender") String sender,
+            @JsonProperty("senderId") Long senderId,
             @JsonProperty("content") String content,
             @JsonProperty("messageType") MessageType messageType,
             @JsonProperty("timestamp") String timestamp,
             @JsonProperty("chatRoom") ChatRoom chatRoom
     ) {
         this.chatMessageId = chatMessageId;
-        this.sender = sender;
+        this.senderId = senderId;
         this.content = content;
         this.messageType = messageType;
         this.timestamp = timestamp;

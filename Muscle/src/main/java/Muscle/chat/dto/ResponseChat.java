@@ -10,12 +10,12 @@ public class ResponseChat {
 
     @Data
     public static class ChatMessageDto {
-        private String sender;
+        private Long senderId;
         private String content;
         private String timestamp;  // LocalDateTime -> String
 
         public ChatMessageDto(ChatMessage chatMessage) {
-            this.sender = chatMessage.getSender();
+            this.senderId = chatMessage.getSenderId();
             this.content = chatMessage.getContent();
             this.timestamp = chatMessage.getTimestamp();  // String 그대로 사용
         }
