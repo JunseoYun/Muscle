@@ -11,6 +11,7 @@ import lombok.NoArgsConstructor;
 import jakarta.persistence.*;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 
 @Table(name = "chatRoom")
 @Entity
@@ -20,8 +21,7 @@ import java.util.List;
 public class ChatRoom {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long chatRoomId;
+    private String chatRoomId;
 
     @Column(name = "roomName")
     private String roomName;
@@ -38,4 +38,12 @@ public class ChatRoom {
     @OneToMany(mappedBy = "chatRoom", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     @JsonManagedReference  // 부모 엔티티에서 자식 엔티티로의 참조 관리
     private List<ChatMessage> messages = new ArrayList<>();
+
+    public ChatRoom(String roomName, Long senderId, Long receiverId, String createdAt) {
+        this.roomName = roomName;
+        this.senderId = senderId;
+        this.receiverId = receiverId;
+        this.createdAt = createdAt;
+    }
+
 }

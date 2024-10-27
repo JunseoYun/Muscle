@@ -20,10 +20,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
@@ -56,11 +53,19 @@ public class ChatService {
         // 채팅방이 있으면 반환, 없으면 새로 생성
         return existingRoom.orElseGet(() -> {
             ChatRoom chatRoom = new ChatRoom();
+            chatRoom.setChatRoomId(UUID.randomUUID().toString());
+            chatRoom.setRoomName(sender.getMuscleId()+receiver.getMuscleId());
             chatRoom.setSenderId(senderId);
             chatRoom.setReceiverId(receiverId);
             chatRoom.setCreatedAt(LocalDateTime.now().toString());
             return chatRoomRepository.save(chatRoom);
         });
+    }
+
+    @Transactional
+    public ChatRoom getChatRoom(String chatRoomId) {
+        ChatRoom chatRoom = chatRoomRepository.findByChatRoomId(chatRoomId).get();
+        return chatRoom;
     }
 
     public List<ResponseChat.ChatRoomListDto> getUserChatRooms(Optional<String> token) {
@@ -71,7 +76,7 @@ public class ChatService {
         }
         Long userId = authRepository.findByMuscleId(muscleId).getId();
 
-        List<ChatRoom> chatRoomList = chatRoomRepository.findBySenderIdOrReceiverId(userId, userId);
+        List<ChatRoom> chatRoomList = chatRoomRepository.findChatRoomsByUserId(userId);
         List<ResponseChat.ChatRoomListDto> dtoList = new ArrayList<>();
         chatRoomList.forEach(chatRoom -> {
             dtoList.add(new ResponseChat.ChatRoomListDto(chatRoom));
@@ -79,6 +84,20 @@ public class ChatService {
 
         return dtoList;
     }
+
+//    public List<ResponseChat.ChatRoomListDto> getUserChatRooms(Long userId) {
+//        System.out.println("getUserChatRooms called with userId: " + userId); // 로그 추가
+//
+//        List<ChatRoom> chatRoomList = chatRoomRepository.findChatRoomsByUserId(userId);
+//        System.out.println("Chat rooms found: " + chatRoomList.size()); // 로그 추가
+//
+//        List<ResponseChat.ChatRoomListDto> dtoList = new ArrayList<>();
+//        chatRoomList.forEach(chatRoom -> {
+//            dtoList.add(new ResponseChat.ChatRoomListDto(chatRoom));
+//        });
+//
+//        return dtoList;
+//    }
 
     // Redis에 메시지 임시 저장
     public void saveMessageInRedis(ChatMessage chatMessage) {
@@ -117,7 +136,7 @@ public class ChatService {
     }
 
 
-    public void persistMessagesToDatabase(Long chatRoomId) {
+    public void persistMessagesToDatabase(String chatRoomId) {
         String key = CHAT_ROOM_PREFIX + chatRoomId;
         List<Object> serializedMessages = chatRedisTemplate.opsForList().range(key, 0, -1);
 
@@ -128,7 +147,7 @@ public class ChatService {
 
         if (!messages.isEmpty()) {
             // ChatRoom을 찾음
-            ChatRoom chatRoom = chatRoomRepository.findById(chatRoomId)
+            ChatRoom chatRoom = chatRoomRepository.findByChatRoomId(chatRoomId)
                     .orElseThrow(() -> new RuntimeException("ChatRoom not found with id: " + chatRoomId));
 
             // 각 메시지에 ChatRoom 설정

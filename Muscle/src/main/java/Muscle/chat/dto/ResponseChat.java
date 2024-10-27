@@ -23,7 +23,7 @@ public class ResponseChat {
 
     @Data
     public static class ChatRoomDto {
-        private Long roomId;
+        private String roomId;
         private Long senderId;
         private Long receiverId;
         private List<ChatMessageDto> messages;
@@ -40,7 +40,7 @@ public class ResponseChat {
 
     @Data
     public static class ChatRoomListDto {
-        private Long roomId;
+        private String roomId;
         private String roomName;
         private String dateTime;  // LocalDateTime -> String
 

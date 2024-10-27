@@ -63,6 +63,14 @@ public class ChatController {
         return new ResponseChat.ChatRoomDto(chatRoom);
     }
 
+    @GetMapping("/get/chatRoom/{chatRoomId}")
+    @ResponseBody
+    public ResponseChat.ChatRoomDto getChatRoomId(@PathVariable String chatRoomId) {
+
+        ChatRoom chatRoom = chatService.getChatRoom(chatRoomId);
+        // ChatRoomDto로 변환하여 채팅방과 메시지 반환
+        return new ResponseChat.ChatRoomDto(chatRoom);
+    }
     /**
      * 사용자가 참여 중인 채팅방 목록을 반환
      * @return 참여 중인 채팅방 목록
@@ -74,8 +82,12 @@ public class ChatController {
         if (request != null) {
             token = jwtAuthTokenProvider.getAuthToken(request);
         }
-        return chatService.getUserChatRooms(token);
+        List<ResponseChat.ChatRoomListDto> response = chatService.getUserChatRooms(token);
+        System.out.println(response);
+        return response;
     }
+
+
 
 //    /**
 //     * 특정 채팅방에서 Redis에 저장된 메시지들을 조회
@@ -94,7 +106,7 @@ public class ChatController {
     @EventListener
     public void handleWebSocketDisconnectListener(SessionDisconnectEvent event) {
         SimpMessageHeaderAccessor headerAccessor = SimpMessageHeaderAccessor.wrap(event.getMessage());
-        Long chatRoomId = (Long) headerAccessor.getSessionAttributes().get("chatRoomId");
+        String chatRoomId = (String) headerAccessor.getSessionAttributes().get("chatRoomId");
 
         if (chatRoomId != null) {
             // 사용자가 채팅방을 떠났을 때 Redis의 메시지를 데이터베이스로 옮김
