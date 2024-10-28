@@ -10,6 +10,9 @@ import Muscle.common.exception.error.RegisterFailedException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.PropertySource;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
@@ -24,14 +27,19 @@ import java.util.Optional;
 import java.util.UUID;
 
 @Service
+@Configuration
 @RequiredArgsConstructor
+@PropertySource("classpath:/secret/secret.properties")
 public class KakaoLoginService {
     private final AuthRepository authRepository;
 
     private final AuthService authService;
 
     private static final String KAKAO_AUTH_BASE_URL = "https://kauth.kakao.com/oauth/authorize";
-    private static final String CLIENT_ID = "10a2cf156a1962c0fe80bfd2d221f76f";
+
+
+    @Value("${oauth2.kakao.client-id}")
+    private String CLIENT_ID;
     private static final String REDIRECT_URI = "http://localhost:8080/api/auth/login/oauth2/code/kakao";
     private static final String STATE_STRING = generateRandomUUID();  // CSRF 방지용 상태값
     private static final String TOKEN_URL = "https://kauth.kakao.com/oauth/token";

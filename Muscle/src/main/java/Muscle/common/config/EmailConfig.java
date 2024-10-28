@@ -1,23 +1,33 @@
 package Muscle.common.config;
 
 
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.PropertySource;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.JavaMailSenderImpl;
 
 import java.util.Properties;
 
 @Configuration
+@PropertySource("classpath:/secret/secret.properties")
 public class EmailConfig {
+
+    @Value("${mail.sender.userName}")
+    private String userName;
+    @Value("${mail.sender.password}")
+    private String password;
+
+
     @Bean
     public JavaMailSender mailSender() {//JAVA MAILSENDER 인터페이스를 구현한 객체를 빈으로 등록하기 위함.
 
         JavaMailSenderImpl mailSender = new JavaMailSenderImpl();//JavaMailSender 의 구현체를 생성하고
         mailSender.setHost("smtp.naver.com");// 속성을 넣기 시작합니다. 이메일 전송에 사용할 SMTP 서버 호스트를 설정
         mailSender.setPort(465);// 587로 포트를 지정
-        mailSender.setUsername("musclepj24@naver.com");//네이버계정을 넣습니다.
-        mailSender.setPassword("Wnstj0115!");//네이버 비밀번호를 넣습니다.
+        mailSender.setUsername(userName);//네이버계정을 넣습니다.
+        mailSender.setPassword(password);//네이버 비밀번호를 넣습니다.
 
         Properties javaMailProperties = new Properties();//JavaMail의 속성을 설정하기 위해 Properties 객체를 생성
         javaMailProperties.put("mail.transport.protocol", "smtp");//프로토콜로 smtp 사용

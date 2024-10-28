@@ -10,8 +10,10 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.swagger.v3.oas.annotations.tags.Tags;
 import lombok.RequiredArgsConstructor;
-import lombok.Value;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.PropertySource;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
@@ -24,8 +26,11 @@ import org.springframework.web.util.UriComponentsBuilder;
 import java.util.Optional;
 import java.util.UUID;
 
+
 @Service
+@Configuration
 @RequiredArgsConstructor
+@PropertySource("classpath:/secret/secret.properties")
 public class NaverLoginService {
 
     private final AuthRepository authRepository;
@@ -33,8 +38,12 @@ public class NaverLoginService {
     private final AuthService authService;
 
     private static final String NAVER_AUTH_BASE_URL = "https://nid.naver.com/oauth2.0/authorize";
-    private static final String CLIENT_ID = "7IkNK1KlVLSR0SAiMAiS";
-    private static final String CLIENT_SECRET = "A1fpi0bgFt";
+
+    @Value("${oauth2.naver.client-id}")
+    private String CLIENT_ID;
+
+    @Value("${oauth2.naver.client-secret}")
+    private String CLIENT_SECRET;
     private static final String REDIRECT_URI = "http://localhost:8080/api/auth/login/oauth2/code/naver";
     private static final String STATE_STRING = generateRandomUUID();  // CSRF 방지용 상태값
     private static final String TOKEN_URL = "https://nid.naver.com/oauth2.0/token";
