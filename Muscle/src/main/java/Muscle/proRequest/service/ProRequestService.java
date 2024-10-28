@@ -127,6 +127,8 @@ public class ProRequestService {
         requester.setLevel(proRequest.getProField());
         authRepository.save(requester);
 
+        proRequestRepository.delete(proRequest);
+
 
     }
 

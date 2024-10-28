@@ -44,6 +44,10 @@ public class FriendService {
 
         Auth recipient = authRepository.findById(friendRequestDto.getUserId()).get();
 
+
+        if(sender == recipient) {
+            throw new IllegalArgumentException("자신에게 친구 요청 불가");
+        }
         if(friendRequestRepository.findByRequester(sender) != null && friendRequestRepository.findByRequester(sender).getStatus().equals("PENDING")) {
             throw new IllegalArgumentException("이미 보낸 친구 요청이 있습니다.");
         } else if (sender.getMuscleFriend() != null) {

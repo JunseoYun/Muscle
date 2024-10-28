@@ -189,6 +189,7 @@ public class ResponseAuth {
         private String recipientMuscleId;
         private String recipientImg;
         private String recipientLevel;
+        private String status;
 
         public static FriendRecipientResponseDto toDto(FriendRequest friendRequest) {
             return FriendRecipientResponseDto.builder()
@@ -197,6 +198,7 @@ public class ResponseAuth {
                     .recipientMuscleId(friendRequest.getRecipient().getMuscleId())
                     .recipientImg(friendRequest.getRecipient().getUserImg())
                     .recipientLevel(friendRequest.getRecipient().getLevel())
+                    .status(friendRequest.getStatus())
                     .build();
         }
     }
