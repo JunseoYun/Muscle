@@ -4,6 +4,7 @@ import Muscle.auth.dto.RequestAuth;
 import Muscle.auth.security.JwtAuthTokenProvider;
 import Muscle.common.dto.ResponseDto;
 import Muscle.common.dto.ResponseMessage;
+import Muscle.post.dto.RequestPost;
 import Muscle.proRequest.dto.RequestPro;
 import Muscle.proRequest.dto.ResponsePro;
 import Muscle.proRequest.service.ProRequestService;
@@ -42,6 +43,7 @@ public class ProRequestController {
         return ResponseEntity.status(HttpStatus.OK).body(responseMessage);
     }
 
+
     //프로 신청 취소
     @DeleteMapping("cancelProRequest")
     public ResponseEntity<ResponseMessage> cancelProRequest (HttpServletRequest request) {
@@ -55,6 +57,8 @@ public class ProRequestController {
                 .build();
         return ResponseEntity.status(HttpStatus.OK).body(responseMessage);
     }
+
+
 
     //프로 신청 수락
     @PostMapping("acceptProRequest")
@@ -168,6 +172,20 @@ public class ProRequestController {
         ResponseMessage responseMessage = ResponseMessage.builder()
                 .message("Image uploaded successfully.")
                 .data(url)
+                .build();
+        return ResponseEntity.status(HttpStatus.OK).body(responseMessage);
+    }
+
+    @PostMapping("/sendWithImg")
+    public ResponseEntity<ResponseMessage> sendWithImg(@RequestPart(value = "files", required = false) MultipartFile[] files, @RequestPart(value = "proRequestDto") RequestPro.ProRequestDto proRequestDto, HttpServletRequest request) throws IOException {
+        Optional<String> token = null;
+        if (request != null) {
+            token = jwtAuthTokenProvider.getAuthToken(request);
+        }
+        Long id = proRequestService.sendWithImg(files, proRequestDto, token);
+        ResponseMessage responseMessage = ResponseMessage.builder()
+                .message("Pro registered successfully.")
+                .data(id)
                 .build();
         return ResponseEntity.status(HttpStatus.OK).body(responseMessage);
     }

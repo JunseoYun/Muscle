@@ -87,7 +87,49 @@ public class ProRequestService {
     }
 
 
+    @Transactional
+    public Long sendWithImg(MultipartFile[] files, RequestPro.ProRequestDto proRequestDto, Optional<String> token) throws IOException {
+        String muscleId = null;
+        if(token.isPresent()) {
+            JwtAuthToken jwtAuthToken = jwtAuthTokenProvider.convertAuthToken(token.get());
+            muscleId = jwtAuthToken.getClaims().getSubject();
+        }
+        Auth requester = authRepository.findByMuscleId(muscleId);
 
+        if(proRequestRepository.findByRequester(requester) != null) {
+            throw new IllegalArgumentException("이미 보낸 프로 신청이 있습니다.");
+        }
+        ProRequest proRequest = RequestPro.ProRequestDto.toEntity(proRequestDto, requester);
+
+
+        proRequestRepository.save(proRequest);
+
+        List<String> imageUrls = s3Service.uploadFiles(files, "proRequest");
+
+        List<ProCertifyImage> images = imageUrls.stream()
+                .map(url -> {
+                    ProCertifyImage proCertifyImage = new ProCertifyImage();
+                    proCertifyImage.setUrl(url);
+                    proCertifyImage.setFileName(url.substring(url.lastIndexOf("/") + 1));
+                    proCertifyImage.setProRequest(proRequest);
+                    proCertifyImageRepository.save(proCertifyImage);
+                    return proCertifyImage;
+                })
+                .collect(Collectors.toList());
+
+        // 기존의 이미지 리스트를 비운다.
+        if (!proRequest.getImages().isEmpty()) {
+            proRequest.getImages().clear();  // Hibernate에서 orphan 상태로 관리되기 위해 리스트를 비운다.
+        }
+
+        // 새로운 이미지 리스트 설정
+        proRequest.getImages().addAll(images);  // 새로운 이미지 리스트를 추가
+
+        proRequestRepository.save(proRequest);
+
+        return proRequest.getId();
+
+    }
 
 
     //프로 신청 취소

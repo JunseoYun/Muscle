@@ -381,4 +381,22 @@ public class PostController {
                 .build();
         return ResponseEntity.status(HttpStatus.OK).body(responseDto);
     }
+
+    @PostMapping("/createWithImg")
+    public ResponseEntity<ResponseDto> createWithImg(@RequestPart(value = "files", required = false) MultipartFile[] files,
+                                                     @RequestPart(value = "createPostDto") RequestPost.CreatePostDto createPostDto, HttpServletRequest request) throws IOException {
+        Optional<String> token = null;
+        if (request != null) {
+            token = jwtAuthTokenProvider.getAuthToken(request);
+        }
+
+        Long PostId = PostService.createPostWithImg(files, createPostDto, token);
+        ResponseDto responseDto = ResponseDto.builder()
+                .message("Post created successfully.")
+                .data(PostId)
+                .build();
+        return ResponseEntity.status(HttpStatus.OK).body(responseDto);
+    }
+
+
 }

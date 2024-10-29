@@ -91,8 +91,52 @@ public class PostService {
         return imageUrls;
     }
 
+    @Transactional
+    public Long createPostWithImg(MultipartFile[] files, RequestPost.CreatePostDto createPostDto, Optional<String> token) throws IOException {
+
+        String muscleId = null;
+        if (token.isPresent()) {
+            JwtAuthToken jwtAuthToken = jwtAuthTokenProvider.convertAuthToken(token.get());
+            muscleId = jwtAuthToken.getClaims().getSubject();
+        }
+        Auth writer = authRepository.findByMuscleId(muscleId);
+
+        PostRole postRole = getPostRole(createPostDto.getPostRole());
+        if (postRole == PostRole.PRO && (writer.getRole() != UserRole.PRO && writer.getRole() != UserRole.ADMIN)) {
+            throw new IllegalArgumentException("PRO 글 작성 권한 없음.");
+        }
+
+        Post post = RequestPost.CreatePostDto.toEntity(createPostDto, writer.getId(), postRole);
+        postRepository.save(post);
 
 
+        List<String> imageUrls = s3Service.uploadFiles(files, "post");
+
+        List<PostImage> images = imageUrls.stream()
+                .map(url -> {
+                    PostImage postImage = new PostImage();
+                    postImage.setUrl(url);
+                    postImage.setFileName(url.substring(url.lastIndexOf("/") + 1));
+                    postImage.setPost(post);
+                    postImageRepository.save(postImage);
+                    return postImage;
+                })
+                .collect(Collectors.toList());
+
+        // 기존의 이미지 리스트를 비운다.
+        if (!post.getImages().isEmpty()) {
+            post.getImages().clear();  // Hibernate에서 orphan 상태로 관리되기 위해 리스트를 비운다.
+        }
+
+        // 새로운 이미지 리스트 설정
+        post.getImages().addAll(images);  // 새로운 이미지 리스트를 추가
+
+        postRepository.save(post);  // 변경 사항 저장
+
+        writer.setPostCount(writer.getPostCount() + 1);
+        authRepository.save(writer);
+        return post.getPostId();
+    }
 
 
     public void likePost(Optional<String> token, RequestPost.SendPostIdDto sendPostIdDto) {
