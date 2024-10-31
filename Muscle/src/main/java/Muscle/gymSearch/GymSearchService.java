@@ -5,6 +5,9 @@ import Muscle.auth.repository.AuthRepository;
 import Muscle.auth.security.JwtAuthToken;
 import Muscle.auth.security.JwtAuthTokenProvider;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.PropertySource;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.http.HttpEntity;
@@ -15,10 +18,15 @@ import org.springframework.http.ResponseEntity;
 import java.util.Optional;
 
 @Service
+@Configuration
 @RequiredArgsConstructor
+@PropertySource("classpath:/secret/secret.properties")
 public class GymSearchService {
-    private static final String CLIENT_ID = "7IkNK1KlVLSR0SAiMAiS";
-    private static final String CLIENT_SECRET = "A1fpi0bgFt";
+    @Value("${oauth2.naver.client-id}")
+    private String CLIENT_ID;
+
+    @Value("${oauth2.naver.client-secret}")
+    private String CLIENT_SECRET;
     private final JwtAuthTokenProvider jwtAuthTokenProvider;
     private final AuthRepository authRepository;
 
