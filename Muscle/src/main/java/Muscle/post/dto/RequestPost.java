@@ -24,6 +24,7 @@ public class RequestPost {
             return Post.builder()
                     .writerId(writerId)
                     .title(createPostDto.getTitle())
+                    .content(createPostDto.getContent())
                     .postRole(postRole)
                     .board(createPostDto.getBoard())
                     .build();
