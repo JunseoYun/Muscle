@@ -32,9 +32,10 @@ public class ResponsePost {
         private Boolean isPostLiked;
         private Boolean isPostSaved;
         private Boolean isFollowed;
+        private Boolean isMine;
 
 
-        public static GetPostDto toDto(Auth writer, Post post, Boolean isPostLiked, Boolean isPostSaved, Boolean isFollowed) {
+        public static GetPostDto toDto(Auth writer, Post post, Boolean isPostLiked, Boolean isPostSaved, Boolean isFollowed, Boolean isMine) {
 
             List<String> imageUrls = post.getImages().stream()
                     .map(PostImage::getUrl)
@@ -57,6 +58,7 @@ public class ResponsePost {
                     .isPostLiked(isPostLiked)
                     .isPostSaved(isPostSaved)
                     .isFollowed(isFollowed)
+                    .isMine(isMine)
                     .build();
         }
     }

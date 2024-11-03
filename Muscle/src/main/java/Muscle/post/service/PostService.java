@@ -230,6 +230,7 @@ public class PostService {
             boolean isPostLiked = false;
             boolean isPostSaved = false;
             boolean isFollowed = false;
+            boolean isMine = false;
 
             LikedPost likedPost = likedPostRepository.findByUserIdAndPostId(user.getId(), post.getPostId());
             if (likedPost != null)
@@ -241,8 +242,11 @@ public class PostService {
             if (follow != null) {
                 isFollowed = true;
             }
+            if(Objects.equals(user.getId(), post.getWriterId())) {
+                isMine = true;
+            }
 
-            dtoList.add(ResponsePost.GetPostDto.toDto(writer, post, isPostLiked, isPostSaved, isFollowed));
+            dtoList.add(ResponsePost.GetPostDto.toDto(writer, post, isPostLiked, isPostSaved, isFollowed, isMine));
         });
 
 
@@ -258,6 +262,7 @@ public class PostService {
         boolean isPostLiked = false;
         boolean isPostSaved = false;
         boolean isFollowed = false;
+        boolean isMine = false;
 
         if (token.isPresent()) {
             JwtAuthToken jwtAuthToken = jwtAuthTokenProvider.convertAuthToken(token.get());
@@ -275,7 +280,10 @@ public class PostService {
             isFollowed = true;
         }
 
-        return ResponsePost.GetPostDto.toDto(writer, post, isPostLiked, isPostSaved, isFollowed);
+        if(Objects.equals(user.getId(), post.getWriterId())) {
+            isMine = true;
+        }
+        return ResponsePost.GetPostDto.toDto(writer, post, isPostLiked, isPostSaved, isFollowed, isMine);
     }
 
 
@@ -293,7 +301,7 @@ public class PostService {
             boolean isPostLiked = false;
             boolean isPostSaved = true;
             boolean isFollowed = false;
-
+            boolean isMine = false;
             LikedPost likedPost = likedPostRepository.findByUserIdAndPostId(user.getId(), savedPost.getPostId());
             if (likedPost != null)
                 isPostLiked = true;
@@ -306,7 +314,11 @@ public class PostService {
             if (follow != null) {
                 isFollowed = true;
             }
-            dtoList.add(ResponsePost.GetPostDto.toDto(writer, post, isPostLiked, isPostSaved, isFollowed));
+
+            if(Objects.equals(user.getId(), post.getWriterId())) {
+                isMine = true;
+            }
+            dtoList.add(ResponsePost.GetPostDto.toDto(writer, post, isPostLiked, isPostSaved, isFollowed, isMine));
         });
 
 
@@ -329,6 +341,7 @@ public class PostService {
             boolean isPostLiked = false;
             boolean isPostSaved = false;
             boolean isFollowed = false;
+            boolean isMine = false;
 
             LikedPost likedPost = likedPostRepository.findByUserIdAndPostId(user.getId(), post.getPostId());
             if (likedPost != null)
@@ -341,7 +354,10 @@ public class PostService {
             if (follow != null) {
                 isFollowed = true;
             }
-            dtoList.add(ResponsePost.GetPostDto.toDto(writer, post, isPostLiked, isPostSaved, isFollowed));
+            if(Objects.equals(user.getId(), post.getWriterId())) {
+                isMine = true;
+            }
+            dtoList.add(ResponsePost.GetPostDto.toDto(writer, post, isPostLiked, isPostSaved, isFollowed, isMine));
         });
 
 
@@ -364,6 +380,7 @@ public class PostService {
             boolean isPostLiked = false;
             boolean isPostSaved = false;
             boolean isFollowed = false;
+            boolean isMine = true;
 
             LikedPost likedPost = likedPostRepository.findByUserIdAndPostId(writerId, post.getPostId());
             if (likedPost != null)
@@ -373,7 +390,8 @@ public class PostService {
                 isPostSaved = true;
 
             Auth writer = authRepository.findById(post.getWriterId()).get();
-            dtoList.add(ResponsePost.GetPostDto.toDto(writer, post, isPostLiked, isPostSaved, isFollowed));
+
+            dtoList.add(ResponsePost.GetPostDto.toDto(writer, post, isPostLiked, isPostSaved, isFollowed, isMine));
         });
 
         return dtoList;
@@ -387,10 +405,11 @@ public class PostService {
         boolean isPostLiked = false;
         boolean isPostSaved = false;
         boolean isFollowed = false;
+        boolean isMine = false;
 
         entityList.stream().forEach(post -> {
             Auth writer = authRepository.findById(post.getWriterId()).get();
-            dtoList.add(ResponsePost.GetPostDto.toDto(writer, post, isPostLiked, isPostSaved, isFollowed));
+            dtoList.add(ResponsePost.GetPostDto.toDto(writer, post, isPostLiked, isPostSaved, isFollowed, isMine));
         });
 
         return dtoList;
@@ -406,10 +425,11 @@ public class PostService {
         boolean isPostLiked = false;
         boolean isPostSaved = false;
         boolean isFollowed = false;
+        boolean isMine = false;
 
         entityList.stream().forEach(post -> {
             Auth writer = authRepository.findById(post.getWriterId()).get();
-            dtoList.add(ResponsePost.GetPostDto.toDto(writer, post, isPostLiked, isPostSaved, isFollowed));
+            dtoList.add(ResponsePost.GetPostDto.toDto(writer, post, isPostLiked, isPostSaved, isFollowed, isMine));
         });
 
         return dtoList;
@@ -444,6 +464,7 @@ public class PostService {
             boolean isPostLiked = false;
             boolean isPostSaved = false;
             boolean isFollowed = false;
+            boolean isMine = false;
 
             LikedPost likedPost = likedPostRepository.findByUserIdAndPostId(user.getId(), post.getPostId());
             if (likedPost != null)
@@ -456,7 +477,10 @@ public class PostService {
             if (follow != null) {
                 isFollowed = true;
             }
-            dtoList.add(ResponsePost.GetPostDto.toDto(writer, post, isPostLiked, isPostSaved, isFollowed));
+            if(Objects.equals(user.getId(), post.getWriterId())) {
+                isMine = true;
+            }
+            dtoList.add(ResponsePost.GetPostDto.toDto(writer, post, isPostLiked, isPostSaved, isFollowed, isMine));
         });
         return dtoList;
     }
@@ -477,6 +501,7 @@ public class PostService {
             boolean isPostLiked = false;
             boolean isPostSaved = false;
             boolean isFollowed = false;
+            boolean isMine = false;
 
             LikedPost likedPost = likedPostRepository.findByUserIdAndPostId(user.getId(), post.getPostId());
             if (likedPost != null)
@@ -489,7 +514,11 @@ public class PostService {
             if (follow != null) {
                 isFollowed = true;
             }
-            dtoList.add(ResponsePost.GetPostDto.toDto(writer, post, isPostLiked, isPostSaved, isFollowed));
+            if(Objects.equals(user.getId(), post.getWriterId())) {
+                isMine = true;
+            }
+
+            dtoList.add(ResponsePost.GetPostDto.toDto(writer, post, isPostLiked, isPostSaved, isFollowed, isMine));
         });
         return dtoList;
     }
@@ -511,6 +540,7 @@ public class PostService {
             boolean isPostLiked = false;
             boolean isPostSaved = false;
             boolean isFollowed = false;
+            boolean isMine = false;
 
             LikedPost likedPost = likedPostRepository.findByUserIdAndPostId(user.getId(), post.getPostId());
             if (likedPost != null)
@@ -522,7 +552,11 @@ public class PostService {
             if (follow != null) {
                 isFollowed = true;
             }
-            dtoList.add(ResponsePost.GetPostDto.toDto(writer, post, isPostLiked, isPostSaved, isFollowed));
+            if(Objects.equals(user.getId(), post.getWriterId())) {
+                isMine = true;
+            }
+
+            dtoList.add(ResponsePost.GetPostDto.toDto(writer, post, isPostLiked, isPostSaved, isFollowed,isMine));
         });
         return dtoList;
     }
@@ -550,6 +584,7 @@ public class PostService {
             boolean isPostLiked = false;
             boolean isPostSaved = false;
             boolean isFollowed = false;
+            boolean isMine = false;
 
             LikedPost likedPost = likedPostRepository.findByUserIdAndPostId(user.getId(), post.getPostId());
             if (likedPost != null)
@@ -562,7 +597,11 @@ public class PostService {
             if (follow != null) {
                 isFollowed = true;
             }
-            dtoList.add(ResponsePost.GetPostDto.toDto(writer, post, isPostLiked, isPostSaved, isFollowed));
+            if(Objects.equals(user.getId(), post.getWriterId())) {
+                isMine = true;
+            }
+
+            dtoList.add(ResponsePost.GetPostDto.toDto(writer, post, isPostLiked, isPostSaved, isFollowed, isMine));
         });
         return dtoList;
     }
@@ -584,6 +623,7 @@ public class PostService {
             boolean isPostLiked = false;
             boolean isPostSaved = false;
             boolean isFollowed = false;
+            boolean isMine = false;
 
             LikedPost likedPost = likedPostRepository.findByUserIdAndPostId(user.getId(), post.getPostId());
             if (likedPost != null)
@@ -597,7 +637,10 @@ public class PostService {
             if (follow != null) {
                 isFollowed = true;
             }
-            dtoList.add(ResponsePost.GetPostDto.toDto(writer, post, isPostLiked, isPostSaved, isFollowed));
+            if(Objects.equals(user.getId(), post.getWriterId())) {
+                isMine = true;
+            }
+            dtoList.add(ResponsePost.GetPostDto.toDto(writer, post, isPostLiked, isPostSaved, isFollowed, isMine));
         });
 
         return dtoList;
