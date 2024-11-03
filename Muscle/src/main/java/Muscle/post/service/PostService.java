@@ -749,6 +749,10 @@ public class PostService {
                     s3Service.deleteFile(postImage.getUrl());
                 }
 
+                // 좋아요 및 저장된 게시글 관련 데이터 삭제
+                likedPostRepository.deleteAll(likedPostRepository.findAllByPostId(postId));
+                savedPostRepository.deleteAll(savedPostRepository.findAllByPostId(postId));
+
                 postRepository.delete(post);
                 writer.setPostCount(writer.getPostCount() - 1);
                 authRepository.save(writer);
