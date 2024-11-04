@@ -89,8 +89,8 @@ public class RequestAuth {
     @Data
     public static class ChangePasswordDto{
         @NotNull
-        private String password;
-        private String temp;
+        private String currentPassword;
+        private String newPassword;
     }
 
 

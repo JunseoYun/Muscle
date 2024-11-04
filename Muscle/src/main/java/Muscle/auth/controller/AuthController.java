@@ -204,7 +204,7 @@ public class AuthController {
         if (request != null) {
             token = jwtAuthTokenProvider.getAuthToken(request);
         }
-        authService.changePassword(token, changePasswordDto.getPassword());
+        authService.changePassword(token, changePasswordDto);
         ResponseMessage responseMessage = ResponseMessage.builder()
                 .message("Password changed successfully.")
                 .build();

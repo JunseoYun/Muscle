@@ -77,7 +77,28 @@ public class AuthService {
         return Optional.ofNullable(ResponseAuth.LoginUserRsDto.toDto(accessToken));
     }
 
+    @Transactional
+    public void changePassword(Optional<String> token, RequestAuth.ChangePasswordDto changePasswordDto){
+        String muscleId = null;
+        if (token.isPresent()) {
+            JwtAuthToken jwtAuthToken = jwtAuthTokenProvider.convertAuthToken(token.get());
+            muscleId = jwtAuthToken.getClaims().getSubject();
+        }
 
+        Auth user = authRepository.findByMuscleId(muscleId);
+        if(user == null) {
+            throw new NotFoundUserException();
+        }
+        String salt = user.getSalt();
+        if(!Objects.equals(user.getPassword(), SHA256Util.getEncrypt(changePasswordDto.getCurrentPassword(), salt))) {
+            throw new NotFoundUserException();
+        }
+
+        salt = SHA256Util.generateSalt();
+        String encryptedPassword = SHA256Util.getEncrypt(changePasswordDto.getNewPassword(), salt);
+        user.changePassword(encryptedPassword, salt);
+        authRepository.save(user);
+    }
 
 
 
@@ -162,23 +183,7 @@ public class AuthService {
         authRepository.save(user);
     }
 
-    @Transactional
-    public void changePassword(Optional<String> token, String password){
-        String muscleId = null;
-        if (token.isPresent()) {
-            JwtAuthToken jwtAuthToken = jwtAuthTokenProvider.convertAuthToken(token.get());
-            muscleId = jwtAuthToken.getClaims().getSubject();
-        }
 
-        Auth user = authRepository.findByMuscleId(muscleId);
-        if(user == null)
-            throw new NotFoundUserException();
-
-        String salt = SHA256Util.generateSalt();
-        String encryptedPassword = SHA256Util.getEncrypt(password, salt);
-        user.changePassword(encryptedPassword, salt);
-        authRepository.save(user);
-    }
 
     @Transactional
     public void setUserLevel(Optional<String> token, RequestAuth.SetUserLevelDto setUserLevelDto) {
