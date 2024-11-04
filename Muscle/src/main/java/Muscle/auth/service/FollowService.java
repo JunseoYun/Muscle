@@ -67,6 +67,29 @@ public class FollowService {
 
     }
 
+    //특정 유저를 팔로우 하는 사람 조회
+    @Transactional
+    public List<ResponseAuth.FollowerResponseDto> getUserFollower (Optional<String> token, Long userId) {
+        String muscleId = null;
+        if (token.isPresent()) {
+            JwtAuthToken jwtAuthToken = jwtAuthTokenProvider.convertAuthToken(token.get());
+            muscleId = jwtAuthToken.getClaims().getSubject();
+        }
+        Auth auth = authRepository.findByMuscleId(muscleId);
+
+        if(auth == null) {
+            throw new IllegalArgumentException("Not Muscle user");
+        }
+        Auth following = authRepository.findById(userId).get();
+
+        List<Follow> followerList = followRepository.findByFollowing(following);
+
+        return followerList.stream()
+                .map(ResponseAuth.FollowerResponseDto::toDto)
+                .collect(Collectors.toList());
+
+    }
+
     //내가 팔로우 하는 사람 조회
     @Transactional
     public List<ResponseAuth.FollowingResponseDto> getFollowing (Optional<String> token) {
@@ -76,6 +99,27 @@ public class FollowService {
             muscleId = jwtAuthToken.getClaims().getSubject();
         }
         Auth follower = authRepository.findByMuscleId(muscleId);
+
+        List<Follow> followList = followRepository.findByFollower(follower);
+
+        return followList.stream()
+                .map(ResponseAuth.FollowingResponseDto::toDto)
+                .collect(Collectors.toList());
+    }
+
+    //특정 유저가 팔로우 하는 사람 조회
+    @Transactional
+    public List<ResponseAuth.FollowingResponseDto> getUserFollowing (Optional<String> token, Long userId) {
+        String muscleId = null;
+        if (token.isPresent()) {
+            JwtAuthToken jwtAuthToken = jwtAuthTokenProvider.convertAuthToken(token.get());
+            muscleId = jwtAuthToken.getClaims().getSubject();
+        }
+        Auth auth = authRepository.findByMuscleId(muscleId);
+        if(auth == null) {
+            throw new IllegalArgumentException("Not Muscle user");
+        }
+        Auth follower = authRepository.findById(userId).get();
 
         List<Follow> followList = followRepository.findByFollower(follower);
 

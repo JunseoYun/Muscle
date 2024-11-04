@@ -1,5 +1,6 @@
 package Muscle.post.dto;
 
+import Muscle.auth.entity.UserRole;
 import Muscle.post.entity.Post;
 import Muscle.auth.entity.Auth;
 import Muscle.post.entity.PostRole;
@@ -20,6 +21,7 @@ public class ResponsePost {
         private String writerMuscleId;
         private String writerLevel;
         private String writerImg;
+        private UserRole writerRole;
         private PostRole postRole;
         private Long postId;
         private String title;
@@ -46,6 +48,7 @@ public class ResponsePost {
                     .writerMuscleId(writer.getMuscleId())
                     .writerLevel(writer.getLevel())
                     .writerImg(writer.getUserImg())
+                    .writerRole(writer.getRole())
                     .postId(post.getPostId())
                     .title(post.getTitle())
                     .content(post.getContent())
@@ -70,6 +73,7 @@ public class ResponsePost {
         private String writerMuscleId;
         private String writerLevel;
         private String writerImg;
+        private UserRole writerRole;
         private Long postId;
         private String title;
         public static GetPostSimpleDto toDto(Auth writer, Post post) {
@@ -79,6 +83,7 @@ public class ResponsePost {
                     .writerMuscleId(writer.getMuscleId())
                     .writerLevel(writer.getLevel())
                     .writerImg(writer.getUserImg())
+                    .writerRole(writer.getRole())
                     .postId(post.getPostId())
                     .title(post.getTitle())
                     .build();
@@ -93,6 +98,7 @@ public class ResponsePost {
         private String writerMuscleId;
         private String writerLevel;
         private String writerImg;
+        private UserRole writerRole;
         private Long postId;
         private String title;
         private PostRole postRole;
@@ -108,6 +114,7 @@ public class ResponsePost {
                     .writerMuscleId(writer.getMuscleId())
                     .writerLevel(writer.getLevel())
                     .writerImg(writer.getUserImg())
+                    .writerRole(writer.getRole())
                     .postId(post.getPostId())
                     .title(post.getTitle())
                     .postRole(post.getPostRole())
@@ -127,6 +134,7 @@ public class ResponsePost {
         private String writerMuscleId;
         private String writerLevel;
         private String writerImg;
+        private UserRole writerRole;
         private Long postId;
         private String title;
         private String content;
@@ -148,6 +156,7 @@ public class ResponsePost {
                     .writerMuscleId(writer.getMuscleId())
                     .writerLevel(writer.getLevel())
                     .writerImg(writer.getUserImg())
+                    .writerRole(writer.getRole())
                     .postId(post.getPostId())
                     .title(post.getTitle())
                     .content(post.getContent())

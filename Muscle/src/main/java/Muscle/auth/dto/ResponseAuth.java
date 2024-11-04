@@ -4,6 +4,7 @@ package Muscle.auth.dto;
 import Muscle.auth.entity.Auth;
 import Muscle.auth.entity.Follow;
 import Muscle.auth.entity.FriendRequest;
+import Muscle.auth.entity.UserRole;
 import jdk.jfr.DataAmount;
 import lombok.Builder;
 import lombok.Data;
@@ -30,6 +31,7 @@ public class ResponseAuth {
         private String userName;
         private String userLevel;
         private String userImg;
+        private UserRole userRole;
         private Long userPostCount;
         private Long userFollowerCount;
         private Long userFollowingCount;
@@ -47,6 +49,7 @@ public class ResponseAuth {
                         .userName(user.getName())
                         .userLevel(user.getLevel())
                         .userImg(user.getUserImg())
+                        .userRole(user.getRole())
                         .userPostCount(user.getPostCount())
                         .userFollowerCount(user.getFollowerCount())
                         .userFollowingCount(user.getFollowingCount())
@@ -59,6 +62,7 @@ public class ResponseAuth {
                     .userName(user.getName())
                     .userLevel(user.getLevel())
                     .userImg(user.getUserImg())
+                    .userRole(user.getRole())
                     .userPostCount(user.getPostCount())
                     .userFollowerCount(user.getFollowerCount())
                     .userFollowingCount(user.getFollowingCount())
@@ -78,6 +82,7 @@ public class ResponseAuth {
         private String userName;
         private String userLevel;
         private String userImg;
+        private UserRole userRole;
         private Long userPostCount;
         private Long userFollowerCount;
         private Long userFollowingCount;
@@ -95,6 +100,7 @@ public class ResponseAuth {
                         .userName(user.getName())
                         .userLevel(user.getLevel())
                         .userImg(user.getUserImg())
+                        .userRole(user.getRole())
                         .userPostCount(user.getPostCount())
                         .userFollowerCount(user.getFollowerCount())
                         .userFollowingCount(user.getFollowingCount())
@@ -107,6 +113,7 @@ public class ResponseAuth {
                     .userName(user.getName())
                     .userLevel(user.getLevel())
                     .userImg(user.getUserImg())
+                    .userRole(user.getRole())
                     .userPostCount(user.getPostCount())
                     .userFollowerCount(user.getFollowerCount())
                     .userFollowingCount(user.getFollowingCount())
@@ -126,6 +133,7 @@ public class ResponseAuth {
         private String muscleId;
         private String level;
         private String userImg;
+        private UserRole userRole;
 
         public static SearchUserDto toDto(Auth user) {
             return SearchUserDto.builder()
@@ -133,6 +141,7 @@ public class ResponseAuth {
                     .muscleId(user.getMuscleId())
                     .level(user.getLevel())
                     .userImg(user.getUserImg())
+                    .userRole(user.getRole())
                     .build();
         }
     }

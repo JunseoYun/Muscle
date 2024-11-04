@@ -50,6 +50,20 @@ public class FollowController {
         return ResponseEntity.status(HttpStatus.OK).body(responseMessage);
     }
 
+    @GetMapping("/getUserFollower/{userId}")
+    public ResponseEntity<ResponseMessage> getTargetFollower (HttpServletRequest request, @PathVariable("userId") Long userId) {
+        Optional<String> token = null;
+        if (request != null) {
+            token = jwtAuthTokenProvider.getAuthToken(request);
+        }
+        List<ResponseAuth.FollowerResponseDto> response = followService.getUserFollower(token, userId);
+        ResponseMessage responseMessage = ResponseMessage.builder()
+                .message("User follower get successfully.")
+                .data(response)
+                .build();
+        return ResponseEntity.status(HttpStatus.OK).body(responseMessage);
+    }
+
     @GetMapping("/getFollowing")
     public ResponseEntity<ResponseMessage> getFollowing (HttpServletRequest request) {
         Optional<String> token = null;
@@ -59,6 +73,20 @@ public class FollowController {
         List<ResponseAuth.FollowingResponseDto> response = followService.getFollowing(token);
         ResponseMessage responseMessage = ResponseMessage.builder()
                 .message("Following get successfully.")
+                .data(response)
+                .build();
+        return ResponseEntity.status(HttpStatus.OK).body(responseMessage);
+    }
+
+    @GetMapping("/getUserFollowing/{userId}")
+    public ResponseEntity<ResponseMessage> getUserFollowing (HttpServletRequest request, @PathVariable("userId") Long userId) {
+        Optional<String> token = null;
+        if (request != null) {
+            token = jwtAuthTokenProvider.getAuthToken(request);
+        }
+        List<ResponseAuth.FollowingResponseDto> response = followService.getUserFollowing(token, userId);
+        ResponseMessage responseMessage = ResponseMessage.builder()
+                .message("user following get successfully.")
                 .data(response)
                 .build();
         return ResponseEntity.status(HttpStatus.OK).body(responseMessage);
