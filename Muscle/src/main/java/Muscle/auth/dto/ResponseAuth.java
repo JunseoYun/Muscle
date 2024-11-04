@@ -39,6 +39,7 @@ public class ResponseAuth {
         private String friendMuscleId;
         private String friendLevel;
         private String friendImg;
+        private UserRole friendRole;
 
         public static GetUserDto toDto(Auth user, Auth friend){
             if(friend == null) {
@@ -70,6 +71,7 @@ public class ResponseAuth {
                     .friendMuscleId(friend.getMuscleId())
                     .friendLevel(friend.getLevel())
                     .friendImg(friend.getUserImg())
+                    .friendRole(friend.getRole())
                     .build();
         }
     }
@@ -91,6 +93,7 @@ public class ResponseAuth {
         private String friendMuscleId;
         private String friendLevel;
         private String friendImg;
+        private UserRole friendRole;
 
         public static GetUserInfoDto toDto(Auth user, Auth friend, Boolean isFollowed) {
             if(friend == null) {
@@ -122,6 +125,7 @@ public class ResponseAuth {
                     .friendMuscleId(friend.getMuscleId())
                     .friendLevel(friend.getLevel())
                     .friendImg(friend.getUserImg())
+                    .friendRole(friend.getRole())
                     .build();
         }
     }
