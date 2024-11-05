@@ -229,6 +229,9 @@ public class ProRequestService {
         }
         Auth user = authRepository.findByMuscleId(muscleId);
         ProRequest proRequest = proRequestRepository.findByRequester(user);
+        if(proRequest == null) {
+            return null;
+        }
 
 
         return  ResponsePro.ProRequesterDto.toDto(proRequest);
