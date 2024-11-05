@@ -143,7 +143,7 @@ public class FriendService {
 
     // 보낸 친구 요청 조회
     @Transactional
-    public ResponseAuth.FriendRecipientResponseDto getSendFriendRequest(Optional<String> token) {
+    public List<ResponseAuth.FriendRecipientResponseDto> getSendFriendRequest(Optional<String> token) {
         String muscleId = null;
         if (token.isPresent()) {
             JwtAuthToken jwtAuthToken = jwtAuthTokenProvider.convertAuthToken(token.get());
@@ -151,9 +151,11 @@ public class FriendService {
         }
         Auth sender = authRepository.findByMuscleId(muscleId);
 
-        FriendRequest friendRequest = friendRequestRepository.findByRequester(sender);
+        List<FriendRequest> friendRequests = friendRequestRepository.findAllByRequester(sender);
 
-        return ResponseAuth.FriendRecipientResponseDto.toDto(friendRequest);
+        return friendRequests.stream()
+                .map(ResponseAuth.FriendRecipientResponseDto::toDto)
+                .collect(Collectors.toList());
     }
 
     // 받은 친구 요청 목록 조회

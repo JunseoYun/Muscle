@@ -111,7 +111,7 @@ public class FriendController {
         if (request != null) {
             token = jwtAuthTokenProvider.getAuthToken(request);
         }
-        ResponseAuth.FriendRecipientResponseDto response = friendService.getSendFriendRequest(token);
+        List<ResponseAuth.FriendRecipientResponseDto> response = friendService.getSendFriendRequest(token);
         ResponseMessage responseMessage = ResponseMessage.builder()
                 .message("User information retrieved successfully.")
                 .data(response)
