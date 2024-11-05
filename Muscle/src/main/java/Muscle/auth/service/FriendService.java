@@ -69,7 +69,7 @@ public class FriendService {
             muscleId = jwtAuthToken.getClaims().getSubject();
         }
         Auth sender = authRepository.findByMuscleId(muscleId);
-        FriendRequest friendRequest = friendRequestRepository.findByRequester(sender);
+        FriendRequest friendRequest = friendRequestRepository.findByRequesterAndStatus(sender, "PENDING");
         if(friendRequest == null || !friendRequest.getStatus().equals("PENDING")) {
             throw new IllegalArgumentException("취소할 친구 요청이 없습니다.");
         }

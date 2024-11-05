@@ -9,4 +9,5 @@ public interface FriendRequestRepository extends JpaRepository<FriendRequest, Lo
     FriendRequest findByRequester(Auth auth);
 
     List<FriendRequest> findAllByRecipientAndStatus(Auth auth, String status);
+    FriendRequest findByRequesterAndStatus(Auth auth, String status);
 }
