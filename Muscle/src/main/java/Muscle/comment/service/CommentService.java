@@ -50,33 +50,54 @@ public class CommentService {
         return comment.getCommentId();
     }
 
-    public List<ResponseComment.GetCommentDto> getPostComment(Long postId) {
+    public List<ResponseComment.GetCommentDto> getPostComment(Optional<String> token, Long postId) {
 
+        String muscleId = null;
+        if(token.isPresent()) {
+            JwtAuthToken jwtAuthToken = jwtAuthTokenProvider.convertAuthToken(token.get());
+            muscleId = jwtAuthToken.getClaims().getSubject();
+        }
+        Auth user = authRepository.findByMuscleId(muscleId);
         Post post = postRepository.findById(postId).get();
         List<Comment> entityList = commentRepository.findAllByPost(post);
         List<ResponseComment.GetCommentDto> dtoList = new ArrayList<>();
         entityList.stream().forEach(comment -> {
+            boolean isMine = false;
             Auth writer = authRepository.findById(comment.getCommentWriterId()).get();
-            dtoList.add(ResponseComment.GetCommentDto.toDto(writer, comment));
+            if(user == writer) {
+                isMine = true;
+            }
+            dtoList.add(ResponseComment.GetCommentDto.toDto(writer, comment, isMine));
         });
         return dtoList;
 
     }
 
-    public List<ResponseComment.GetCommentDto> getAllComment() {
-        List<Comment> entityList = commentRepository.findAll();
-        List<ResponseComment.GetCommentDto> dtoList = new ArrayList<>();
-        entityList.stream().forEach(comment -> {
-            Auth writer = authRepository.findById(comment.getCommentWriterId()).get();
-            dtoList.add(ResponseComment.GetCommentDto.toDto(writer, comment));
-                });
-        return dtoList;
-    }
+//    public List<ResponseComment.GetCommentDto> getAllComment() {
+//        List<Comment> entityList = commentRepository.findAll();
+//        List<ResponseComment.GetCommentDto> dtoList = new ArrayList<>();
+//        entityList.stream().forEach(comment -> {
+//            Auth writer = authRepository.findById(comment.getCommentWriterId()).get();
+//            dtoList.add(ResponseComment.GetCommentDto.toDto(writer, comment));
+//                });
+//        return dtoList;
+//    }
 
-    public ResponseComment.GetCommentDto getComment(Long commentId) {
+    public ResponseComment.GetCommentDto getComment(Optional<String> token, Long commentId) {
+        String muscleId = null;
+        if(token.isPresent()) {
+            JwtAuthToken jwtAuthToken = jwtAuthTokenProvider.convertAuthToken(token.get());
+            muscleId = jwtAuthToken.getClaims().getSubject();
+        }
+        Auth user = authRepository.findByMuscleId(muscleId);
         Comment comment = commentRepository.findById(commentId).get();
         Auth writer = authRepository.findById(comment.getCommentWriterId()).get();
-        return ResponseComment.GetCommentDto.toDto(writer, comment);
+
+        boolean isMine = false;
+        if(user == writer) {
+            isMine = true;
+        }
+        return ResponseComment.GetCommentDto.toDto(writer, comment, isMine);
     }
 
     public void updateComment(RequestComment.UpdateCommentDto updateCommentDto, Optional<String> token) {

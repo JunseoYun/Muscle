@@ -40,20 +40,24 @@ public class CommentController {
         return ResponseEntity.status(HttpStatus.OK).body(responseDto);
     }
 
-    @GetMapping("/get")
-    public ResponseEntity<ResponseDto> getAllComment() {
-
-        List<ResponseComment.GetCommentDto> response = commentService.getAllComment();
-        ResponseDto responseDto = ResponseDto.builder()
-                .message("Comment list retrieved successfully.")
-                .data(response)
-                .build();
-        return ResponseEntity.status(HttpStatus.OK).body(responseDto);
-    }
+//    @GetMapping("/get")
+//    public ResponseEntity<ResponseDto> getAllComment() {
+//
+//        List<ResponseComment.GetCommentDto> response = commentService.getAllComment();
+//        ResponseDto responseDto = ResponseDto.builder()
+//                .message("Comment list retrieved successfully.")
+//                .data(response)
+//                .build();
+//        return ResponseEntity.status(HttpStatus.OK).body(responseDto);
+//    }
 
     @GetMapping("/getPostComment/{postId}")
-    public ResponseEntity<ResponseDto> getPostComment(@PathVariable("postId") Long postId) {
-        List<ResponseComment.GetCommentDto> response = commentService.getPostComment(postId);
+    public ResponseEntity<ResponseDto> getPostComment(HttpServletRequest request, @PathVariable("postId") Long postId) {
+        Optional<String> token = null;
+        if (request != null) {
+            token = jwtAuthTokenProvider.getAuthToken(request);
+        }
+        List<ResponseComment.GetCommentDto> response = commentService.getPostComment(token, postId);
         ResponseDto responseDto = ResponseDto.builder()
                 .message("Post comment list retrieved successfully.")
                 .data(response)
@@ -62,9 +66,12 @@ public class CommentController {
     }
 
     @GetMapping("/get/{commentId}")
-    public ResponseEntity<ResponseDto> getComment(@PathVariable("commentId") Long commentId) {
-
-        ResponseComment.GetCommentDto response = commentService.getComment(commentId);
+    public ResponseEntity<ResponseDto> getComment(HttpServletRequest request, @PathVariable("commentId") Long commentId) {
+        Optional<String> token = null;
+        if (request != null) {
+            token = jwtAuthTokenProvider.getAuthToken(request);
+        }
+        ResponseComment.GetCommentDto response = commentService.getComment(token, commentId);
         ResponseDto responseDto = ResponseDto.builder()
                 .message("Comment retrieved successfully.")
                 .data(response)

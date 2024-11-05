@@ -22,8 +22,9 @@ public class ResponseComment {
         private String commentContent;
         private LocalDateTime commentDate;
         private Long postId;
+        private Boolean isMine;
 
-        public static GetCommentDto toDto(Auth writer, Comment comment) {
+        public static GetCommentDto toDto(Auth writer, Comment comment, Boolean isMine) {
             return GetCommentDto.builder()
                     .writerId(writer.getId())
                     .writerMuscleId(writer.getMuscleId())
@@ -33,6 +34,7 @@ public class ResponseComment {
                     .commentContent(comment.getCommentContent())
                     .commentDate(comment.getCommentDate())
                     .postId(comment.getPost().getPostId())
+                    .isMine(isMine)
                     .build();
         }
     }
