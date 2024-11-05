@@ -197,6 +197,7 @@ public class ResponseAuth {
     @Data
     @Builder
     public static class FriendRecipientResponseDto {
+        private Long friendRequestId;
         private Long recipientId;
         private String recipientName;
         private String recipientMuscleId;
@@ -206,6 +207,7 @@ public class ResponseAuth {
 
         public static FriendRecipientResponseDto toDto(FriendRequest friendRequest) {
             return FriendRecipientResponseDto.builder()
+                    .friendRequestId(friendRequest.getId())
                     .recipientId(friendRequest.getRecipient().getId())
                     .recipientName(friendRequest.getRecipient().getName())
                     .recipientMuscleId(friendRequest.getRecipient().getMuscleId())

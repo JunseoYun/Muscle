@@ -46,13 +46,13 @@ public class FriendController {
 
 
     //친구 요청 취소
-    @DeleteMapping("/cancel")
-    public ResponseEntity<ResponseMessage> cancelFriendRequest(HttpServletRequest request) {
+    @DeleteMapping("/cancel/{requestId}")
+    public ResponseEntity<ResponseMessage> cancelFriendRequest(HttpServletRequest request, @PathVariable("requestId") Long requestId) {
         Optional<String> token = null;
         if (request != null) {
             token = jwtAuthTokenProvider.getAuthToken(request);
         }
-        friendService.cancelFriendRequest(token);
+        friendService.cancelFriendRequest(token, requestId);
         ResponseMessage responseMessage = ResponseMessage.builder()
                 .message("Muscle friend request cancel successfully.")
                 .build();

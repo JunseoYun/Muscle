@@ -62,17 +62,21 @@ public class FriendService {
 
     //친구 요청 취소
     @Transactional
-    public void cancelFriendRequest(Optional<String> token) {
+    public void cancelFriendRequest(Optional<String> token, Long requestId) {
         String muscleId = null;
         if (token.isPresent()) {
             JwtAuthToken jwtAuthToken = jwtAuthTokenProvider.convertAuthToken(token.get());
             muscleId = jwtAuthToken.getClaims().getSubject();
         }
         Auth sender = authRepository.findByMuscleId(muscleId);
-        FriendRequest friendRequest = friendRequestRepository.findByRequesterAndStatus(sender, "PENDING");
+        FriendRequest friendRequest = friendRequestRepository.findById(requestId).get();
         if(friendRequest == null || !friendRequest.getStatus().equals("PENDING")) {
             throw new IllegalArgumentException("취소할 친구 요청이 없습니다.");
         }
+        if(friendRequest.getRequester() != sender) {
+            throw new IllegalArgumentException("내 친구 요청이 아닙니다.");
+        }
+
         friendRequestRepository.delete(friendRequest);
     }
 
