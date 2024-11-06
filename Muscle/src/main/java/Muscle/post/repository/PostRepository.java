@@ -12,7 +12,7 @@ import java.util.List;
 
 public interface PostRepository extends JpaRepository<Post, Long> {
     List<Post> findAllByWriterId(Long writerId);
-    List<Post> findAllByWriterIdOrderByCreatedAtDesc(Long writerId);
+    List<Post> findByWriterIdOrderByPostDateDesc(Long writerId);
 
     List<Post> findByBoard(String board);
     @Query("SELECT a FROM Post a WHERE a.title = :title " +

@@ -374,7 +374,7 @@ public class PostService {
             muscleId = jwtAuthToken.getClaims().getSubject();
         }
         Long writerId = authRepository.findByMuscleId(muscleId).getId();
-        List<Post> entityList = postRepository.findAllByWriterIdOrderByCreatedAtDesc(writerId);
+        List<Post> entityList = postRepository.findByWriterIdOrderByPostDateDesc(writerId);
 
         entityList.stream().forEach(post -> {
             boolean isPostLiked = false;
