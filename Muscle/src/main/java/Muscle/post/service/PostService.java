@@ -397,6 +397,11 @@ public class PostService {
         return dtoList;
     }
 
+
+
+
+
+
     //베스트 게시글 조회(전체 게시글 중 좋아요 많은 순 10걔) - 비로그인
     public List<ResponsePost.GetPostDto> getBestPosts() {
         List<Post> entityList = postRepository.findTop10ByOrderByLikeCountDesc();
@@ -434,7 +439,72 @@ public class PostService {
 
         return dtoList;
     }
+    //투데이 게시판 게시글 전체글 탑30 - 로그인
+    public List<ResponsePost.GetPostDto> getTodayBoard30Posts(Optional<String> token) {
+        String muscleId = null;
+        List<ResponsePost.GetPostDto> dtoList = new ArrayList<>();
+        if (token.isPresent()) {
+            JwtAuthToken jwtAuthToken = jwtAuthTokenProvider.convertAuthToken(token.get());
+            muscleId = jwtAuthToken.getClaims().getSubject();
+        }
+        Long writerId = authRepository.findByMuscleId(muscleId).getId();
+        LocalDateTime now = LocalDateTime.now();
+        LocalDateTime twentyFourHoursAgo = now.minusHours(24);
+        List<Post> entityList = postRepository.findTop30ByPostDateAfterOrderByLikeCountDesc(twentyFourHoursAgo);
 
+        entityList.stream().forEach(post -> {
+            boolean isPostLiked = false;
+            boolean isPostSaved = false;
+            boolean isFollowed = false;
+            boolean isMine = true;
+
+            LikedPost likedPost = likedPostRepository.findByUserIdAndPostId(writerId, post.getPostId());
+            if (likedPost != null)
+                isPostLiked = true;
+            SavedPost savedPost = savedPostRepository.findByUserIdAndPostId(writerId, post.getPostId());
+            if (savedPost != null)
+                isPostSaved = true;
+
+            Auth writer = authRepository.findById(post.getWriterId()).get();
+
+            dtoList.add(ResponsePost.GetPostDto.toDto(writer, post, isPostLiked, isPostSaved, isFollowed, isMine));
+        });
+
+        return dtoList;
+    }
+
+
+    //베스트 게시판 게시글 전체글 탑30 - 로그인
+    public List<ResponsePost.GetPostDto> getBestBoard30Posts(Optional<String> token) {
+        String muscleId = null;
+        List<ResponsePost.GetPostDto> dtoList = new ArrayList<>();
+        if (token.isPresent()) {
+            JwtAuthToken jwtAuthToken = jwtAuthTokenProvider.convertAuthToken(token.get());
+            muscleId = jwtAuthToken.getClaims().getSubject();
+        }
+        Long writerId = authRepository.findByMuscleId(muscleId).getId();
+        List<Post> entityList = postRepository.findTop30ByOrderByLikeCountDesc();
+
+        entityList.stream().forEach(post -> {
+            boolean isPostLiked = false;
+            boolean isPostSaved = false;
+            boolean isFollowed = false;
+            boolean isMine = true;
+
+            LikedPost likedPost = likedPostRepository.findByUserIdAndPostId(writerId, post.getPostId());
+            if (likedPost != null)
+                isPostLiked = true;
+            SavedPost savedPost = savedPostRepository.findByUserIdAndPostId(writerId, post.getPostId());
+            if (savedPost != null)
+                isPostSaved = true;
+
+            Auth writer = authRepository.findById(post.getWriterId()).get();
+
+            dtoList.add(ResponsePost.GetPostDto.toDto(writer, post, isPostLiked, isPostSaved, isFollowed, isMine));
+        });
+
+        return dtoList;
+    }
     //각 게시판 최근 게시글 10개 - 비로그인
     public List<ResponsePost.GetPostSimpleDto> geTopBoardNewPosts(String postRoleString) {
         PostRole postRole = getPostRole(postRoleString);

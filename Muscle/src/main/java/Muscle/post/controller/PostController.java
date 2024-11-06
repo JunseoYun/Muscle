@@ -172,6 +172,34 @@ public class PostController {
         return ResponseEntity.status(HttpStatus.OK).body(responseDto);
     }
 
+    @GetMapping("/getBestBoard30Posts")//베스트 게시판 게시글 전체글 탑30 - 로그인
+    public ResponseEntity<ResponseDto> getBestBoard30Posts(HttpServletRequest request) {
+        Optional<String> token = null;
+        if (request != null) {
+            token = jwtAuthTokenProvider.getAuthToken(request);
+        }
+        List<ResponsePost.GetPostDto> response = PostService.getBestBoard30Posts(token);
+        ResponseDto responseDto = ResponseDto.builder()
+                .message("Post list retrieved successfully.")
+                .data(response)
+                .build();
+        return ResponseEntity.status(HttpStatus.OK).body(responseDto);
+    }
+
+    @GetMapping("/getTodayBoard30Posts")//베스트 게시판 게시글 전체글 탑30 - 로그인
+    public ResponseEntity<ResponseDto> getTodayBoard30Posts(HttpServletRequest request) {
+        Optional<String> token = null;
+        if (request != null) {
+            token = jwtAuthTokenProvider.getAuthToken(request);
+        }
+        List<ResponsePost.GetPostDto> response = PostService.getTodayBoard30Posts(token);
+        ResponseDto responseDto = ResponseDto.builder()
+                .message("Post list retrieved successfully.")
+                .data(response)
+                .build();
+        return ResponseEntity.status(HttpStatus.OK).body(responseDto);
+    }
+
 
     //베스트 게시글 조회(전체 게시글 중 좋아요 많은 순 10걔) - 비로그인
     @GetMapping("/getBestPosts")

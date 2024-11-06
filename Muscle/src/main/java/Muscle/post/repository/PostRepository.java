@@ -23,6 +23,13 @@ public interface PostRepository extends JpaRepository<Post, Long> {
     //베스트 게시글 조회(전체 게시글 중 좋아요 많은 순 10걔) - 비로그인
     List<Post> findTop10ByOrderByLikeCountDesc();
 
+    //베스트 게시판 게시글 전체글 탑30 - 로그인
+    List<Post> findTop30ByOrderByLikeCountDesc();
+
+
+    //투데이 게시판 게시글 전체글 탑30 - 로그인
+    List<Post> findTop30ByPostDateAfterOrderByLikeCountDesc(LocalDateTime localDateTime);
+
 
     //투데이 베스트 게시글 조회(24시간이 지나지 않은 게시글 중 좋아요 많은 순 10개) - 비로그인
     List<Post> findTop10ByPostDateAfterOrderByLikeCountDesc(LocalDateTime localDateTime);
