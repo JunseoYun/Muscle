@@ -77,7 +77,6 @@ public class Post {
     public  void update(String title, String content) {
         this.title = title;
         this.content = content;
-        this.postDate = LocalDateTime.now();
     }
 
     public void addComment(Comment comment) {
