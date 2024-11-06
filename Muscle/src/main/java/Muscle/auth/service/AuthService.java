@@ -74,7 +74,7 @@ public class AuthService {
             throw new LoginFailedException();
 
         String accessToken = createAccessToken(user.getMuscleId());
-        return Optional.ofNullable(ResponseAuth.LoginUserRsDto.toDto(accessToken, user.getId()));
+        return Optional.ofNullable(ResponseAuth.LoginUserRsDto.toDto(accessToken, user.getId(), user.getRole()));
     }
 
     @Transactional

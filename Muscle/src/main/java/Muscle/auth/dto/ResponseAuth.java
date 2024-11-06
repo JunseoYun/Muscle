@@ -15,11 +15,13 @@ public class ResponseAuth {
     public static class LoginUserRsDto{
         private String accessToken;
         private Long userId;
+        private UserRole userRole;
 
-        public static LoginUserRsDto toDto(String accessToken, Long userId){
+        public static LoginUserRsDto toDto(String accessToken, Long userId, UserRole userRole){
             return LoginUserRsDto.builder()
                     .accessToken(accessToken)
                     .userId(userId)
+                    .userRole(userRole)
                     .build();
         }
     }
