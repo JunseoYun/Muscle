@@ -110,7 +110,7 @@ public class NaverLoginService {
     public Optional<ResponseAuth.LoginUserRsDto> naverLogin (Auth user) {
 
         String accessToken = authService.createAccessToken(user.getMuscleId());
-        return Optional.ofNullable(ResponseAuth.LoginUserRsDto.toDto(accessToken));
+        return Optional.ofNullable(ResponseAuth.LoginUserRsDto.toDto(accessToken, user.getId()));
     }
 
     public Optional<ResponseAuth.LoginUserRsDto> naverRegister(String naverId, String email, String name, String muscleId) {
@@ -118,7 +118,7 @@ public class NaverLoginService {
         authRepository.save(user);
 
         String accessToken = authService.createAccessToken(user.getMuscleId());
-        return Optional.ofNullable(ResponseAuth.LoginUserRsDto.toDto(accessToken));
+        return Optional.ofNullable(ResponseAuth.LoginUserRsDto.toDto(accessToken, user.getId()));
 
     }
 
@@ -127,7 +127,7 @@ public class NaverLoginService {
         authRepository.save(user);
 
         String accessToken = authService.createAccessToken(user.getMuscleId());
-        return Optional.ofNullable(ResponseAuth.LoginUserRsDto.toDto(accessToken));
+        return Optional.ofNullable(ResponseAuth.LoginUserRsDto.toDto(accessToken, user.getId()));
     }
 
 

@@ -14,10 +14,12 @@ public class ResponseAuth {
     @Builder
     public static class LoginUserRsDto{
         private String accessToken;
+        private Long userId;
 
-        public static LoginUserRsDto toDto(String accessToken){
+        public static LoginUserRsDto toDto(String accessToken, Long userId){
             return LoginUserRsDto.builder()
                     .accessToken(accessToken)
+                    .userId(userId)
                     .build();
         }
     }

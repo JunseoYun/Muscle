@@ -181,7 +181,7 @@ public class KakaoLoginService {
     public Optional<ResponseAuth.LoginUserRsDto> kakaoLogin (Auth user) {
 
         String accessToken = authService.createAccessToken(user.getMuscleId());
-        return Optional.ofNullable(ResponseAuth.LoginUserRsDto.toDto(accessToken));
+        return Optional.ofNullable(ResponseAuth.LoginUserRsDto.toDto(accessToken, user.getId()));
     }
 
     public Optional<ResponseAuth.LoginUserRsDto> kakaoRegister(String kakaoId, String email, String name, String muscleId) {
@@ -189,7 +189,7 @@ public class KakaoLoginService {
         authRepository.save(user);
 
         String accessToken = authService.createAccessToken(user.getMuscleId());
-        return Optional.ofNullable(ResponseAuth.LoginUserRsDto.toDto(accessToken));
+        return Optional.ofNullable(ResponseAuth.LoginUserRsDto.toDto(accessToken, user.getId()));
 
     }
 
@@ -198,7 +198,7 @@ public class KakaoLoginService {
         authRepository.save(user);
 
         String accessToken = authService.createAccessToken(user.getMuscleId());
-        return Optional.ofNullable(ResponseAuth.LoginUserRsDto.toDto(accessToken));
+        return Optional.ofNullable(ResponseAuth.LoginUserRsDto.toDto(accessToken, user.getId()));
     }
 
     private static String generateRandomUUID() {
