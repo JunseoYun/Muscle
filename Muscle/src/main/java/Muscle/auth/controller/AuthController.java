@@ -226,6 +226,22 @@ public class AuthController {
         return ResponseEntity.status(HttpStatus.OK).body(responseMessage);
     }
 
+    @GetMapping("/getUserImg")
+    public ResponseEntity<ResponseMessage> getUserImg(HttpServletRequest request) {
+        Optional<String> token = null;
+        if (request != null) {
+            token = jwtAuthTokenProvider.getAuthToken(request);
+        }
+        String  response = authService.getUserImg(token);
+        ResponseMessage responseMessage = ResponseMessage.builder()
+                .message("User information retrieved successfully.")
+                .data(response)
+                .build();
+        return ResponseEntity.status(HttpStatus.OK).body(responseMessage);
+    }
+
+
+
     @GetMapping("/getUserInfo/{targetId}")
     public ResponseEntity<ResponseMessage> getUserInfo(HttpServletRequest request, @PathVariable("targetId") Long targetId) {
         Optional<String> token = null;

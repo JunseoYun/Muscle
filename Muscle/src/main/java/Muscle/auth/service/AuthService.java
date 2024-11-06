@@ -223,6 +223,17 @@ public class AuthService {
         return ResponseAuth.GetUserDto.toDto(user, friend);
     }
 
+    @Transactional
+    public String getUserImg(Optional<String> token) {
+        String muscleId = null;
+        if(token.isPresent()){
+            JwtAuthToken jwtAuthToken = jwtAuthTokenProvider.convertAuthToken(token.get());
+            muscleId = jwtAuthToken.getClaims().getSubject();
+        }
+        Auth user = authRepository.findByMuscleId(muscleId);
+        return user.getUserImg();
+    }
+
     public ResponseAuth.GetUserInfoDto getUserInfo (Optional<String> token, Long targetId) {
         String muscleId = null;
         if(token.isPresent()){
