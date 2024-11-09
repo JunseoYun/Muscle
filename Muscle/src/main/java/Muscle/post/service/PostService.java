@@ -258,27 +258,17 @@ public class PostService {
         Post post = postRepository.findById(postId).get();
         Auth writer = authRepository.findById(post.getWriterId()).get();
 
-        String muscleId = null;
-        boolean isPostLiked = false;
-        boolean isPostSaved = false;
-        boolean isFollowed = false;
-        boolean isMine = false;
+        if (token.isEmpty()) {
+            return null; // 토큰이 없는 경우 빈 리스트 반환
+        }
 
-        if (token.isPresent()) {
-            JwtAuthToken jwtAuthToken = jwtAuthTokenProvider.convertAuthToken(token.get());
-            muscleId = jwtAuthToken.getClaims().getSubject();
-        }
+        String muscleId = jwtAuthTokenProvider.convertAuthToken(token.get()).getClaims().getSubject();
+
         Auth user = authRepository.findByMuscleId(muscleId);
-        LikedPost likedPost = likedPostRepository.findByUserIdAndPostId(user.getId(), postId);
-        if (likedPost != null)
-            isPostLiked = true;
-        SavedPost savedPost = savedPostRepository.findByUserIdAndPostId(user.getId(), postId);
-        if (savedPost != null)
-            isPostSaved = true;
-        Follow follow = followRepository.findByFollowerAndFollowing(user, writer);
-        if (follow != null) {
-            isFollowed = true;
-        }
+        boolean isPostLiked = likedPostRepository.existsByUserIdAndPostId(user.getId(), postId);
+        boolean isPostSaved = savedPostRepository.existsByUserIdAndPostId(user.getId(), postId);
+        boolean isFollowed = followRepository.existsByFollowerAndFollowing(user, writer);
+        boolean isMine = false;
 
         if(Objects.equals(user.getId(), post.getWriterId())) {
             isMine = true;
@@ -336,13 +326,14 @@ public class PostService {
 
 
     public List<ResponsePost.GetPostDto> getPostByBoard(String board, Optional<String> token) {
-        String muscleId = null;
+
         List<ResponsePost.GetPostDto> dtoList = new ArrayList<>();
 
-        if (token.isPresent()) {
-            JwtAuthToken jwtAuthToken = jwtAuthTokenProvider.convertAuthToken(token.get());
-            muscleId = jwtAuthToken.getClaims().getSubject();
+        if (token.isEmpty()) {
+            return dtoList; // 토큰이 없는 경우 빈 리스트 반환
         }
+
+        String muscleId = jwtAuthTokenProvider.convertAuthToken(token.get()).getClaims().getSubject();
         Auth user = authRepository.findByMuscleId(muscleId);
         List<Post> entityList = postRepository.findByBoard(board);
 
