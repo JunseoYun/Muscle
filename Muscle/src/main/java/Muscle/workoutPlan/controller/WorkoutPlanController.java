@@ -14,6 +14,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDate;
+import java.util.List;
 import java.util.Optional;
 
 @Controller
@@ -51,6 +52,22 @@ public class WorkoutPlanController {
         ResponseWorkoutPlan.GetWorkoutPlanDto response = workoutPlanService.getWorkoutPlan(token, date);
         ResponseDto responseDto = ResponseDto.builder()
                 .message("WorkoutPlan retrieved successfully.")
+                .data(response)
+                .build();
+        return ResponseEntity.status(HttpStatus.OK).body(responseDto);
+    }
+
+    //이달의 내 운동 계획 보기
+    @GetMapping("/monthly")
+    public ResponseEntity<ResponseDto> getMonthlyWorkoutPlans(HttpServletRequest request, @RequestParam int year,
+                                                              @RequestParam int month) {
+        Optional<String> token = null;
+        if (request != null) {
+            token = jwtAuthTokenProvider.getAuthToken(request);
+        }
+        List<ResponseWorkoutPlan.GetWorkoutPlanDto> response = workoutPlanService.getMonthlyWorkoutPlans(token, year, month);
+        ResponseDto responseDto = ResponseDto.builder()
+                .message("WorkoutPlan list retrieved successfully.")
                 .data(response)
                 .build();
         return ResponseEntity.status(HttpStatus.OK).body(responseDto);

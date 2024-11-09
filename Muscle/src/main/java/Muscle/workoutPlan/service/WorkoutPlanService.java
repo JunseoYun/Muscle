@@ -59,6 +59,28 @@ public class WorkoutPlanService {
         return ResponseWorkoutPlan.GetWorkoutPlanDto.toDto(user, workoutPlan);
     }
 
+    // 이달의 운동 계획 보기
+    public List<ResponseWorkoutPlan.GetWorkoutPlanDto> getMonthlyWorkoutPlans(Optional<String> token, int year, int month) {
+        String muscleId = null;
+        if (token.isPresent()) {
+            JwtAuthToken jwtAuthToken = jwtAuthTokenProvider.convertAuthToken(token.get());
+            muscleId = jwtAuthToken.getClaims().getSubject();
+        }
+        Auth user = authRepository.findByMuscleId(muscleId);
+
+        // 이달의 운동 계획 조회
+        List<WorkoutPlan> workoutPlans = workoutPlanRepository.findAllByWriterIdAndMonth(user.getId(), year, month);
+
+        // DTO 리스트로 변환
+        List<ResponseWorkoutPlan.GetWorkoutPlanDto> dtoList = new ArrayList<>();
+        for (WorkoutPlan workoutPlan : workoutPlans) {
+            dtoList.add(ResponseWorkoutPlan.GetWorkoutPlanDto.toDto(user, workoutPlan));
+        }
+
+        return dtoList;
+    }
+
+
     //친구 운동 계획 보기
     public ResponseWorkoutPlan.GetWorkoutPlanDto getFriendWorkoutPlan(Optional<String> token, LocalDate date) {
 

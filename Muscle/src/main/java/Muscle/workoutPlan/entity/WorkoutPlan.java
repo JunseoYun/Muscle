@@ -36,8 +36,6 @@ public class WorkoutPlan {
     @Column(name = "bodyPart")
     private String bodyPart;
 
-    @Column(name = "completionPercentage")
-    private double completionPercentage;
 
     @OneToMany(mappedBy = "workoutPlan", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private List<Workout> workoutList;
