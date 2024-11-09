@@ -64,6 +64,27 @@ public class WorkoutService {
         return ResponseWorkout.GetWorkoutDto.toDto(workout);
     }
 
+    //운동 목록 조회
+    public List<ResponseWorkout.GetWorkoutDto> getPlanWorkout(Optional<String> token, Long workoutPlanId) {
+        String muscleId = null;
+        if(token.isPresent()) {
+            JwtAuthToken jwtAuthToken = jwtAuthTokenProvider.convertAuthToken(token.get());
+            muscleId = jwtAuthToken.getClaims().getSubject();
+        }
+        Auth user = authRepository.findByMuscleId(muscleId);
+        WorkoutPlan workoutPlan = workoutPlanRepository.findById(workoutPlanId).get();
+        Auth planer = authRepository.findById(workoutPlan.getWriterId()).get();
+        if(user != planer && user != planer.getMuscleFriend()) {
+            throw new IllegalArgumentException("권한 없음");
+        }
+        List<Workout> entityList = workoutRepository.findAllByWorkoutPlan(workoutPlan);
+        List<ResponseWorkout.GetWorkoutDto> dtoList = new ArrayList<>();
+        entityList.stream().forEach(workout -> {
+            dtoList.add(ResponseWorkout.GetWorkoutDto.toDto(workout));
+        });
+        return dtoList;
+    }
+
     //운동 완료
     public WorkoutStatus completeWorkout(Optional<String> token, RequestWorkout.CompleteWorkoutDto completeWorkoutDto) {
         String muscleId = null;

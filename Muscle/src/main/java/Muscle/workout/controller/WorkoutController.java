@@ -56,7 +56,7 @@ public class WorkoutController {
 
 
     //운동 조회
-    @GetMapping("/get{workoutId}")
+    @GetMapping("/get/{workoutId}")
     public ResponseEntity<ResponseDto> getWorkout(@PathVariable("workoutId") Long workoutId) {
         ResponseWorkout.GetWorkoutDto response = workoutService.getWorkout(workoutId);
         ResponseDto responseDto = ResponseDto.builder()
@@ -65,6 +65,24 @@ public class WorkoutController {
                 .build();
         return ResponseEntity.status(HttpStatus.OK).body(responseDto);
     }
+
+    //운동 조회
+    @GetMapping("/getPlanWorkout/{workoutPlanId}")
+    public ResponseEntity<ResponseDto> getPlanWorkout(HttpServletRequest request, @PathVariable("workoutPlanId") Long workoutPlanId) {
+        Optional<String> token = null;
+        if (request != null) {
+            token = jwtAuthTokenProvider.getAuthToken(request);
+        }
+
+        List<ResponseWorkout.GetWorkoutDto> response = workoutService.getPlanWorkout(token, workoutPlanId);
+        ResponseDto responseDto = ResponseDto.builder()
+                .message("Workout retrieved successfully.")
+                .data(response)
+                .build();
+        return ResponseEntity.status(HttpStatus.OK).body(responseDto);
+    }
+
+
 
     //운동 완료
     @PostMapping("/complete")
