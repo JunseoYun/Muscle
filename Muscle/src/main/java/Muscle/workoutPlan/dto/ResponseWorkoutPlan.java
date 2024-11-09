@@ -42,7 +42,6 @@ public class ResponseWorkoutPlan {
                     .workoutPlanId(workoutPlan.getId())
                     .date(workoutPlan.getDate())
                     .bodyPart(workoutPlan.getBodyPart())
-                    .completionPercentage(workoutPlan.getCompletionPercentage())
 //                    .workoutList(workoutList)
                     .build();
         }
