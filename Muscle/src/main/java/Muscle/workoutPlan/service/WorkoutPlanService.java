@@ -31,6 +31,10 @@ public class WorkoutPlanService {
             muscleId = jwtAuthToken.getClaims().getSubject();
         }
         Long writerId = authRepository.findByMuscleId(muscleId).getId();
+        boolean isWorkoutPlan = workoutPlanRepository.existsByWriterIdAndDate(writerId, createWorkoutPlanDto.getDate());
+        if(isWorkoutPlan) {
+            throw new IllegalArgumentException("해당 날짜에 이미 운동 플랜 존재");
+        }
         WorkoutPlan workoutPlan = RequestWorkoutPlan.CreateWorkoutPlanDto.toEntity(createWorkoutPlanDto, writerId);
         workoutPlanRepository.save(workoutPlan);
         return workoutPlan.getId();

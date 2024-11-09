@@ -8,4 +8,5 @@ import java.time.LocalDate;
 
 public interface WorkoutPlanRepository extends JpaRepository<WorkoutPlan, Long> {
     WorkoutPlan findByWriterIdAndDate(Long writerId, LocalDate date);
+    boolean existsByWriterIdAndDate(Long writerId, LocalDate date);
 }
