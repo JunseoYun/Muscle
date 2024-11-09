@@ -99,9 +99,7 @@ public class WorkoutService {
             throw new IllegalArgumentException("권한 없음");
         }
         workout.setStatus(WorkoutStatus.COMPLETED);
-        workoutPlan.completeWorkout(workout.getId());
         workoutRepository.save(workout);
-        workoutPlanRepository.save(workoutPlan);
         return workout.getStatus();
     }
 
@@ -119,9 +117,7 @@ public class WorkoutService {
             throw new IllegalArgumentException("권한 없음");
         }
         workout.setStatus(WorkoutStatus.NOT_COMPLETED);
-        workoutPlan.unCompleteWorkout(workout.getId());
         workoutRepository.save(workout);
-        workoutPlanRepository.save(workoutPlan);
         return workout.getStatus();
     }
 

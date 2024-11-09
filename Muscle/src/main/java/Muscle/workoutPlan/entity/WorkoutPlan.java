@@ -60,34 +60,4 @@ public class WorkoutPlan {
     }
 
 
-    public void completeWorkout(Long workoutId) {
-        workoutList.stream()
-                .filter(workout -> workout.getId().equals(workoutId))
-                .findFirst()
-                .ifPresent(workout -> workout.setStatus(WorkoutStatus.COMPLETED));
-        checkCompletion();
-    }
-
-    public void unCompleteWorkout(Long workoutId) {
-        workoutList.stream()
-                .filter(workout -> workout.getId().equals(workoutId))
-                .findFirst()
-                .ifPresent(workout -> workout.setStatus(WorkoutStatus.NOT_COMPLETED));
-        checkCompletion();
-    }
-
-
-
-    private void checkCompletion() {
-        long completedWorkouts = workoutList.stream()
-                .filter(workout -> workout.getStatus() == WorkoutStatus.COMPLETED)
-                .count();
-        this.completionPercentage = (double) completedWorkouts / workoutList.size() * 100;
-    }
-
-
-
-
-
-
 }
