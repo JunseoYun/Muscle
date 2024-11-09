@@ -91,6 +91,9 @@ public class FriendService {
         Auth recipient = authRepository.findByMuscleId(muscleId);
         Auth sender = authRepository.findById(friendRequestDto.getUserId()).get();
         FriendRequest friendRequest = friendRequestRepository.findByRequester(sender);
+        if(recipient.getMuscleFriend() != null || sender.getMuscleFriend() != null ) {
+            throw new IllegalArgumentException("이미 머슬 친구 있음.");
+        }
         friendRequest.setStatus("ACCEPTED");
         recipient.setMuscleFriend(sender);
         sender.setMuscleFriend(recipient);

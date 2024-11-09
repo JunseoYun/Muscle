@@ -288,42 +288,51 @@ public class PostService {
 
 
     public List<ResponsePost.GetPostDto> getSavedPost(Optional<String> token) {
-        String muscleId = null;
         List<ResponsePost.GetPostDto> dtoList = new ArrayList<>();
-        if (token.isPresent()) {
-            JwtAuthToken jwtAuthToken = jwtAuthTokenProvider.convertAuthToken(token.get());
-            muscleId = jwtAuthToken.getClaims().getSubject();
+
+        // 토큰이 있는 경우 muscleId 추출
+        if (token.isEmpty()) {
+            return dtoList; // 토큰이 없는 경우 빈 리스트 반환
         }
+
+        String muscleId = jwtAuthTokenProvider.convertAuthToken(token.get()).getClaims().getSubject();
+
+        // 유저 조회
         Auth user = authRepository.findByMuscleId(muscleId);
+        if (user == null) {
+            return dtoList; // 유저가 없는 경우 빈 리스트 반환
+        }
+
+        // 저장된 게시물 조회
         List<SavedPost> entityList = savedPostRepository.findAllByUserId(user.getId());
 
-        entityList.stream().forEach(savedPost -> {
-            boolean isPostLiked = false;
-            boolean isPostSaved = true;
-            boolean isFollowed = false;
-            boolean isMine = false;
-            LikedPost likedPost = likedPostRepository.findByUserIdAndPostId(user.getId(), savedPost.getPostId());
-            if (likedPost != null)
-                isPostLiked = true;
+        for (SavedPost savedPost : entityList) {
+            Long postId = savedPost.getPostId();
 
+            // 게시물 조회
+            Post post = postRepository.findById(postId).orElse(null);
+            if (post == null) continue;
 
-            Post post = postRepository.findById(savedPost.getPostId()).get();
-            Auth writer = authRepository.findById(post.getWriterId()).get();
+            // 작성자 조회
+            Auth writer = authRepository.findById(post.getWriterId()).orElse(null);
+            if (writer == null) continue;
 
-            Follow follow = followRepository.findByFollowerAndFollowing(user, writer);
-            if (follow != null) {
-                isFollowed = true;
-            }
+            // 좋아요 여부 체크
+            boolean isPostLiked = likedPostRepository.existsByUserIdAndPostId(user.getId(), postId);
 
-            if(Objects.equals(user.getId(), post.getWriterId())) {
-                isMine = true;
-            }
-            dtoList.add(ResponsePost.GetPostDto.toDto(writer, post, isPostLiked, isPostSaved, isFollowed, isMine));
-        });
+            // 팔로우 여부 체크
+            boolean isFollowed = followRepository.existsByFollowerAndFollowing(user, writer);
 
+            // 본인 게시물 여부 체크
+            boolean isMine = Objects.equals(user.getId(), post.getWriterId());
+
+            // DTO 생성 및 추가
+            dtoList.add(ResponsePost.GetPostDto.toDto(writer, post, isPostLiked, true, isFollowed, isMine));
+        }
 
         return dtoList;
     }
+
 
 
     public List<ResponsePost.GetPostDto> getPostByBoard(String board, Optional<String> token) {
