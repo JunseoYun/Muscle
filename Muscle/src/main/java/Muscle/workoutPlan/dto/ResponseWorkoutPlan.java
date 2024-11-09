@@ -25,7 +25,6 @@ public class ResponseWorkoutPlan {
         private Long workoutPlanId;
         private LocalDate date;
         private String bodyPart;
-        private double completionPercentage;
 //        private List<WorkoutListDto> workoutList;
 
         public static GetWorkoutPlanDto toDto(Auth writer, WorkoutPlan workoutPlan) {
