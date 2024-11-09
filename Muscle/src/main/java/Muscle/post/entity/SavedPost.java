@@ -7,6 +7,8 @@ import lombok.NoArgsConstructor;
 
 import jakarta.persistence.*;
 
+import java.time.LocalDateTime;
+
 @Table(name = "SavedPost")
 @Entity
 @Getter
@@ -24,9 +26,13 @@ public class SavedPost {
     @Column(name = "userId")
     private Long userId;
 
+    @Column(name = "createdAt")
+    private LocalDateTime createdAt;
+
     @Builder
     public SavedPost(Long postId, Long userId){
         this.postId = postId;
         this.userId = userId;
+        this.createdAt = LocalDateTime.now();
     }
 }
