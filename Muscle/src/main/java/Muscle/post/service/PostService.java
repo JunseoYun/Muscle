@@ -294,7 +294,7 @@ public class PostService {
         }
 
         // 저장된 게시물 조회
-        List<SavedPost> entityList = savedPostRepository.findAllByUserId(user.getId());
+        List<SavedPost> entityList = savedPostRepository.findAllByUserIdOrderByCreatedAtDesc(user.getId());
 
         for (SavedPost savedPost : entityList) {
             Long postId = savedPost.getPostId();

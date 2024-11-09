@@ -9,6 +9,8 @@ import java.util.List;
 
 public interface SavedPostRepository extends JpaRepository<SavedPost, Long> {
     SavedPost findByUserIdAndPostId(Long userId, Long postId);
+    List<SavedPost> findAllByUserIdOrderByCreatedAtDesc(Long userId);
+
 
     boolean existsByUserIdAndPostId(Long userId, Long postId);
     List<SavedPost> findAllByUserId(Long userId);
