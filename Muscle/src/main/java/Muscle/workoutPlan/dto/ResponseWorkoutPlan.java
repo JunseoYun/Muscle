@@ -26,13 +26,13 @@ public class ResponseWorkoutPlan {
         private LocalDate date;
         private String bodyPart;
         private double completionPercentage;
-        private List<WorkoutListDto> workoutList;
+//        private List<WorkoutListDto> workoutList;
 
         public static GetWorkoutPlanDto toDto(Auth writer, WorkoutPlan workoutPlan) {
-            List<WorkoutListDto> workoutList = new ArrayList<>();
-            if(!workoutPlan.getWorkoutList().isEmpty()) {
-                workoutPlan.getWorkoutList().stream().forEach(workout -> workoutList.add(WorkoutListDto.toDto(workout)));
-            }
+//            List<WorkoutListDto> workoutList = new ArrayList<>();
+//            if(!workoutPlan.getWorkoutList().isEmpty()) {
+//                workoutPlan.getWorkoutList().stream().forEach(workout -> workoutList.add(WorkoutListDto.toDto(workout)));
+//            }
 
             return GetWorkoutPlanDto.builder()
                     .writerId(writer.getId())
@@ -43,7 +43,7 @@ public class ResponseWorkoutPlan {
                     .date(workoutPlan.getDate())
                     .bodyPart(workoutPlan.getBodyPart())
                     .completionPercentage(workoutPlan.getCompletionPercentage())
-                    .workoutList(workoutList)
+//                    .workoutList(workoutList)
                     .build();
         }
     }
