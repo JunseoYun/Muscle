@@ -40,6 +40,22 @@ public class WorkoutPlanService {
         return workoutPlan.getId();
     }
 
+    // 친구 운동 계획 생성
+    public Long createFriendWorkoutPlan(Optional<String> token, RequestWorkoutPlan.CreateWorkoutPlanDto createWorkoutPlanDto) {
+        String muscleId = null;
+        if (token.isPresent()) {
+            JwtAuthToken jwtAuthToken = jwtAuthTokenProvider.convertAuthToken(token.get());
+            muscleId = jwtAuthToken.getClaims().getSubject();
+        }
+        Long writerId = authRepository.findByMuscleId(muscleId).getMuscleFriend().getId();
+        boolean isWorkoutPlan = workoutPlanRepository.existsByWriterIdAndDate(writerId, createWorkoutPlanDto.getDate());
+        if(isWorkoutPlan) {
+            throw new IllegalArgumentException("해당 날짜에 이미 운동 플랜 존재");
+        }
+        WorkoutPlan workoutPlan = RequestWorkoutPlan.CreateWorkoutPlanDto.toEntity(createWorkoutPlanDto, writerId);
+        workoutPlanRepository.save(workoutPlan);
+        return workoutPlan.getId();
+    }
 
 
     //내 운동 계획 보기
@@ -67,6 +83,27 @@ public class WorkoutPlanService {
             muscleId = jwtAuthToken.getClaims().getSubject();
         }
         Auth user = authRepository.findByMuscleId(muscleId);
+
+        // 이달의 운동 계획 조회
+        List<WorkoutPlan> workoutPlans = workoutPlanRepository.findAllByWriterIdAndMonth(user.getId(), year, month);
+
+        // DTO 리스트로 변환
+        List<ResponseWorkoutPlan.GetWorkoutPlanDto> dtoList = new ArrayList<>();
+        for (WorkoutPlan workoutPlan : workoutPlans) {
+            dtoList.add(ResponseWorkoutPlan.GetWorkoutPlanDto.toDto(user, workoutPlan));
+        }
+
+        return dtoList;
+    }
+
+    // 이달의 친구 운동 계획 보기
+    public List<ResponseWorkoutPlan.GetWorkoutPlanDto> getMonthlyFriendWorkoutPlans(Optional<String> token, int year, int month) {
+        String muscleId = null;
+        if (token.isPresent()) {
+            JwtAuthToken jwtAuthToken = jwtAuthTokenProvider.convertAuthToken(token.get());
+            muscleId = jwtAuthToken.getClaims().getSubject();
+        }
+        Auth user = authRepository.findByMuscleId(muscleId).getMuscleFriend();
 
         // 이달의 운동 계획 조회
         List<WorkoutPlan> workoutPlans = workoutPlanRepository.findAllByWriterIdAndMonth(user.getId(), year, month);

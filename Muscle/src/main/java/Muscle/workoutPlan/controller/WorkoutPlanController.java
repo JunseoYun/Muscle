@@ -73,6 +73,22 @@ public class WorkoutPlanController {
         return ResponseEntity.status(HttpStatus.OK).body(responseDto);
     }
 
+    //이달의 친구 운동 계획 보기
+    @GetMapping("/monthlyFriend")
+    public ResponseEntity<ResponseDto> getMonthlyFriendWorkoutPlans(HttpServletRequest request, @RequestParam int year,
+                                                              @RequestParam int month) {
+        Optional<String> token = null;
+        if (request != null) {
+            token = jwtAuthTokenProvider.getAuthToken(request);
+        }
+        List<ResponseWorkoutPlan.GetWorkoutPlanDto> response = workoutPlanService.getMonthlyFriendWorkoutPlans(token, year, month);
+        ResponseDto responseDto = ResponseDto.builder()
+                .message("WorkoutPlan list retrieved successfully.")
+                .data(response)
+                .build();
+        return ResponseEntity.status(HttpStatus.OK).body(responseDto);
+    }
+
     //친구 운동 계획 보기
     @GetMapping("/getFriend/{date}")
     public ResponseEntity<ResponseDto> getFriendWorkoutPlan(HttpServletRequest request, @PathVariable("date") LocalDate date) {
