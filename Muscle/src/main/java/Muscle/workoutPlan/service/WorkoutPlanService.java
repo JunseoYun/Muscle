@@ -69,6 +69,9 @@ public class WorkoutPlanService {
         Auth user = authRepository.findByMuscleId(muscleId);
 
         WorkoutPlan workoutPlan = workoutPlanRepository.findByWriterIdAndDate(user.getId(), date);
+        if(workoutPlan == null) {
+            return null;
+        }
         if(!Objects.equals(workoutPlan.getWriterId(), user.getId()) && !Objects.equals(workoutPlan.getWriterId(), user.getMuscleFriend().getId())) {
             throw new IllegalArgumentException("권한 없음");
         }
@@ -129,6 +132,9 @@ public class WorkoutPlanService {
         Auth user = authRepository.findByMuscleId(muscleId);
 
         WorkoutPlan workoutPlan = workoutPlanRepository.findByWriterIdAndDate(user.getMuscleFriend().getId(), date);
+        if(workoutPlan == null) {
+            return null;
+        }
         if(!Objects.equals(workoutPlan.getWriterId(), user.getId()) && !Objects.equals(workoutPlan.getWriterId(), user.getMuscleFriend().getId())) {
             throw new IllegalArgumentException("권한 없음");
         }
