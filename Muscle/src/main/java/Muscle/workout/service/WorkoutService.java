@@ -29,7 +29,7 @@ public class WorkoutService {
     private final AuthRepository authRepository;
 
     //운동 생성
-    public Long createWorkout(Optional<String> token, RequestWorkout.CreateWorkoutDto createWorkoutDto) {
+    public ResponseWorkout.GetWorkoutDto createWorkout(Optional<String> token, RequestWorkout.CreateWorkoutDto createWorkoutDto) {
         String muscleId = null;
         if(token.isPresent()) {
             JwtAuthToken jwtAuthToken = jwtAuthTokenProvider.convertAuthToken(token.get());
@@ -46,7 +46,7 @@ public class WorkoutService {
         Workout workout = RequestWorkout.CreateWorkoutDto.toEntity(createWorkoutDto, writer.getId(), workoutPlan);
         workoutRepository.save(workout);
         workoutPlan.addWorkoutList(workout);
-        return workout.getId();
+        return ResponseWorkout.GetWorkoutDto.toDto(workout);
 
     }
 

@@ -34,10 +34,10 @@ public class WorkoutController {
         if (request != null) {
             token = jwtAuthTokenProvider.getAuthToken(request);
         }
-        Long workoutId = workoutService.createWorkout(token, createWorkoutDto);
+        ResponseWorkout.GetWorkoutDto response = workoutService.createWorkout(token, createWorkoutDto);
         ResponseDto responseDto = ResponseDto.builder()
                 .message("Workout created successfully.")
-                .data(workoutId)
+                .data(response)
                 .build();
         return ResponseEntity.status(HttpStatus.OK).body(responseDto);
     }
