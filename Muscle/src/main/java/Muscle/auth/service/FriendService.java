@@ -140,6 +140,9 @@ public class FriendService {
         Auth user = authRepository.findByMuscleId(muscleId);
 
         Auth friend = user.getMuscleFriend(); // 1대1 친구 관계
+        if(friend == null) {
+            return null;
+        }
 
 
 
