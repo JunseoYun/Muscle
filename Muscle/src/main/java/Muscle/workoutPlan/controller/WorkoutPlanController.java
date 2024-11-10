@@ -41,6 +41,21 @@ public class WorkoutPlanController {
         return ResponseEntity.status(HttpStatus.OK).body(responseDto);
     }
 
+    // 친구 운동 계획 생성
+    @PostMapping("/create")
+    public ResponseEntity<ResponseDto> createFriendWorkoutPlan(HttpServletRequest request, @RequestBody RequestWorkoutPlan.CreateWorkoutPlanDto createWorkoutPlanDto) {
+        Optional<String> token = null;
+        if (request != null) {
+            token = jwtAuthTokenProvider.getAuthToken(request);
+        }
+        Long WorkoutPlanId = workoutPlanService.createWorkoutPlan(token, createWorkoutPlanDto);
+        ResponseDto responseDto = ResponseDto.builder()
+                .message("WorkoutPlan created successfully.")
+                .data(WorkoutPlanId)
+                .build();
+        return ResponseEntity.status(HttpStatus.OK).body(responseDto);
+    }
+
 
     //내 운동 계획 보기
     @GetMapping("/get/{date}")
