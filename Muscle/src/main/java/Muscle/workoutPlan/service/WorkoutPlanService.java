@@ -24,37 +24,37 @@ public class WorkoutPlanService {
 
 
     // 운동 계획 생성
-    public Long createWorkoutPlan(Optional<String> token, RequestWorkoutPlan.CreateWorkoutPlanDto createWorkoutPlanDto) {
+    public ResponseWorkoutPlan.GetWorkoutPlanDto createWorkoutPlan(Optional<String> token, RequestWorkoutPlan.CreateWorkoutPlanDto createWorkoutPlanDto) {
         String muscleId = null;
         if (token.isPresent()) {
             JwtAuthToken jwtAuthToken = jwtAuthTokenProvider.convertAuthToken(token.get());
             muscleId = jwtAuthToken.getClaims().getSubject();
         }
-        Long writerId = authRepository.findByMuscleId(muscleId).getId();
-        boolean isWorkoutPlan = workoutPlanRepository.existsByWriterIdAndDate(writerId, createWorkoutPlanDto.getDate());
+        Auth user = authRepository.findByMuscleId(muscleId);
+        boolean isWorkoutPlan = workoutPlanRepository.existsByWriterIdAndDate(user.getId(), createWorkoutPlanDto.getDate());
         if(isWorkoutPlan) {
             throw new IllegalArgumentException("해당 날짜에 이미 운동 플랜 존재");
         }
-        WorkoutPlan workoutPlan = RequestWorkoutPlan.CreateWorkoutPlanDto.toEntity(createWorkoutPlanDto, writerId);
+        WorkoutPlan workoutPlan = RequestWorkoutPlan.CreateWorkoutPlanDto.toEntity(createWorkoutPlanDto, user.getId());
         workoutPlanRepository.save(workoutPlan);
-        return workoutPlan.getId();
+        return ResponseWorkoutPlan.GetWorkoutPlanDto.toDto(user, workoutPlan);
     }
 
     // 친구 운동 계획 생성
-    public Long createFriendWorkoutPlan(Optional<String> token, RequestWorkoutPlan.CreateWorkoutPlanDto createWorkoutPlanDto) {
+    public ResponseWorkoutPlan.GetWorkoutPlanDto createFriendWorkoutPlan(Optional<String> token, RequestWorkoutPlan.CreateWorkoutPlanDto createWorkoutPlanDto) {
         String muscleId = null;
         if (token.isPresent()) {
             JwtAuthToken jwtAuthToken = jwtAuthTokenProvider.convertAuthToken(token.get());
             muscleId = jwtAuthToken.getClaims().getSubject();
         }
-        Long writerId = authRepository.findByMuscleId(muscleId).getMuscleFriend().getId();
-        boolean isWorkoutPlan = workoutPlanRepository.existsByWriterIdAndDate(writerId, createWorkoutPlanDto.getDate());
+        Auth friend = authRepository.findByMuscleId(muscleId).getMuscleFriend();
+        boolean isWorkoutPlan = workoutPlanRepository.existsByWriterIdAndDate(friend.getId(), createWorkoutPlanDto.getDate());
         if(isWorkoutPlan) {
             throw new IllegalArgumentException("해당 날짜에 이미 운동 플랜 존재");
         }
-        WorkoutPlan workoutPlan = RequestWorkoutPlan.CreateWorkoutPlanDto.toEntity(createWorkoutPlanDto, writerId);
+        WorkoutPlan workoutPlan = RequestWorkoutPlan.CreateWorkoutPlanDto.toEntity(createWorkoutPlanDto, friend.getId());
         workoutPlanRepository.save(workoutPlan);
-        return workoutPlan.getId();
+        return ResponseWorkoutPlan.GetWorkoutPlanDto.toDto(friend, workoutPlan);
     }
 
 

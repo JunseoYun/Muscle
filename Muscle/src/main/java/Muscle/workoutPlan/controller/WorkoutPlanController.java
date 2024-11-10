@@ -33,10 +33,10 @@ public class WorkoutPlanController {
         if (request != null) {
             token = jwtAuthTokenProvider.getAuthToken(request);
         }
-        Long WorkoutPlanId = workoutPlanService.createWorkoutPlan(token, createWorkoutPlanDto);
+        ResponseWorkoutPlan.GetWorkoutPlanDto response = workoutPlanService.createWorkoutPlan(token, createWorkoutPlanDto);
         ResponseDto responseDto = ResponseDto.builder()
                 .message("WorkoutPlan created successfully.")
-                .data(WorkoutPlanId)
+                .data(response)
                 .build();
         return ResponseEntity.status(HttpStatus.OK).body(responseDto);
     }
@@ -48,10 +48,10 @@ public class WorkoutPlanController {
         if (request != null) {
             token = jwtAuthTokenProvider.getAuthToken(request);
         }
-        Long WorkoutPlanId = workoutPlanService.createFriendWorkoutPlan(token, createWorkoutPlanDto);
+        ResponseWorkoutPlan.GetWorkoutPlanDto response = workoutPlanService.createFriendWorkoutPlan(token, createWorkoutPlanDto);
         ResponseDto responseDto = ResponseDto.builder()
                 .message("Friend WorkoutPlan created successfully.")
-                .data(WorkoutPlanId)
+                .data(response)
                 .build();
         return ResponseEntity.status(HttpStatus.OK).body(responseDto);
     }
