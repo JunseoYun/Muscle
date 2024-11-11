@@ -84,9 +84,26 @@ public class ChatService {
 
 
     @Transactional
-    public ChatRoom getChatRoomId(String chatRoomId) {
+    public ResponseChat.ChatRoomIdDto getChatRoomId(Optional<String> token, String chatRoomId) {
+        String muscleId = null;
+        if (token.isPresent()) {
+            JwtAuthToken jwtAuthToken = jwtAuthTokenProvider.convertAuthToken(token.get());
+            muscleId = jwtAuthToken.getClaims().getSubject();
+        }
+        Auth user = authRepository.findByMuscleId(muscleId);
+
         ChatRoom chatRoom = chatRoomRepository.findByChatRoomId(chatRoomId).get();
-        return chatRoom;
+        if(chatRoom == null) return null;
+        Auth otherUser;
+
+        // senderId와 receiverId 중 현재 사용자가 아닌 ID를 선택
+        if (chatRoom.getSenderId().equals(user.getId())) {
+            otherUser = authRepository.findById(chatRoom.getReceiverId()).get();
+        } else {
+            otherUser = authRepository.findById(chatRoom.getSenderId()).get();
+        }
+
+        return new ResponseChat.ChatRoomIdDto(chatRoom, user, otherUser);
     }
 
     public List<ResponseChat.ChatRoomListDto> getUserChatRooms(Optional<String> token) {

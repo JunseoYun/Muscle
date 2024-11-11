@@ -36,7 +36,7 @@ public class ChatController {
     @SendTo("/topic/chatroom/{senderId}/{receiverId}")
     public ChatMessage sendMessage(@DestinationVariable Long senderId, @DestinationVariable Long receiverId, @Payload ChatMessage chatMessage) {
         // 채팅방 생성 또는 가져오기
-        System.out.println("Received message from sender " + senderId + " to receiver " + receiverId + ": " + chatMessage);
+
         ChatRoom chatRoom = chatService.createOrGetChatRoom(senderId, receiverId);
         chatMessage.setChatRoom(chatRoom);
         chatMessage.setTimestamp(LocalDateTime.now().toString());
@@ -55,7 +55,7 @@ public class ChatController {
 
     @MessageMapping("/chat.leave/{roomId}")
     public void leaveChatRoom(@DestinationVariable String roomId) {
-        System.out.println("클라이언트 요청에 의해 연결 해제, Room ID: " + roomId);
+
         chatService.persistMessagesToDatabase(roomId);
     }
 
@@ -79,14 +79,17 @@ public class ChatController {
 
     @GetMapping("/get/chatRoom/{chatRoomId}")
     @ResponseBody
-    public ResponseChat.ChatRoomDto getChatRoomId(@PathVariable String chatRoomId) {
+    public ResponseChat.ChatRoomIdDto getChatRoomId(HttpServletRequest request, @PathVariable String chatRoomId) {
+        Optional<String> token = null;
+        if (request != null) {
+            token = jwtAuthTokenProvider.getAuthToken(request);
+        }
 
+        ResponseChat.ChatRoomIdDto response = chatService.getChatRoomId(token, chatRoomId);
+        if(response == null) return null;
 
-        ChatRoom chatRoom = chatService.getChatRoomId(chatRoomId);
-
-        if(chatRoom == null) return null;
         // ChatRoomDto로 변환하여 채팅방과 메시지 반환
-        return new ResponseChat.ChatRoomDto(chatRoom);
+        return response;
     }
     /**
      * 사용자가 참여 중인 채팅방 목록을 반환
@@ -100,7 +103,7 @@ public class ChatController {
             token = jwtAuthTokenProvider.getAuthToken(request);
         }
         List<ResponseChat.ChatRoomListDto> response = chatService.getUserChatRooms(token);
-        System.out.println(response);
+
         return response;
     }
 
