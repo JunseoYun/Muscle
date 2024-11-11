@@ -48,6 +48,18 @@ public class ChatController {
         return chatMessage;
     }
 
+//    @PostMapping("/api/chat/persistMessages")
+//    public void persistMessages(@RequestParam String chatRoomId) {
+//        chatService.persistMessagesToDatabase(chatRoomId);
+//    }
+
+    @MessageMapping("/chat.leave/{roomId}")
+    public void leaveChatRoom(@DestinationVariable String roomId) {
+        System.out.println("클라이언트 요청에 의해 연결 해제, Room ID: " + roomId);
+        chatService.persistMessagesToDatabase(roomId);
+    }
+
+
     /**
      * 채팅방을 조회하는 메서드 (채팅방 클릭 시 호출)
      * @param senderId 메시지를 보낸 유저 ID
