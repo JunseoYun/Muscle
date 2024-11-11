@@ -58,7 +58,7 @@ public class ChatController {
     @ResponseBody
     public ResponseChat.ChatRoomDto getChatRoom(@PathVariable Long senderId, @PathVariable Long receiverId) {
         // 채팅방이 존재하면 반환, 없으면 생성
-        ChatRoom chatRoom = chatService.createOrGetChatRoom(senderId, receiverId);
+        ChatRoom chatRoom = chatService.getChatRoom(senderId, receiverId);
         // ChatRoomDto로 변환하여 채팅방과 메시지 반환
         return new ResponseChat.ChatRoomDto(chatRoom);
     }
@@ -67,7 +67,7 @@ public class ChatController {
     @ResponseBody
     public ResponseChat.ChatRoomDto getChatRoomId(@PathVariable String chatRoomId) {
 
-        ChatRoom chatRoom = chatService.getChatRoom(chatRoomId);
+        ChatRoom chatRoom = chatService.getChatRoomId(chatRoomId);
         // ChatRoomDto로 변환하여 채팅방과 메시지 반환
         return new ResponseChat.ChatRoomDto(chatRoom);
     }

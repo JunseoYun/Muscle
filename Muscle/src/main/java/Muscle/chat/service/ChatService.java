@@ -63,7 +63,28 @@ public class ChatService {
     }
 
     @Transactional
-    public ChatRoom getChatRoom(String chatRoomId) {
+    public ChatRoom getChatRoom(Long senderId, Long receiverId) {
+
+        Auth sender = authRepository.findById(senderId)
+                .orElseThrow(() -> new RuntimeException("Sender not found"));
+        Auth receiver = authRepository.findById(receiverId)
+                .orElseThrow(() -> new RuntimeException("Receiver not found"));
+
+        // 송신자와 수신자 간의 팔로우 관계 확인 (생략 가능)
+        Follow sendToReceive = followRepository.findByFollowerAndFollowing(sender, receiver);
+        Follow receiveToSender = followRepository.findByFollowerAndFollowing(receiver, sender);
+
+        // 기존 채팅방이 있는지 확인 (양방향 검색)
+        Optional<ChatRoom> existingRoom = chatRoomRepository.findBySenderIdAndReceiverId(senderId, receiverId)
+                .or(() -> chatRoomRepository.findBySenderIdAndReceiverId(receiverId, senderId));
+
+        // Optional에서 ChatRoom으로 변환하여 반환, 없으면 null 반환
+        return existingRoom.orElse(null);
+    }
+
+
+    @Transactional
+    public ChatRoom getChatRoomId(String chatRoomId) {
         ChatRoom chatRoom = chatRoomRepository.findByChatRoomId(chatRoomId).get();
         return chatRoom;
     }
