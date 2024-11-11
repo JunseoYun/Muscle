@@ -102,7 +102,7 @@ public class ChatService {
         chatRoomList.forEach(chatRoom -> {
 
             String senderImg = authRepository.findById(chatRoom.getSenderId()).get().getUserImg();
-            String receiverImg = authRepository.findById(chatRoom.getSenderId()).get().getUserImg();
+            String receiverImg = authRepository.findById(chatRoom.getReceiverId()).get().getUserImg();
             dtoList.add(new ResponseChat.ChatRoomListDto(chatRoom, senderImg, receiverImg));
         });
 
