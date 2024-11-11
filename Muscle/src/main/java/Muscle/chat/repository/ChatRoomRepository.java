@@ -16,7 +16,8 @@ public interface ChatRoomRepository extends JpaRepository<ChatRoom, Long> {
     List<ChatRoom> findBySenderIdOrReceiverId(Long senderId, Long receiverId);
     Optional<ChatRoom> findByChatRoomId(String chatRoomId);
 
-    @Query("SELECT c FROM ChatRoom c WHERE c.senderId = :userId OR c.receiverId = :userId")
+    @Query("SELECT c FROM ChatRoom c WHERE c.senderId = :userId OR c.receiverId = :userId ORDER BY c.lastMessageTimestamp DESC")
     List<ChatRoom> findChatRoomsByUserId(@Param("userId") Long userId);
+
 
 }
