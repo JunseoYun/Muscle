@@ -42,11 +42,15 @@ public class ResponseChat {
     public static class ChatRoomListDto {
         private String roomId;
         private String roomName;
+        private String senderImg;
+        private String receiverImg;
         private String dateTime;  // LocalDateTime -> String
 
-        public ChatRoomListDto(ChatRoom chatRoom) {
+        public ChatRoomListDto(ChatRoom chatRoom, String senderImg, String receiverImg) {
             this.roomId = chatRoom.getChatRoomId();
             this.roomName = chatRoom.getRoomName();
+            this.senderImg = senderImg;
+            this.receiverImg = receiverImg;
             this.dateTime = chatRoom.getCreatedAt();  // String 그대로 사용
         }
     }
