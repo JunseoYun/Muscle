@@ -60,6 +60,7 @@ public class ChatController {
         // 채팅방이 존재하면 반환, 없으면 생성
         ChatRoom chatRoom = chatService.getChatRoom(senderId, receiverId);
 
+        if(chatRoom == null) return null;
         // ChatRoomDto로 변환하여 채팅방과 메시지 반환
         return new ResponseChat.ChatRoomDto(chatRoom);
     }
