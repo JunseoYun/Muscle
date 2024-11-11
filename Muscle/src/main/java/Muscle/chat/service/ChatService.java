@@ -100,10 +100,17 @@ public class ChatService {
         List<ChatRoom> chatRoomList = chatRoomRepository.findChatRoomsByUserId(userId);
         List<ResponseChat.ChatRoomListDto> dtoList = new ArrayList<>();
         chatRoomList.forEach(chatRoom -> {
+            Long otherUserId;
 
-            String senderImg = authRepository.findById(chatRoom.getSenderId()).get().getUserImg();
-            String receiverImg = authRepository.findById(chatRoom.getReceiverId()).get().getUserImg();
-            dtoList.add(new ResponseChat.ChatRoomListDto(chatRoom, senderImg, receiverImg));
+            // senderId와 receiverId 중 현재 사용자가 아닌 ID를 선택
+            if (chatRoom.getSenderId().equals(userId)) {
+                otherUserId = chatRoom.getReceiverId();
+            } else {
+                otherUserId = chatRoom.getSenderId();
+            }
+
+            Auth otherUser = authRepository.findById(otherUserId).get();
+            dtoList.add(new ResponseChat.ChatRoomListDto(chatRoom, otherUser));
         });
 
         return dtoList;
@@ -180,8 +187,12 @@ public class ChatService {
             // 메시지 저장
             chatMessageRepository.saveAll(messages);
 
-            // ChatRoom의 createdAt을 갱신
-            chatRoom.setCreatedAt(LocalDateTime.now().toString());
+            ChatMessage lastMessage = messages.get(messages.size() -1);
+
+            chatRoom.setLastMessage(lastMessage.getContent());
+            chatRoom.setLastMessageTimestamp(lastMessage.getTimestamp());
+
+
             chatRoomRepository.save(chatRoom);
 
             // Redis에서 메시지 삭제

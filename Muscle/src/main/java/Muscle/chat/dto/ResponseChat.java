@@ -1,5 +1,6 @@
 package Muscle.chat.dto;
 
+import Muscle.auth.entity.Auth;
 import Muscle.chat.entity.ChatMessage;
 import Muscle.chat.entity.ChatRoom;
 import lombok.Data;
@@ -42,16 +43,18 @@ public class ResponseChat {
     public static class ChatRoomListDto {
         private String roomId;
         private String roomName;
-        private String senderImg;
-        private String receiverImg;
-        private String dateTime;  // LocalDateTime -> String
+        private String otherUserImg;
+        private String otherUserMuscleId;
+        private String lastMessage;
+        private String lastMessageTimestamp;  // LocalDateTime -> String
 
-        public ChatRoomListDto(ChatRoom chatRoom, String senderImg, String receiverImg) {
+        public ChatRoomListDto(ChatRoom chatRoom, Auth otherUser) {
             this.roomId = chatRoom.getChatRoomId();
             this.roomName = chatRoom.getRoomName();
-            this.senderImg = senderImg;
-            this.receiverImg = receiverImg;
-            this.dateTime = chatRoom.getCreatedAt();  // String 그대로 사용
+            this.otherUserImg = otherUser.getUserImg();
+            this.otherUserMuscleId = otherUser.getMuscleId();
+            this.lastMessage =  chatRoom.getLastMessage();
+            this.lastMessageTimestamp = chatRoom.getLastMessageTimestamp();  // String 그대로 사용
         }
     }
 }

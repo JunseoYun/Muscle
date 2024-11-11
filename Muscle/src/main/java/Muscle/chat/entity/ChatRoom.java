@@ -35,6 +35,12 @@ public class ChatRoom {
     @Column(name = "createdAt")
     private String createdAt;
 
+    @Column(name = "lastMessage")
+    private String lastMessage;
+
+    @Column(name = "lastMessageTimestamp")
+    private String lastMessageTimestamp;
+
     @OneToMany(mappedBy = "chatRoom", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     @JsonManagedReference  // 부모 엔티티에서 자식 엔티티로의 참조 관리
     private List<ChatMessage> messages = new ArrayList<>();
