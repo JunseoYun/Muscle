@@ -21,7 +21,7 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
     public void registerStompEndpoints(StompEndpointRegistry registry) {
         // 클라이언트가 WebSocket으로 연결할 엔드포인트 설정
         registry.addEndpoint("/ws")
-                .setAllowedOriginPatterns("http://localhost:*")
+                .setAllowedOriginPatterns("http://43.201.91.43:*", "http://localhost:*")
                 .withSockJS();
     }
 }
