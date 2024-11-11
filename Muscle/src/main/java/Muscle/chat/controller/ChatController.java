@@ -68,7 +68,10 @@ public class ChatController {
     @ResponseBody
     public ResponseChat.ChatRoomDto getChatRoomId(@PathVariable String chatRoomId) {
 
+
         ChatRoom chatRoom = chatService.getChatRoomId(chatRoomId);
+
+        if(chatRoom == null) return null;
         // ChatRoomDto로 변환하여 채팅방과 메시지 반환
         return new ResponseChat.ChatRoomDto(chatRoom);
     }
