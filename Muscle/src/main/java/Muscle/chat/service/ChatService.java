@@ -135,8 +135,10 @@ public class ChatService {
     }
 
     public List<ResponseChat.ChatMessageDto> getMessagesFromDatabase(String chatRoomId, int page, int size) {
+        ChatRoom chatRoom = chatRoomRepository.findByChatRoomId(chatRoomId).get();
+
         // 데이터베이스에서 메시지 조회 (최근 메시지부터 역순으로 가져옴)
-        List<ChatMessage> dbMessages = chatMessageRepository.findByChatRoomIdOrderByTimestampDesc(chatRoomId, PageRequest.of(page, size))
+        List<ChatMessage> dbMessages = chatMessageRepository.findByChatRoomOrderByTimestampDesc(chatRoom, PageRequest.of(page, size))
                 .getContent();
 
         // DTO로 변환하여 반환
