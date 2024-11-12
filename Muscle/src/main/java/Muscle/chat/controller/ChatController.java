@@ -91,6 +91,24 @@ public class ChatController {
         // ChatRoomDto로 변환하여 채팅방과 메시지 반환
         return response;
     }
+
+    /**
+     * 특정 채팅방에서 메시지 목록을 페이지네이션으로 조회
+     * @param chatRoomId 채팅방 ID
+     * @param page 페이지 번호 (0부터 시작)
+     * @param size 한 번에 가져올 메시지 개수
+     * @return 해당 채팅방의 메시지 목록
+     */
+    @GetMapping("/messages/{chatRoomId}")
+    public List<ResponseChat.ChatMessageDto> getMessagesFromDatabase(
+            @PathVariable String chatRoomId,
+            @RequestParam int page,
+            @RequestParam int size) {
+
+        return chatService.getMessagesFromDatabase(chatRoomId, page, size);
+    }
+
+
     /**
      * 사용자가 참여 중인 채팅방 목록을 반환
      * @return 참여 중인 채팅방 목록

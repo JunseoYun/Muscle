@@ -14,6 +14,7 @@ import Muscle.chat.repository.ChatMessageRepository;
 import Muscle.chat.repository.ChatRoomRepository;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
@@ -132,6 +133,18 @@ public class ChatService {
 
         return dtoList;
     }
+
+    public List<ResponseChat.ChatMessageDto> getMessagesFromDatabase(String chatRoomId, int page, int size) {
+        // 데이터베이스에서 메시지 조회 (최근 메시지부터 역순으로 가져옴)
+        List<ChatMessage> dbMessages = chatMessageRepository.findByChatRoomIdOrderByTimestampDesc(chatRoomId, PageRequest.of(page, size))
+                .getContent();
+
+        // DTO로 변환하여 반환
+        return dbMessages.stream()
+                .map(ResponseChat.ChatMessageDto::new)
+                .collect(Collectors.toList());
+    }
+
 
 //    public List<ResponseChat.ChatRoomListDto> getUserChatRooms(Long userId) {
 //        System.out.println("getUserChatRooms called with userId: " + userId); // 로그 추가
