@@ -33,6 +33,7 @@ public class ResponseAuth {
         private String userEmail;
         private String userMuscleId;
         private String userName;
+        private String userAddress;
         private String userLevel;
         private String userImg;
         private UserRole userRole;
@@ -52,6 +53,7 @@ public class ResponseAuth {
                         .userEmail(user.getEmail())
                         .userMuscleId(user.getMuscleId())
                         .userName(user.getName())
+                        .userAddress(user.getAddress())
                         .userLevel(user.getLevel())
                         .userImg(user.getUserImg())
                         .userRole(user.getRole())
@@ -65,6 +67,7 @@ public class ResponseAuth {
                     .userEmail(user.getEmail())
                     .userMuscleId(user.getMuscleId())
                     .userName(user.getName())
+                    .userAddress(user.getAddress())
                     .userLevel(user.getLevel())
                     .userImg(user.getUserImg())
                     .userRole(user.getRole())
@@ -86,6 +89,7 @@ public class ResponseAuth {
         private Long userId;
         private String userMuscleId;
         private String userName;
+        private String userAddress;
         private String userLevel;
         private String userImg;
         private UserRole userRole;
@@ -105,6 +109,7 @@ public class ResponseAuth {
                         .userId(user.getId())
                         .userMuscleId(user.getMuscleId())
                         .userName(user.getName())
+                        .userAddress(user.getAddress())
                         .userLevel(user.getLevel())
                         .userImg(user.getUserImg())
                         .userRole(user.getRole())
@@ -118,6 +123,7 @@ public class ResponseAuth {
                     .userId(user.getId())
                     .userMuscleId(user.getMuscleId())
                     .userName(user.getName())
+                    .userAddress(user.getAddress())
                     .userLevel(user.getLevel())
                     .userImg(user.getUserImg())
                     .userRole(user.getRole())
