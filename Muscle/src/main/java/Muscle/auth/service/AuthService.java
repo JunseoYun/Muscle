@@ -178,7 +178,7 @@ public class AuthService {
         if(nameUser != null && !user.equals(nameUser))
             throw new RegisterFailedException();
 
-        user.update(updateUserDto.getName(), updateUserDto.getMuscleId());
+        user.update(updateUserDto.getName(), updateUserDto.getMuscleId(), updateUserDto.getAddress(), updateUserDto.getLatitude(), updateUserDto.getLongitude());
 
         authRepository.save(user);
     }

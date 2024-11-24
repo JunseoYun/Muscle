@@ -41,6 +41,17 @@ public class Auth {
     @Column(name="level")
     private String level = "등급 미정";
 
+    @Column(name="address")
+    private String address;
+
+    @Column(name="latitude")
+    private Double latitude;
+
+
+    @Column(name="longitude")
+    private Double longitude;
+
+
 
     @Column(name="salt")
     private String salt;
@@ -72,11 +83,14 @@ public class Auth {
 
 
     @Builder
-    public Auth(String email, String password, String name, String muscleId, String salt, String userImg, String naverId, String kakaoId){
+    public Auth(String email, String password, String name, String muscleId, String address, Double latitude, Double longitude, String salt, String userImg, String naverId, String kakaoId){
         this.email = email;
         this.password = password;
         this.name = name;
         this.muscleId = muscleId;
+        this.address = address;
+        this.latitude = latitude;
+        this.longitude = longitude;
         this.salt = salt;
         this.userImg = userImg;
         this.naverId = naverId;
@@ -85,9 +99,13 @@ public class Auth {
 
 
 
-    public void update(String name, String muscleId) {
+    public void update(String name, String muscleId, String address, Double latitude, Double longitude) {
         this.name = name;
         this.muscleId = muscleId;
+        this.address = address;
+        this.latitude = latitude;
+        this.longitude = longitude;
+
     }
 
 

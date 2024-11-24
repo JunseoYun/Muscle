@@ -21,6 +21,9 @@ public class RequestAuth {
         private String password;
         private String name;
         private String muscleId;
+        private String address;
+        private Double latitude;
+        private Double longitude;
 
         public static Auth toEntity(RegisterUserDto registerUserDto, String salt, String encryptedPassword){
             return Auth.builder()
@@ -28,6 +31,9 @@ public class RequestAuth {
                     .password(encryptedPassword)
                     .name(registerUserDto.getName())
                     .muscleId(registerUserDto.getMuscleId())
+                    .address(registerUserDto.getAddress())
+                    .latitude(registerUserDto.getLatitude())
+                    .longitude(registerUserDto.getLongitude())
                     .salt(salt)
                     .build();
         }
@@ -82,6 +88,9 @@ public class RequestAuth {
     public static class UpdateUserDto{
         private String name;
         private String muscleId;
+        private String address;
+        private Double latitude;
+        private Double longitude;
 
     }
 
