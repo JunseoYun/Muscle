@@ -22,21 +22,24 @@ public interface AuthRepository extends JpaRepository<Auth, Long> {
     List<Auth> findByMuscleIdContainingOrdered(@PathVariable("muscleId") String muscleId);
 
     @Query(value = """
-        SELECT a FROM Auth a
-        WHERE (
-            6371 * acos(
-                cos(radians(:latitude)) * cos(radians(a.latitude)) *
-                cos(radians(a.longitude) - radians(:longitude)) +
-                sin(radians(:latitude)) * sin(radians(a.latitude))
-            )
-        ) <= 10
-        AND a.level = :level
-    """)
-    List<Auth> findNearbyUsersByLevel(
+    SELECT a FROM Auth a
+    WHERE (
+        6371 * acos(
+            cos(radians(:latitude)) * cos(radians(a.latitude)) *
+            cos(radians(a.longitude) - radians(:longitude)) +
+            sin(radians(:latitude)) * sin(radians(a.latitude))
+        )
+    ) <= 10
+    AND a.level = :level
+    AND a.muscleId != :muscleId
+""")
+    List<Auth> findNearbyUsersByLevelExcludingSelf(
             @Param("latitude") Double latitude,
             @Param("longitude") Double longitude,
-            @Param("level") String level
+            @Param("level") String level,
+            @Param("muscleId") String muscleId
     );
+
 
 
 }

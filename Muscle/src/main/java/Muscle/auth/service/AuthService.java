@@ -342,7 +342,7 @@ public class AuthService {
 
 
         List<ResponseAuth.MatchingUserDto> dtoList = new ArrayList<>();
-        List<Auth> nearbyUsers = authRepository.findNearbyUsersByLevel(latitude, longitude, level);
+        List<Auth> nearbyUsers = authRepository.findNearbyUsersByLevelExcludingSelf(latitude, longitude, level, muscleId);
 
         nearbyUsers.stream().forEach(auth -> dtoList.add(ResponseAuth.MatchingUserDto.toDto(auth)));
         return dtoList;
