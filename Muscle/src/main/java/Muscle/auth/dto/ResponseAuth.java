@@ -160,6 +160,28 @@ public class ResponseAuth {
         }
     }
 
+    @Data
+    @Builder
+    public static class MatchingUserDto {
+        private Long userId;
+        private String muscleId;
+        private String level;
+        private String address;
+        private String userImg;
+        private Long userFollowerCount;
+
+        public static MatchingUserDto toDto(Auth user) {
+            return MatchingUserDto.builder()
+                    .userId(user.getId())
+                    .muscleId(user.getMuscleId())
+                    .level(user.getLevel())
+                    .address(user.getAddress())
+                    .userImg(user.getUserImg())
+                    .userFollowerCount(user.getFollowerCount())
+                    .build();
+        }
+    }
+
 
 
 

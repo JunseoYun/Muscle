@@ -329,6 +329,26 @@ public class AuthService {
         return dtoList;
     }
 
+    public List<ResponseAuth.MatchingUserDto> matchingUser(Optional<String> token, String level) {
+        String muscleId = null;
+        if(token.isPresent()){
+            JwtAuthToken jwtAuthToken = jwtAuthTokenProvider.convertAuthToken(token.get());
+            muscleId = jwtAuthToken.getClaims().getSubject();
+        }
+
+        Auth user = authRepository.findByMuscleId(muscleId);
+        Double latitude = user.getLatitude();
+        Double longitude = user.getLongitude();
+
+
+        List<ResponseAuth.MatchingUserDto> dtoList = new ArrayList<>();
+        List<Auth> nearbyUsers = authRepository.findNearbyUsersByLevel(latitude, longitude, level);
+
+        nearbyUsers.stream().forEach(auth -> dtoList.add(ResponseAuth.MatchingUserDto.toDto(auth)));
+        return dtoList;
+
+    }
+
     //아이디 중복 검사
     public Boolean checkId(String muscleId) {
         boolean isCheckId = false;
@@ -379,5 +399,7 @@ public class AuthService {
 
 
     }
+
+
 
 }

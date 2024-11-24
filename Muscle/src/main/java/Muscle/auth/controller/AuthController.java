@@ -306,6 +306,21 @@ public class AuthController {
         return ResponseEntity.status(HttpStatus.OK).body(responseDto);
     }
 
+    //유저 매칭
+    @GetMapping("/matching/{level}")
+    public ResponseEntity<ResponseDto>  matchingUser(HttpServletRequest request, @PathVariable("level") String level) {
+        Optional<String> token = null;
+        if (request != null) {
+            token = jwtAuthTokenProvider.getAuthToken(request);
+        }
+        List<ResponseAuth.MatchingUserDto> response = authService.matchingUser(token, level);
+        ResponseDto responseDto = ResponseDto.builder()
+                .message("User searched successfully.")
+                .data(response)
+                .build();
+        return ResponseEntity.status(HttpStatus.OK).body(responseDto);
+    }
+
     //아이디 중복 검사
     @PostMapping("/checkId/{muscleId}")
     public ResponseEntity<ResponseDto> checkId(@PathVariable("muscleId") String muscleId) {
