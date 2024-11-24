@@ -32,6 +32,13 @@ public interface AuthRepository extends JpaRepository<Auth, Long> {
     ) <= 10
     AND a.level = :level
     AND a.muscleId != :muscleId
+    ORDER BY (
+        6371 * acos(
+            cos(radians(:latitude)) * cos(radians(a.latitude)) *
+            cos(radians(a.longitude) - radians(:longitude)) +
+            sin(radians(:latitude)) * sin(radians(a.latitude))
+        )
+    ) ASC
 """)
     List<Auth> findNearbyUsersByLevelExcludingSelf(
             @Param("latitude") Double latitude,
@@ -39,6 +46,7 @@ public interface AuthRepository extends JpaRepository<Auth, Long> {
             @Param("level") String level,
             @Param("muscleId") String muscleId
     );
+
 
 
 
