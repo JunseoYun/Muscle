@@ -4,15 +4,15 @@ spring:
       client:
         registration:
           naver:
-            client-id:
-            client-secret:
+            client-id: YOUR_NAVER_CLIENT_ID        # 네이버 개발자센터에서 발급
+            client-secret: YOUR_NAVER_CLIENT_SECRET
             redirect-uri: http://localhost:8080/api/auth/login/oauth2/code/naver
             authorization-grant-type: authorization_code
             scope:
               - name
               - email
           kakao:
-            client-id:
+            client-id: YOUR_KAKAO_REST_API_KEY     # 카카오 개발자센터에서 발급
             client-secret:
             redirect-uri: http://localhost:8080/api/auth/login/oauth2/code/kakao
             authorization-grant-type: authorization_code
